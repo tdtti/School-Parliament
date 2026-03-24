@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TDTTI THURAVOOR - General School Election</title>
+    
     <!-- PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         :root { --primary: #1e3a8a; --secondary: #3b82f6; --bg: #f3f4f6; --text: #1f2937; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); overflow-x: hidden; }
         
         .d-flex { display: flex; gap: 10px; align-items: center; }
         .hidden { display: none !important; }
         .text-center { text-align: center; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative; }
         
         header { background: var(--primary); color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         .logo { width: 60px; height: 60px; background: white; border-radius: 50%; padding: 5px; object-fit: contain; }
@@ -74,6 +76,9 @@
         .modal-box { background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; width: 90%; animation: popIn 0.3s ease-out forwards;}
         .modal-box h2 { margin-top: 0; color: var(--primary); }
         
+        /* Live Clock & Duration panel across all tabs */
+        .live-clock-panel { text-align: right; font-weight: bold; font-size: 16px; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;}
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -142,6 +147,9 @@
 
     <!-- Main Content -->
     <main id="mainApp" class="container hidden">
+        
+        <!-- Live Global Clock & Session Duration spanning all tabs -->
+        <div id="liveClock" class="live-clock-panel"></div>
 
         <!-- TAB 1: Admin Panel -->
         <div id="tab1" class="tab-content">
@@ -206,7 +214,7 @@
 
         <!-- TAB 5: Voting Records -->
         <div id="tab5" class="tab-content">
-            <h2>Presiding Officer - Voting Records</h2>
+            <h2 id="vrTitle">Presiding Officer - Voting Records</h2>
             <button onclick="fetchVotingStats()">Refresh Stats</button>
             <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0;">
                 <div style="padding: 20px; background: #e0f2fe; border-radius: 10px; text-align: center; width: 30%;"><h3>Total Votes</h3><h1 id="statTotal">0</h1></div>
@@ -235,7 +243,7 @@
                 <select id="resClass"><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
                 <select id="resDiv"><option value="A">Division A</option><option value="B">Division B</option><option value="C">Division C</option><option value="D">Division D</option><option value="E">Division E</option></select>
                 <button onclick="fetchResults()" style="width:50%;">Publish Results</button>
-                <button id="btnExportPDF" class="hidden" onclick="generatePDF()" style="background:#dc2626; width:50%;">Export to PDF</button>
+                <button id="btnExportPDF" class="hidden" onclick="generatePDF()" style="background:#dc2626; width:50%;">Save as PDF</button>
             </div>
             
             <div id="resultData" class="hidden" style="margin-top: 30px;">
@@ -255,12 +263,13 @@
     </main>
 
     <!-- Hidden Layout for PDF Generation -->
-    <div id="pdfReportData" style="display:none;">
+    <div id="pdfReportData" style="position: absolute; left: -9999px; top: 0px; width: 800px; background: white; z-index: -1;">
         <div id="exportContent" style="padding: 40px; background: white; color: black; font-family: Arial, sans-serif; min-height:1000px;">
             <div style="text-align:center; border-bottom:3px solid #1e3a8a; padding-bottom:15px; margin-bottom:30px;">
                 <h1 style="margin:0; font-size:28px; color:#1e3a8a;">TDTTI THURAVOOR</h1>
                 <h2 style="margin:5px 0; font-size:18px; color:#333;">GENERAL SCHOOL ELECTION REPORT</h2>
                 <h3 style="margin:0; font-size:16px;">Class: <span id="pdfClass"></span> &nbsp;|&nbsp; Division: <span id="pdfDiv"></span></h3>
+                <h4 style="margin:5px 0; font-size:14px; font-weight:normal; color:#555;">Generated on: <span id="pdfDateTime"></span><br>Generated by: <span id="pdfGeneratedBy"></span></h4>
             </div>
             
             <table style="width:100%; margin-bottom:30px; font-size:16px; border:none;">
@@ -269,6 +278,7 @@
                 <tr><td style="padding:8px;">3) No of Absentees</td><td>: <strong id="pdfAbsent"></strong></td></tr>
                 <tr><td style="padding:8px;">4) No of Male Voters</td><td>: <strong id="pdfMale"></strong></td></tr>
                 <tr><td style="padding:8px;">5) No of Female Voters</td><td>: <strong id="pdfFemale"></strong></td></tr>
+                <tr><td style="padding:8px; color:#dc2626;">6) No of Invalid Votes</td><td>: <strong id="pdfInvalid" style="color:#dc2626;"></strong></td></tr>
             </table>
 
             <h3 style="margin-bottom: 10px; color:#1e3a8a;">Winners Record (As per votes gained)</h3>
@@ -286,10 +296,22 @@
                 <tbody id="pdfTableBody"></tbody>
             </table>
 
-            <div style="margin-top: 100px; text-align: right; float: right; width: 300px;">
-                <p style="margin-bottom: 50px; font-weight:bold;">Officiating Signature</p>
-                <p>___________________________</p>
+            <!-- Signatures Section -->
+            <div style="margin-top: 80px; display: flex; justify-content: space-between; text-align: center; width: 100%;">
+                <div style="width: 30%;">
+                    <p style="margin-bottom: 50px; font-weight:bold;">Polling Officer</p>
+                    <p>___________________</p>
+                </div>
+                <div style="width: 30%;">
+                    <p style="margin-bottom: 50px; font-weight:bold;">Presiding Officer</p>
+                    <p>___________________</p>
+                </div>
+                <div style="width: 30%;">
+                    <p style="margin-bottom: 50px; font-weight:bold;">Returning Officer</p>
+                    <p>___________________</p>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -297,7 +319,7 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrVfjjZG0wwGUgjJIP8OjMYZq4S9y-lwE56L-HhMyqD0h5oScqJdfHgMfC0zXIDtmfkQ/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOcadbL4QGOA6dIo9Hh0uxbo8gIr6TChNobIzCWx92xWfzQpdJvj2UkrE8gYfmuqH3xg/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
@@ -331,7 +353,15 @@
         function closeUI() { document.getElementById('customModal').classList.add('hidden'); }
 
         function formatDateTime(date) { return `${date.getDate().toString().padStart(2, '0')}:${(date.getMonth()+1).toString().padStart(2, '0')}:${date.getFullYear().toString().substring(2)} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`; }
-        function calculateDuration(start, end) { let diff = Math.floor((end - start) / 1000); let h = Math.floor(diff / 3600).toString().padStart(2, '0'); let m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0'); let s = (diff % 60).toString().padStart(2, '0'); return `${h}:${m}:${s}`; }
+        
+        function calculateDuration(start, end) { 
+            let diff = Math.floor((end - start) / 1000); 
+            let h = Math.floor(diff / 3600).toString().padStart(2, '0'); 
+            let m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0'); 
+            let s = (diff % 60).toString().padStart(2, '0'); 
+            return `${h}:${m}:${s}`; 
+        }
+
         function playBeep() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(1000, ctx.currentTime); osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 5); } catch(e) {} }
 
         async function apiCall(payload) {
@@ -348,10 +378,37 @@
 
         function clearAllIntervals() { intervals.forEach(clearInterval); intervals =[]; }
 
+        // LIVE CLOCK AND DURATION
+        function startLiveClock() {
+            setInterval(() => {
+                const now = new Date();
+                const days =["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                const day = days[now.getDay()];
+                const date = now.getDate().toString().padStart(2, '0') + ':' + (now.getMonth() + 1).toString().padStart(2, '0') + ':' + now.getFullYear();
+                const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+                
+                let durationStr = "";
+                if(sessionData && sessionData.loginTime) {
+                    let diff = Math.floor((now.getTime() - sessionData.loginTime) / 1000);
+                    let h = Math.floor(diff / 3600).toString().padStart(2, '0');
+                    let m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+                    let s = (diff % 60).toString().padStart(2, '0');
+                    durationStr = ` &nbsp;|&nbsp; Session Duration: <span style="color:var(--danger)">${h}:${m}:${s}</span>`;
+                }
+
+                const clockEl = document.getElementById('liveClock');
+                if(clockEl) clockEl.innerHTML = `${day}, ${date} ${time}${durationStr}`;
+            }, 1000);
+        }
+
         // ==========================================
         // AUTHENTICATION
         // ==========================================
-        window.onload = () => { const saved = localStorage.getItem("electionSession"); if(saved) { sessionData = JSON.parse(saved); initSession(); } };
+        window.onload = () => { 
+            startLiveClock();
+            const saved = localStorage.getItem("electionSession"); 
+            if(saved) { sessionData = JSON.parse(saved); initSession(); } 
+        };
 
         async function loginStaff() {
             const user = document.getElementById('loginId').value.trim(); const pass = document.getElementById('loginPass').value.trim();
@@ -385,8 +442,10 @@
         }
 
         async function logout() {
-            const logoutTime = new Date().getTime(); const duration = calculateDuration(sessionData.loginTime, logoutTime);
-            showLoader(); await apiCall({ action: "logLogout", username: sessionData.username, loginTime: formatDateTime(new Date(sessionData.loginTime)), logoutTime: formatDateTime(new Date(logoutTime)), duration: duration }); hideLoader();
+            if(sessionData.role !== "Home") {
+                const logoutTime = new Date().getTime(); const duration = calculateDuration(sessionData.loginTime, logoutTime);
+                showLoader(); await apiCall({ action: "logLogout", username: sessionData.username, loginTime: formatDateTime(new Date(sessionData.loginTime)), logoutTime: formatDateTime(new Date(logoutTime)), duration: duration }); hideLoader();
+            }
             localStorage.removeItem("electionSession"); location.reload();
         }
 
@@ -519,7 +578,16 @@
         // ==========================================
         async function fetchVotingStats() {
             showLoader(); const res = await apiCall({ action: "getStats" }); hideLoader();
-            if(res.success) { document.getElementById('statTotal').innerText = res.data.total; document.getElementById('statMale').innerText = res.data.male; document.getElementById('statFemale').innerText = res.data.female; if(res.data.pollEnded) document.querySelector("#tab5 button[style*='danger']").innerText = "ALL POLLS ENDED"; }
+            if(res.success) { 
+                document.getElementById('vrTitle').innerText = `Presiding Officer - Voting Records (Class ${res.data.cuClass || "None"} - ${res.data.cuDiv || "None"})`;
+                document.getElementById('statTotal').innerText = res.data.total; 
+                document.getElementById('statMale').innerText = res.data.male; 
+                document.getElementById('statFemale').innerText = res.data.female; 
+                
+                let endBtn = document.querySelector("#tab5 button[style*='danger']");
+                if(res.data.pollEnded) { endBtn.innerText = "POLL ENDED"; endBtn.disabled = true; }
+                else { endBtn.innerText = "END ALL POLLS GLOBALLY"; endBtn.disabled = false; }
+            }
         }
         async function endGlobalElection() {
             if(await showModal("CRITICAL WARNING", "Are you sure you want to end the ENTIRE school election? This stops all active voting globally.", true)) {
@@ -540,48 +608,55 @@
         }
 
         // ==========================================
-        // TAB 7: RESULTS & PDF
+        // TAB 7: RESULTS & PDF & SAVING TO SHEET
         // ==========================================
         async function fetchResults() {
             showLoader();
-            const cls = document.getElementById('resClass').value;
-            const div = document.getElementById('resDiv').value;
+            const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
             const res = await apiCall({ action: "getResults", Class: cls, Div: div });
-            hideLoader();
+            
+            if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
 
-            if(!res.success) { await showModal("Not Ready", res.message); return; }
+            // Immediately save results to Google Sheet backend
+            let totalValid = res.stats.totalPolled - res.stats.invalid;
+            await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
+
+            hideLoader();
 
             document.getElementById('resultData').classList.remove('hidden');
             document.getElementById('btnExportPDF').classList.remove('hidden');
             
-            // Populate Basic Stats
-            document.getElementById('resStud').innerText = res.stats.totalStudents;
-            document.getElementById('resPolled').innerText = res.stats.totalPolled;
-            document.getElementById('resAbsent').innerText = res.stats.absentees;
+            // Stats
+            document.getElementById('resStud').innerText = res.stats.totalStudents; 
+            document.getElementById('resPolled').innerText = res.stats.totalPolled; 
+            document.getElementById('resAbsent').innerText = res.stats.absentees; 
             document.getElementById('resInvalid').innerText = res.stats.invalid;
             
-            // Populate PDF Stats
-            document.getElementById('pdfClass').innerText = cls;
-            document.getElementById('pdfDiv').innerText = div;
-            document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents;
-            document.getElementById('pdfPolled').innerText = res.stats.totalPolled;
-            document.getElementById('pdfAbsent').innerText = res.stats.absentees;
-            document.getElementById('pdfMale').innerText = res.stats.maleVoters;
+            // Generate PDF Date Time Format
+            const now = new Date();
+            const pdfDate = now.getDate().toString().padStart(2, '0') + ':' + (now.getMonth() + 1).toString().padStart(2, '0') + ':' + now.getFullYear();
+            const pdfTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0');
+
+            // PDF Stats Setup
+            document.getElementById('pdfDateTime').innerText = `${pdfDate} ${pdfTime}`;
+            document.getElementById('pdfGeneratedBy').innerText = sessionData.username;
+            document.getElementById('pdfClass').innerText = cls; 
+            document.getElementById('pdfDiv').innerText = div; 
+            document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents; 
+            document.getElementById('pdfPolled').innerText = res.stats.totalPolled; 
+            document.getElementById('pdfAbsent').innerText = res.stats.absentees; 
+            document.getElementById('pdfMale').innerText = res.stats.maleVoters; 
             document.getElementById('pdfFemale').innerText = res.stats.femaleVoters;
+            document.getElementById('pdfInvalid').innerText = res.stats.invalid;
 
             // Generate Animated Leaderboard and PDF Table
-            const board = document.getElementById('animatedLeaderboard');
-            const pdfBody = document.getElementById('pdfTableBody');
+            const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
             board.innerHTML = ""; pdfBody.innerHTML = "";
-            
-            let totalValid = res.stats.totalPolled - res.stats.invalid;
             
             if(res.leaderboard.length > 0) {
                 res.leaderboard.forEach((c, index) => {
                     let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
                     let rankClass = index === 0 ? "rank-1" : (index === 1 ? "rank-2" : (index === 2 ? "rank-3" : ""));
-                    
-                    // Delay animation for cascade effect
                     let delay = index * 0.2;
 
                     board.innerHTML += `
@@ -589,19 +664,13 @@
                             <div class="cand-rank">#${index+1}</div>
                             <img src="${c.Photo}" class="ballot-img" style="margin: 0 15px;" crossorigin="anonymous">
                             <div class="cand-info">
-                                <h3>${c.Name}</h3>
-                                <div class="progress-track">
-                                    <div class="progress-fill" style="width: 0%; animation: fillBar 1.5s ease-out ${delay + 0.5}s forwards;" data-width="${pct}%"></div>
-                                </div>
+                                <h3>${c.Name} <span style="font-size:14px; font-weight:normal; color:#666;">(Class ${cls}-${div})</span></h3>
+                                <div class="progress-track"><div class="progress-fill" style="width: 0%; animation: fillBar 1.5s ease-out ${delay + 0.5}s forwards;" data-width="${pct}%"></div></div>
                             </div>
-                            <div class="cand-stats">
-                                <div style="color:var(--primary); font-size:24px;">${c.Votes}</div>
-                                <div style="font-size:12px; font-weight:normal; color:#666;">${pct}%</div>
-                            </div>
+                            <div class="cand-stats"><div style="color:var(--primary); font-size:24px;">${c.Votes}</div><div style="font-size:12px; font-weight:normal; color:#666;">${pct}%</div></div>
                         </div>
                     `;
 
-                    // Populate PDF Table Line
                     pdfBody.innerHTML += `
                         <tr>
                             <td style="padding:10px;"><b>${index+1}</b></td>
@@ -614,46 +683,38 @@
                     `;
                 });
 
-                // Dynamically inject a style snippet for the progress bar animation
-                const styleId = 'dynamicProgressBarStyles';
-                let styleEl = document.getElementById(styleId);
-                if(styleEl) styleEl.remove();
-                styleEl = document.createElement('style');
-                styleEl.id = styleId;
-                let keyframes = "";
-                res.leaderboard.forEach((c, index) => {
-                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                    keyframes += `@keyframes fillBar { to { width: ${pct}%; } }`;
-                });
-                styleEl.innerHTML = keyframes;
-                document.head.appendChild(styleEl);
+                const styleId = 'dynamicProgressBarStyles'; let styleEl = document.getElementById(styleId);
+                if(styleEl) styleEl.remove(); styleEl = document.createElement('style'); styleEl.id = styleId;
+                let keyframes = ""; res.leaderboard.forEach((c) => { let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; keyframes += `@keyframes fillBar { to { width: ${pct}%; } }`; });
+                styleEl.innerHTML = keyframes; document.head.appendChild(styleEl);
 
-            } else {
-                board.innerHTML = "<h3 class='text-center'>No candidates found for this Class/Division.</h3>";
-            }
+            } else { board.innerHTML = "<h3 class='text-center'>No candidates found for this Class/Division.</h3>"; }
         }
 
-        function generatePDF() {
-            const cls = document.getElementById('resClass').value;
-            const div = document.getElementById('resDiv').value;
-            const element = document.getElementById('exportContent');
+        async function generatePDF() {
+            if (typeof html2pdf === 'undefined') { await showModal("Error", "PDF Library failed to load. Please check your internet connection."); return; }
             
-            // Un-hide momentarily (hidden behind loader) to render PDF correctly
-            document.getElementById('pdfReportData').style.display = 'block';
             showLoader();
+            try {
+                const cls = document.getElementById('resClass').value;
+                const div = document.getElementById('resDiv').value;
+                const element = document.getElementById('exportContent');
 
-            var opt = {
-              margin:[0.5, 0.5, 0.5, 0.5],
-              filename:     `Election_Result_Class_${cls}_Div_${div}.pdf`,
-              image:        { type: 'jpeg', quality: 0.98 },
-              html2canvas:  { scale: 2, useCORS: true },
-              jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
+                var opt = {
+                  margin:       0.5,
+                  filename:     `Election_Result_Class_${cls}_Div_${div}.pdf`,
+                  image:        { type: 'jpeg', quality: 0.98 },
+                  html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 800 },
+                  jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.getElementById('pdfReportData').style.display = 'none';
+                await html2pdf().set(opt).from(element).save();
+            } catch (err) {
+                console.error("PDF Generation Error:", err);
+                await showModal("Export Error", "Failed to save PDF. Check browser permissions.");
+            } finally {
                 hideLoader();
-            });
+            }
         }
     </script>
 </body>
