@@ -147,6 +147,36 @@
         @keyframes slideInRight { from { opacity: 0; transform: translateX(80px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
         @keyframes glow1 { from { box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1); } to { box-shadow: 0 0 60px rgba(255,215,0,0.8), inset 0 0 40px rgba(255,215,0,0.3); } }
         
+        /* --- NATIVE PRINT & PDF SAVING STYLES --- */
+        @media print {
+            /* Hide the web app interface */
+            body * { visibility: hidden; }
+            body { background: white; margin: 0; padding: 0; }
+            #globalLoader, #customModal, header, nav, #loginScreen, #mainApp { display: none !important; }
+            
+            /* Reveal only the PDF Report Data */
+            #pdfReportData, #pdfReportData * { visibility: visible; }
+            #pdfReportData { 
+                display: block !important; 
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+            }
+            #exportContent { 
+                width: 100% !important; 
+                padding: 10px !important; 
+                margin: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Set physical paper size to A4 */
+            @page {
+                size: A4 portrait;
+                margin: 15mm; /* Nice borders for A4 */
+            }
+        }
+        
     </style>
 </head>
 <body>
