@@ -501,7 +501,7 @@
                         <!-- Right Side: Symbol and Name Below -->
                         <div style="width: 320px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2);">
                             <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
-                            <div style="font-size: 20px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 6px 24px; border-radius: 8px; border: 2px dashed #7dd3fc;">ALLOTTED SYMBOL</div>
+                            <div id="posterSymbolLabel" style="font-size: 18px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 6px 20px; border-radius: 8px; border: 2px dashed #7dd3fc; text-align: center; line-height: 1.2;">ALLOTTED SYMBOL</div>
                         </div>
 
                     </div>
@@ -1246,25 +1246,50 @@
 
         // POSTER GENERATOR (Tab 10)
         let allCandidates =[];
+        
         async function fetchCandidatesForPoster() {
-            const res = await apiCall({ action: "getAllCandidates" });
-            if(res.success) {
-                allCandidates = res.data;
+            // Fetch both Candidates and Media Library to match the Symbol URLs to their Labels
+            const[candRes, mediaRes] = await Promise.all([
+                apiCall({ action: "getAllCandidates" }),
+                apiCall({ action: "getMedia" })
+            ]);
+            
+            if(candRes.success) {
+                // Map the symbol URLs to their Labels
+                let mediaMap = {};
+                if(mediaRes.success) {
+                    mediaRes.data.forEach(m => { mediaMap[m.URL] = m.Label; });
+                }
+                
+                // Store candidates with their matched symbol label
+                allCandidates = candRes.data.map(c => ({
+                    ...c, 
+                    SymbolLabel: mediaMap[c.Symbol] || "SYMBOL"
+                }));
+                
                 const sel = document.getElementById('posterCandSelect');
                 sel.innerHTML = '<option value="">Select Candidate...</option>';
-                res.data.forEach((c, idx) => { sel.innerHTML += `<option value="${idx}">${c.Name} (Class ${c.Class}-${c.Div})</option>`; });
+                allCandidates.forEach((c, idx) => { 
+                    sel.innerHTML += `<option value="${idx}">${c.Name} (Class ${c.Class}-${c.Div})</option>`; 
+                });
             }
         }
+        
         function generatePosterPreview() {
             const idx = document.getElementById('posterCandSelect').value;
             if(idx === "") return;
             const cand = allCandidates[idx];
+            
             document.getElementById('posterName').innerText = cand.Name;
             document.getElementById('posterClass').innerText = cand.Class;
             document.getElementById('posterDiv').innerText = cand.Div;
             document.getElementById('posterPhoto').src = cand.Photo;
             document.getElementById('posterSymbol').src = cand.Symbol;
+            
+            // Dynamically inject "VOTE FOR [LABEL]"
+            document.getElementById('posterSymbolLabel').innerHTML = `VOTE FOR<br><span style="color:var(--danger); font-size: 24px;">${cand.SymbolLabel}</span>`;
         }
+        
         function printPoster() {
             if(document.getElementById('posterCandSelect').value === "") { 
                 showModal("Select Candidate", "Please select a candidate first."); 
