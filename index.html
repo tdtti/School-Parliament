@@ -819,44 +819,18 @@
         }
 
         async function generatePDF() {
-            // 3. User permission explicitly required with a specific "Save as PDF" button
-            const isConfirmed = await showModal("Permission Required", "Would you like to save the official election results as a PDF document?", true, "Save as PDF");
+            // 1. Ask permission with the custom modal
+            const isConfirmed = await showModal(
+                "Save as PDF", 
+                "Click OK to open the Print/Save dialog. \n\nTip: In the dialog, set the 'Destination' to 'Save as PDF' to save it to your device.", 
+                true, 
+                "Open Print / Save"
+            );
+            
             if (!isConfirmed) return; // Halt if canceled
             
-            if (typeof html2pdf === 'undefined') { await showModal("Error", "PDF Library failed to load. Please check your internet connection."); return; }
-            
-            showLoader();
-            try {
-                const cls = document.getElementById('resClass').value;
-                const div = document.getElementById('resDiv').value;
-                
-                const wrapper = document.getElementById('pdfReportData');
-                const element = document.getElementById('exportContent');
-                
-                wrapper.style.display = 'block';
-                wrapper.style.position = 'absolute';
-                wrapper.style.top = '0';
-                wrapper.style.left = '0';
-                wrapper.style.zIndex = '-9999';
-
-                var opt = {
-                  margin:       0.4,
-                  filename:     `Election_Result_Class_${cls}_Div_${div}.pdf`,
-                  image:        { type: 'jpeg', quality: 1 },
-                  html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
-                  jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-                };
-
-                await html2pdf().set(opt).from(element).save();
-                
-                wrapper.style.display = 'none';
-                wrapper.style.position = 'static';
-            } catch (err) {
-                console.error("PDF Generation Error:", err);
-                await showModal("Export Error", "Failed to save PDF. Check browser permissions.");
-            } finally {
-                hideLoader();
-            }
+            // 2. Instantly pop up the native OS Print/Save dialog (No spinners needed)
+            window.print();
         }
 
         function fireConfetti() {
