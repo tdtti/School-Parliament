@@ -725,8 +725,15 @@
         // ==========================================
         // TAB 7: RESULTS & PDF & SAVING TO SHEET
         // ==========================================
+        function getOrdinalSuffix(i) {
+            var j = i % 10, k = i % 100;
+            if (j == 1 && k != 11) return i + "st";
+            if (j == 2 && k != 12) return i + "nd";
+            if (j == 3 && k != 13) return i + "rd";
+            return i + "th";
+        }
+
         async function fetchResults(event) {
-            // 1. Prevent accidental page reloads that skip you back to the Admin Tab
             if(event) event.preventDefault(); 
             
             showLoader();
@@ -784,10 +791,13 @@
                         let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
                         let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
 
+                        // Apply 1st, 2nd, 3rd format here
+                        let rankText = getOrdinalSuffix(c.rank);
+
                         arenaHTML += `
                             <div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">
                                 ${crown}
-                                <div class="slide-rank-badge">#${c.rank}</div>
+                                <div class="slide-rank-badge">${rankText}</div>
                                 <img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
                                 <div class="slide-name">${c.Name}</div>
                                 <div class="slide-meta">CLASS ${cls}-${div}</div>
@@ -803,19 +813,58 @@
                     // Build PDF Data quietly
                     rankedCandidates.forEach((c) => {
                         let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                        pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${c.rank}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
+                        let rankText = getOrdinalSuffix(c.rank);
+                        pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
                     });
 
-                    requestAnimationFrame(() => setTimeout(animateFastNumbers, 500));
+                    // Wait slightly longer to ensure DOM is fully painted before animating numbers
+                    setTimeout(animateFastNumbers, 600);
                 } else { 
                     board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; 
                 }
             } catch (error) {
-                // 2. Catch any hidden errors so the app doesn't crash and reload
                 console.error("Result Rendering Error:", error);
                 hideLoader();
                 await showModal("Render Error", "An error occurred while displaying results.");
             }
+        }
+
+        // Bulletproof Number Animation
+        function animateFastNumbers() {
+            const counters = document.querySelectorAll('.fast-counter, .fast-counter-float');
+            
+            counters.forEach(counter => {
+                const targetAttr = counter.getAttribute('data-target');
+                const target = parseFloat(targetAttr) || 0;
+                const isFloat = counter.classList.contains('fast-counter-float');
+                
+                // If 0, instantly set it and skip animation to prevent getting stuck
+                if (target === 0) {
+                    counter.innerText = isFloat ? "0.0" : "0";
+                    return;
+                }
+
+                const duration = 2000;
+                const start = performance.now();
+                
+                function update(currentTime) {
+                    const elapsed = currentTime - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Smooth Ease-out formula
+                    const easeOut = 1 - Math.pow(1 - progress, 3); 
+                    const current = easeOut * target;
+                    
+                    counter.innerText = isFloat ? current.toFixed(1) : Math.floor(current);
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        // Ensure it hits the exact target number at the very end
+                        counter.innerText = isFloat ? target.toFixed(1) : Math.floor(target);
+                    }
+                }
+                requestAnimationFrame(update);
+            });
         }
 
         async function generatePDF() {
@@ -834,7 +883,6 @@
         }
 
         function fireConfetti() {
-            // Check if library exists. If not, inject it automatically.
             if (typeof confetti === 'undefined') {
                 const script = document.createElement('script');
                 script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
@@ -847,7 +895,6 @@
             function launchParticles() {
                 var duration = 4000; var end = Date.now() + duration;
                 (function frame() {
-                    // Added zIndex: 99999 to force confetti to explode ON TOP of the 3D graphics
                     confetti({ particleCount: 7, angle: 60, spread: 65, origin: { x: 0 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] });
                     confetti({ particleCount: 7, angle: 120, spread: 65, origin: { x: 1 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] });
                     if (Date.now() < end) requestAnimationFrame(frame);
