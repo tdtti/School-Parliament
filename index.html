@@ -416,16 +416,18 @@
         function showLoader() { document.getElementById('globalLoader').classList.remove('hidden'); }
         function hideLoader() { document.getElementById('globalLoader').classList.add('hidden'); }
         
-        function showModal(title, msg, isConfirm = false) {
+        function showModal(title, msg, isConfirm = false, confirmText = "OK") {
             return new Promise((resolve) => {
                 document.getElementById('modalTitle').innerText = title;
                 document.getElementById('modalMsg').innerText = msg;
                 document.getElementById('modalBtnCancel').style.display = isConfirm ? 'inline-block' : 'none';
+                document.getElementById('modalBtnOk').innerText = confirmText; // Dynamic button text
                 document.getElementById('modalBtnOk').onclick = () => { closeUI(); resolve(true); };
                 document.getElementById('modalBtnCancel').onclick = () => { closeUI(); resolve(false); };
                 document.getElementById('customModal').classList.remove('hidden');
             });
         }
+        
         function closeUI() { document.getElementById('customModal').classList.add('hidden'); }
 
         function formatDateTime(date) { return `${date.getDate().toString().padStart(2, '0')}:${(date.getMonth()+1).toString().padStart(2, '0')}:${date.getFullYear().toString().substring(2)} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`; }
@@ -693,77 +695,103 @@
         // ==========================================
         // TAB 7: RESULTS & PDF & SAVING TO SHEET
         // ==========================================
-        async function fetchResults() {
+        async function fetchResults(event) {
+            // 1. Prevent accidental page reloads that skip you back to the Admin Tab
+            if(event) event.preventDefault(); 
+            
             showLoader();
-            const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
-            const res = await apiCall({ action: "getResults", Class: cls, Div: div });
             
-            if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
-
-            let totalValid = res.stats.totalPolled - res.stats.invalid;
-            await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
-
-            hideLoader();
-
-            document.getElementById('resultData').classList.remove('hidden');
-            document.getElementById('btnExportPDF').classList.remove('hidden');
-            
-            // Stats Update
-            document.getElementById('resStud').innerText = res.stats.totalStudents; document.getElementById('resPolled').innerText = res.stats.totalPolled; 
-            document.getElementById('resAbsent').innerText = res.stats.absentees; document.getElementById('resInvalid').innerText = res.stats.invalid;
-            
-            const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; 
-            document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents; document.getElementById('pdfPolled').innerText = res.stats.totalPolled; 
-            document.getElementById('pdfAbsent').innerText = res.stats.absentees; document.getElementById('pdfMale').innerText = res.stats.maleVoters; 
-            document.getElementById('pdfFemale').innerText = res.stats.femaleVoters; document.getElementById('pdfInvalid').innerText = res.stats.invalid;
-
-            const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
-            board.innerHTML = ""; pdfBody.innerHTML = "";
-            
-            if(res.leaderboard.length > 0) {
-                fireConfetti();
-                let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
-
-                // Render Slidable UI
-                let arenaHTML = `<div class="results-arena"><div class="results-slider-wrapper"><div class="results-slider">`;
+            try {
+                const cls = document.getElementById('resClass').value; 
+                const div = document.getElementById('resDiv').value;
+                const res = await apiCall({ action: "getResults", Class: cls, Div: div });
                 
-                rankedCandidates.forEach((c, index) => {
-                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                    let delay = index * 0.15; 
-                    let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
-                    let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
+                if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
 
-                    arenaHTML += `
-                        <div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">
-                            ${crown}
-                            <div class="slide-rank-badge">#${c.rank}</div>
-                            <img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
-                            <div class="slide-name">${c.Name}</div>
-                            <div class="slide-meta">CLASS ${cls}-${div}</div>
-                            <div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div>
-                            <div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div>
-                        </div>
-                    `;
-                });
+                // Save to Google Sheet
+                let totalValid = res.stats.totalPolled - res.stats.invalid;
+                await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
+
+                hideLoader();
+
+                document.getElementById('resultData').classList.remove('hidden');
+                document.getElementById('btnExportPDF').classList.remove('hidden');
                 
-                arenaHTML += `</div></div></div>`; 
-                board.innerHTML = arenaHTML;
+                // Set Stats Safely
+                document.getElementById('resStud').innerText = res.stats.totalStudents || 0; 
+                document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; 
+                document.getElementById('resAbsent').innerText = res.stats.absentees || 0; 
+                document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
+                
+                const now = new Date(); 
+                document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                document.getElementById('pdfGeneratedBy').innerText = sessionData.username; 
+                document.getElementById('pdfClass').innerText = cls; 
+                document.getElementById('pdfDiv').innerText = div; 
+                document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; 
+                document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; 
+                document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; 
+                document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; 
+                document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; 
+                document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
 
-                // PDF Table Background Building
-                rankedCandidates.forEach((c) => {
-                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                    pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${c.rank}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
-                });
+                const board = document.getElementById('animatedLeaderboard'); 
+                const pdfBody = document.getElementById('pdfTableBody');
+                board.innerHTML = ""; pdfBody.innerHTML = "";
+                
+                if(res.leaderboard && res.leaderboard.length > 0) {
+                    
+                    // Trigger Confetti properly
+                    fireConfetti();
+                    
+                    let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
 
-                requestAnimationFrame(() => setTimeout(animateFastNumbers, 500));
-            } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
+                    let arenaHTML = `<div class="results-arena"><div class="results-slider-wrapper"><div class="results-slider">`;
+                    
+                    rankedCandidates.forEach((c, index) => {
+                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
+                        let delay = index * 0.15; 
+                        let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
+                        let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
+
+                        arenaHTML += `
+                            <div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">
+                                ${crown}
+                                <div class="slide-rank-badge">#${c.rank}</div>
+                                <img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
+                                <div class="slide-name">${c.Name}</div>
+                                <div class="slide-meta">CLASS ${cls}-${div}</div>
+                                <div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div>
+                                <div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div>
+                            </div>
+                        `;
+                    });
+                    
+                    arenaHTML += `</div></div></div>`; 
+                    board.innerHTML = arenaHTML;
+
+                    // Build PDF Data quietly
+                    rankedCandidates.forEach((c) => {
+                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
+                        pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${c.rank}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
+                    });
+
+                    requestAnimationFrame(() => setTimeout(animateFastNumbers, 500));
+                } else { 
+                    board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; 
+                }
+            } catch (error) {
+                // 2. Catch any hidden errors so the app doesn't crash and reload
+                console.error("Result Rendering Error:", error);
+                hideLoader();
+                await showModal("Render Error", "An error occurred while displaying results.");
+            }
         }
 
         async function generatePDF() {
-            // PROMPT TO CONFIRM SAVING
-            const isConfirmed = await showModal("Save to PDF", "Are you sure you want to download the election results as a PDF document?", true);
-            if (!isConfirmed) return; // Stop if user clicks cancel
+            // 3. User permission explicitly required with a specific "Save as PDF" button
+            const isConfirmed = await showModal("Permission Required", "Would you like to save the official election results as a PDF document?", true, "Save as PDF");
+            if (!isConfirmed) return; // Halt if canceled
             
             if (typeof html2pdf === 'undefined') { await showModal("Error", "PDF Library failed to load. Please check your internet connection."); return; }
             
@@ -801,91 +829,31 @@
             }
         }
 
-        // Extremely optimized numbering animation
-        function animateFastNumbers() {
-            const counters = document.querySelectorAll('.fast-counter, .fast-counter-float');
-            const duration = 2000; // Fast 2-second spin
-            const start = performance.now();
-            
-            function update(currentTime) {
-                const elapsed = currentTime - start;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeOut = 1 - Math.pow(1 - progress, 3); // Cubic ease out for snappiness
-                
-                let isFinished = true;
-                counters.forEach(counter => {
-                    if (!counter.hasAttribute('data-target')) return;
-                    const target = parseFloat(counter.getAttribute('data-target'));
-                    const isFloat = counter.classList.contains('fast-counter-float');
-                    const current = easeOut * target;
-                    
-                    counter.innerText = isFloat ? current.toFixed(1) : Math.floor(current);
-                    if (progress < 1) isFinished = false;
-                    else counter.innerText = isFloat ? target.toFixed(1) : target;
-                });
-                
-                if (!isFinished) requestAnimationFrame(update);
-            }
-            requestAnimationFrame(update);
-        }
-
         function fireConfetti() {
-            if(typeof confetti !== 'undefined') {
-                var duration = 3000; var end = Date.now() + duration;
+            // Check if library exists. If not, inject it automatically.
+            if (typeof confetti === 'undefined') {
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+                script.onload = launchParticles;
+                document.head.appendChild(script);
+            } else {
+                launchParticles();
+            }
+
+            function launchParticles() {
+                var duration = 4000; var end = Date.now() + duration;
                 (function frame() {
-                    confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors:['#ffd700', '#38bdf8', '#ffffff'] });
-                    confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors:['#ffd700', '#38bdf8', '#ffffff'] });
+                    // Added zIndex: 99999 to force confetti to explode ON TOP of the 3D graphics
+                    confetti({ particleCount: 7, angle: 60, spread: 65, origin: { x: 0 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] });
+                    confetti({ particleCount: 7, angle: 120, spread: 65, origin: { x: 1 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] });
                     if (Date.now() < end) requestAnimationFrame(frame);
                 }());
             }
         }
 
-        async function generatePDF() {
-            if (typeof html2pdf === 'undefined') { await showModal("Error", "PDF Library failed to load. Please check your internet connection."); return; }
-            
-            showLoader();
-            try {
-                const cls = document.getElementById('resClass').value;
-                const div = document.getElementById('resDiv').value;
-                
-                const wrapper = document.getElementById('pdfReportData');
-                const element = document.getElementById('exportContent');
-                
-                // Temporarily make the container visible but hidden behind the main UI.
-                // This prevents html2canvas from rendering a blank/corrupted canvas 
-                // while keeping it invisible to the user.
-                wrapper.style.display = 'block';
-                wrapper.style.position = 'absolute';
-                wrapper.style.top = '0';
-                wrapper.style.left = '0';
-                wrapper.style.zIndex = '-9999';
+        
 
-                var opt = {
-                  margin:       0.4, // Proper margins for A4
-                  filename:     `Election_Result_Class_${cls}_Div_${div}.pdf`,
-                  image:        { type: 'jpeg', quality: 1 },
-                  html2canvas:  { 
-                      scale: 2, 
-                      useCORS: true, 
-                      scrollY: 0, // Forces capture from top
-                      scrollX: 0 
-                  },
-                  jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
-                };
-
-                // Await ensures the PDF finishes compiling before we hide the UI again
-                await html2pdf().set(opt).from(element).save();
-                
-                // Restore wrapper state back to completely hidden
-                wrapper.style.display = 'none';
-                wrapper.style.position = 'static';
-            } catch (err) {
-                console.error("PDF Generation Error:", err);
-                await showModal("Export Error", "Failed to save PDF. Check browser permissions.");
-            } finally {
-                hideLoader();
-            }
-        }
+        
     </script>
 </body>
 </html>
