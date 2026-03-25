@@ -249,9 +249,9 @@
         <button class="nav-btn" data-target="tab5" onclick="switchTab('tab5')">Voting Records</button>
         <button class="nav-btn" data-target="tab6" onclick="switchTab('tab6')">Home Voters</button>
         <button class="nav-btn" data-target="tab7" onclick="switchTab('tab7')">Results</button>
-        <button class="nav-btn" data-target="tab8" onclick="switchTab('tab8')" style="background:var(--danger); color:white;">System Reset</button>
         <button class="nav-btn" data-target="tab9" onclick="switchTab('tab9')">Downloads</button>
         <button class="nav-btn" data-target="tab10" onclick="switchTab('tab10')">Poster Generator</button>
+        <button class="nav-btn" data-target="tab8" onclick="switchTab('tab8')" style="background:var(--danger); color:white;">System Reset</button>
     </nav>
 
     <!-- Main Content -->
@@ -549,11 +549,11 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcD2OvCe75lsh703ZcyMITHQTjGvCs7VlFSEFOVCl7ltHCejU6vA9lCuVFbrsxhgH7JQ/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAYolmUZ_0wnKw_1iX9A3lSnXGt3QbYfj2yewmmrqOmzg6NiqAyUD3q322LPF8Iax8ig/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
-            "admin":     { pass: "admin123", tabs:["tab1","tab2","tab3","tab4","tab5","tab6","tab7", "tab8", "tab9", "tab10"] },
+            "admin":     { pass: "admin123", tabs:["tab1","tab2","tab3","tab4","tab5","tab6","tab7","tab9", "tab10","tab8"] },
             "polling":   { pass: "pol123",   tabs: ["tab2"] },
             "Control":   { pass: "con123",   tabs: ["tab3"] },
             "Balot":     { pass: "Bal123",   tabs: ["tab4"] },
@@ -816,11 +816,16 @@
                     setLEDs("bu", res.ready);
                     if(res.ready && !currentBallotReady) { 
                         currentBallotReady = true; 
-                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, res.voterName); 
+                        
+                        // Extract name safely from backend, fallback to STUDENT if missing
+                        let currentVoterName = res.voterName || "STUDENT";
+                        
+                        // Pass the 7th argument (currentVoterName) to the ballot render
+                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
                     } 
                     else if(!res.ready) { 
                         currentBallotReady = false; 
-                        document.getElementById('ballotGreeting').classList.add('hidden');
+                        document.getElementById('ballotGreeting').classList.add('hidden'); 
                         document.getElementById('ballotList').classList.add('hidden'); 
                         document.getElementById('ballotWaiting').classList.remove('hidden'); 
                     }
@@ -881,12 +886,15 @@
             }, 2500));
         }
         
-        function renderBallot(candidates, voteType, cls, div, gender, admNo = null, voterName = "") {
+        function renderBallot(candidates, voteType, cls, div, gender, admNo = null, voterName = "STUDENT") {
             document.getElementById(voteType === "Standard" ? 'ballotWaiting' : 'homeVoterLoginArea').classList.add('hidden'); 
             
-            // Activate Greeting
-            if(voteType === "Standard" && voterName) {
-                document.getElementById('bgName').innerText = voterName;
+            // Activate the dynamic Voter Greeting
+            if(voteType === "Standard") {
+                // Bulletproof fallback: If voterName is empty, force it to "STUDENT"
+                let displayName = (voterName && voterName.trim() !== "") ? voterName : "STUDENT";
+                
+                document.getElementById('bgName').innerText = displayName; 
                 document.getElementById('bgClass').innerText = cls;
                 document.getElementById('bgDiv').innerText = div;
                 document.getElementById('ballotGreeting').classList.remove('hidden');
@@ -898,12 +906,26 @@
             bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
         }
 
-
         async function castVote(candId, candName, voteType, cls, div, gender, voterAdmNo) {
-            showLoader(); playBeep(); await apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); hideLoader();
-            if(voteType === "Standard") { currentBallotReady = false; document.getElementById('ballotList').classList.add('hidden'); document.getElementById('ballotWaiting').classList.remove('hidden'); setLEDs("bu", false); } 
-            else { clearInterval(activeHomeVoterTimer); await showModal("Vote Cast", "Your vote has been recorded securely. Logging out."); logout(); }
+            showLoader(); playBeep(); 
+            await apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
+            hideLoader();
+            
+            if(voteType === "Standard") { 
+                currentBallotReady = false; 
+                // 2. Hide everything properly after the vote is cast
+                document.getElementById('ballotGreeting').classList.add('hidden'); 
+                document.getElementById('ballotList').classList.add('hidden'); 
+                document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                setLEDs("bu", false); 
+            } 
+            else { 
+                clearInterval(activeHomeVoterTimer); 
+                await showModal("Vote Cast", "Your vote has been recorded securely. Logging out."); 
+                logout(); 
+            }
         }
+        
         function setLEDs(unit, isReady) { const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); if(isReady) { red.classList.remove('on'); green.classList.add('on'); } else { red.classList.add('on'); green.classList.remove('on'); } }
 
         // ==========================================
