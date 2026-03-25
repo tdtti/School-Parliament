@@ -7,8 +7,7 @@
     
     <!-- PDF Generation Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Particle / Confetti Animation Library -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         :root { --primary: #1e3a8a; --secondary: #3b82f6; --bg: #f3f4f6; --text: #1f2937; --success: #10b981; --danger: #ef4444; --warning: #f59e0b; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -84,62 +83,69 @@
         @keyframes popIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* High Graphics Podium & Results Styles */
-        .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 15px; margin: 50px 0 30px; min-height: 350px; }
-        .podium-item { display: flex; flex-direction: column; align-items: center; width: 32%; position: relative; }
-        .podium-item.podium-1 { z-index: 3; transform: scale(1.15); margin-bottom: 25px; }
-        .podium-item.podium-2 { z-index: 2; transform: scale(0.95); }
-        .podium-item.podium-3 { z-index: 1; transform: scale(0.85); }
-
-        .podium-photo-container { position: relative; margin-bottom: -35px; z-index: 5; animation: float 3s ease-in-out infinite; }
-        .crown-icon { position: absolute; top: -35px; left: 50%; transform: translateX(-50%); font-size: 45px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); animation: pulseCrown 2s infinite; }
-        .podium-photo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 5px solid; box-shadow: 0 10px 25px rgba(0,0,0,0.3); background: white; }
+        /* SPEED OPTIMIZATIONS */
+        .tab-content { display: none; will-change: transform, opacity; }
+        .tab-content.active { display: block; animation: snapIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        @keyframes snapIn { from { opacity: 0; transform: scale(0.98) translateZ(0); } to { opacity: 1; transform: scale(1) translateZ(0); } }
+        .global-spinner-overlay { backdrop-filter: blur(4px); transition: opacity 0.2s ease; }
         
-        .podium-1 .podium-photo { border-color: #ffd700; box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); width: 130px; height: 130px; }
-        .podium-2 .podium-photo { border-color: #c0c0c0; box-shadow: 0 0 25px rgba(192, 192, 192, 0.6); }
-        .podium-3 .podium-photo { border-color: #cd7f32; box-shadow: 0 0 25px rgba(205, 127, 50, 0.6); }
-
-        .podium-details { background: white; width: 100%; padding: 45px 10px 20px; border-radius: 20px 20px 0 0; text-align: center; box-shadow: 0 -10px 20px rgba(0,0,0,0.15); position: relative; z-index: 4; }
-        .podium-1 .podium-details { background: linear-gradient(135deg, #fffde7, #ffffff); border: 2px solid #ffd700; border-bottom: none; }
-        .podium-2 .podium-details { background: linear-gradient(135deg, #f5f5f5, #ffffff); border: 2px solid #c0c0c0; border-bottom: none; }
-        .podium-3 .podium-details { background: linear-gradient(135deg, #fbe9e7, #ffffff); border: 2px solid #cd7f32; border-bottom: none; }
-
-        .podium-rank-badge { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 3px 12px; border-radius: 12px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);}
-        .podium-1 .podium-rank-badge { background: linear-gradient(90deg, #ff8c00, #ffd700); color: #000; font-size: 18px; padding: 5px 20px; }
+        /* Horizontal Slidable Graphics Arena */
+        .results-arena { background: linear-gradient(145deg, #0f172a, #1e1b4b); border-radius: 24px; padding: 20px 0; box-shadow: 0 30px 60px rgba(0,0,0,0.4); position: relative; margin-top: 30px; }
+        .results-slider-wrapper { width: 100%; overflow: hidden; position: relative; }
+        .results-slider { display: flex; gap: 40px; overflow-x: auto; padding: 60px 40px; align-items: center; scroll-behavior: smooth; }
         
-        .podium-name { margin: 10px 0 2px; font-size: 18px; color: var(--primary); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 800;}
-        .podium-1 .podium-name { font-size: 24px; background: linear-gradient(45deg, #b8860b, #ffaa00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .podium-meta { font-size: 13px; color: #6b7280; font-weight: bold; margin-bottom: 15px; }
-        .podium-votes { font-size: 26px; font-weight: 900; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .podium-pct { font-size: 18px; font-weight: 900; color: var(--danger); margin-top: 5px; background: #ffe4e6; display: inline-block; padding: 4px 12px; border-radius: 8px; border: 1px solid #fda4af; }
+        .results-slider::-webkit-scrollbar { height: 12px; }
+        .results-slider::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; margin: 0 20px; }
+        .results-slider::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.6); border-radius: 10px; }
 
-        .podium-base { width: 100%; height: 25px; background: var(--primary); border-radius: 0 0 15px 15px; box-shadow: inset 0 -8px 15px rgba(0,0,0,0.4); }
-        .podium-1 .podium-base { height: 40px; background: linear-gradient(90deg, #d4af37, #ffe066, #d4af37); }
-        .podium-2 .podium-base { height: 25px; background: linear-gradient(90deg, #9ca3af, #e5e7eb, #9ca3af); }
-        .podium-3 .podium-base { height: 25px; background: linear-gradient(90deg, #b45309, #d97706, #b45309); }
+        .slide-card { position: relative; flex-shrink: 0; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 24px; text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .slide-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.08); }
 
-        /* Runner-ups (4th place and below) */
-        .runner-up-card { display: flex; align-items: center; background: white; margin-bottom: 12px; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 6px solid var(--primary); transition: transform 0.3s; }
-        .runner-up-card:hover { transform: translateX(10px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-left-color: var(--secondary); }
-        .ru-rank { font-size: 24px; font-weight: 900; color: #d1d5db; width: 50px; text-align: center; }
-        .ru-photo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #e5e7eb; margin: 0 15px; }
-        .ru-info { flex: 1; }
-        .ru-info h4 { margin: 0 0 5px; color: #1f2937; font-size: 18px; text-transform: uppercase;}
-        .ru-meta { font-size: 13px; color: #6b7280; font-weight: normal; }
-        .ru-bar-container { height: 10px; background: #e5e7eb; border-radius: 5px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-        .ru-bar-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); position: relative; }
-        .ru-bar-fill::after { content: ''; position: absolute; top:0; left:0; right:0; bottom:0; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%); animation: shine 2s infinite; }
-        .ru-stats { text-align: right; margin-left: 15px; width: 100px; }
-        .ru-votes { font-size: 22px; font-weight: 900; color: var(--primary); }
-        .ru-pct { font-size: 15px; font-weight: 900; color: var(--danger); }
+        /* Rank Scaling & Styling */
+        .slide-card.rank-1 { width: 340px; border: 4px solid #ffd700; background: linear-gradient(180deg, rgba(255,215,0,0.15), rgba(0,0,0,0.5)); z-index: 10; animation: glow1 2s infinite alternate; }
+        .slide-card.rank-2 { width: 280px; border: 3px solid #c0c0c0; background: linear-gradient(180deg, rgba(192,192,192,0.1), rgba(0,0,0,0.4)); box-shadow: 0 0 30px rgba(192,192,192,0.3); z-index: 9; }
+        .slide-card.rank-3 { width: 240px; border: 3px solid #cd7f32; background: linear-gradient(180deg, rgba(205,127,50,0.1), rgba(0,0,0,0.4)); box-shadow: 0 0 20px rgba(205,127,50,0.3); z-index: 8; }
+        .slide-card.rank-other { width: 180px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); z-index: 7; opacity: 0.85; }
+        .slide-card.rank-other:hover { opacity: 1; }
 
-        /* Graphics Keyframes */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        @keyframes pulseCrown { 0%, 100% { transform: translateX(-50%) scale(1); filter: drop-shadow(0 0 5px gold); } 50% { transform: translateX(-50%) scale(1.3); filter: drop-shadow(0 0 20px gold); } }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideRightFade { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes shine { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+        .slide-rank-badge { position: absolute; top: -25px; font-weight: 900; background: #0f172a; border-radius: 20px; padding: 5px 25px; border: 2px solid; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
+        .rank-1 .slide-rank-badge { border-color: #ffd700; color: #ffd700; font-size: 30px; top: -35px; box-shadow: 0 0 20px #ffd700; }
+        .rank-2 .slide-rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 24px; }
+        .rank-3 .slide-rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 20px; }
+        .rank-other .slide-rank-badge { border-color: #fff; color: #fff; font-size: 14px; top: -15px; padding: 3px 15px; }
+
+        .slide-avatar { border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,0.2); margin-bottom: 15px; background: white; z-index: 5; position: relative;}
+        .rank-1 .slide-avatar { width: 170px; height: 170px; border: 6px solid #ffd700; box-shadow: 0 0 40px rgba(255,215,0,0.6); }
+        .rank-2 .slide-avatar { width: 130px; height: 130px; border-color: #c0c0c0; }
+        .rank-3 .slide-avatar { width: 110px; height: 110px; border-color: #cd7f32; }
+        .rank-other .slide-avatar { width: 80px; height: 80px; border-width: 2px; }
+
+        .slide-name { font-weight: 900; color: #fff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 5px; }
+        .rank-1 .slide-name { font-size: 32px; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        .rank-2 .slide-name { font-size: 26px; color: #c0c0c0; }
+        .rank-3 .slide-name { font-size: 20px; color: #cd7f32; }
+        .rank-other .slide-name { font-size: 15px; color: #e2e8f0; }
+
+        .slide-meta { font-weight: bold; color: #94a3b8; margin-bottom: 15px; }
+        .rank-1 .slide-meta { font-size: 18px; }
+        .rank-2 .slide-meta { font-size: 15px; }
+        .rank-3 .slide-meta { font-size: 13px; }
+        .rank-other .slide-meta { font-size: 11px; margin-bottom: 10px; }
+
+        .slide-votes { font-weight: 900; line-height: 1; margin-bottom: 15px; }
+        .rank-1 .slide-votes { font-size: 60px; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+        .rank-2 .slide-votes { font-size: 45px; color: #fff; }
+        .rank-3 .slide-votes { font-size: 35px; color: #fff; }
+        .rank-other .slide-votes { font-size: 24px; color: #fff; }
+
+        .slide-pct { font-weight: 900; display: inline-block; border-radius: 30px; }
+        .rank-1 .slide-pct { font-size: 22px; color: #000; background: #ffd700; padding: 6px 25px; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        .rank-2 .slide-pct { font-size: 18px; color: #0f172a; background: #c0c0c0; padding: 4px 18px; }
+        .rank-3 .slide-pct { font-size: 15px; color: #fff; background: rgba(205,127,50,0.5); border: 1px solid #cd7f32; padding: 4px 15px; }
+        .rank-other .slide-pct { font-size: 12px; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; padding: 3px 12px; }
+
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(80px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes glow1 { from { box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1); } to { box-shadow: 0 0 60px rgba(255,215,0,0.8), inset 0 0 40px rgba(255,215,0,0.3); } }
         
     </style>
 </head>
@@ -176,20 +182,29 @@
     </header>
 
     <!-- Login System -->
-    <div id="loginScreen" class="container" style="max-width: 500px; margin-top: 80px; display:flex; flex-direction:column; gap:30px;">
-        <div style="border:1px solid #ccc; padding:20px; border-radius:8px;">
-            <h2 class="text-center" style="color:var(--primary); margin-top:0;">Staff Login</h2>
-            <input type="text" id="loginId" placeholder="Username">
-            <input type="password" id="loginPass" placeholder="Password">
-            <div class="d-flex" style="margin-bottom: 15px;">
-                <input type="checkbox" id="keepLoggedIn" style="width: auto;"> <label>Keep me logged in</label>
-            </div>
-            <button onclick="loginStaff()">Login as Staff</button>
+    <div id="loginScreen" class="container" style="max-width: 550px; margin-top: 50px; display:flex; flex-direction:column; gap:20px; background: transparent; box-shadow: none;">
+        
+        <!-- Centered Logo and Titles -->
+        <div style="text-align: center; animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <img src="https://via.placeholder.com/150?text=LOGO" alt="School Logo" style="width: 110px; height: 110px; border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 5px solid white; margin-bottom: 15px; object-fit: contain; background: white;">
+            <h1 style="color: var(--primary); margin: 0; font-size: 28px; font-weight: 900; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">TDTTI THURAVOOR</h1>
+            <h2 style="color: var(--secondary); margin: 8px 0 20px 0; font-size: 15px; font-weight: 700; letter-spacing: 1px;">GENERAL SCHOOL ELECTION FOR THE YEAR 2026</h2>
         </div>
-        <div style="border:1px solid #ccc; padding:20px; border-radius:8px; background:#f9fafb;">
-            <h3 class="text-center" style="color:var(--warning); margin-top:0;">Home Voting (Absentees Only)</h3>
-            <input type="text" id="homePhone" placeholder="Enter Registered Mobile Number">
-            <button onclick="loginHomeVoter()" style="background:var(--warning)">Login to Ballot</button>
+
+        <div style="border:1px solid #e5e7eb; padding:30px; border-radius:16px; background: white; box-shadow: 0 15px 35px rgba(0,0,0,0.05);">
+            <h2 class="text-center" style="color:var(--primary); margin-top:0; font-size: 22px;">Staff Login</h2>
+            <input type="text" id="loginId" placeholder="Username" style="border-radius: 8px; font-size: 16px;">
+            <input type="password" id="loginPass" placeholder="Password" style="border-radius: 8px; font-size: 16px;">
+            <div class="d-flex" style="margin-bottom: 20px; color: #4b5563; font-size: 14px;">
+                <input type="checkbox" id="keepLoggedIn" style="width: auto; margin:0; cursor: pointer;"> <label for="keepLoggedIn" style="cursor: pointer;">Keep me logged in</label>
+            </div>
+            <button onclick="loginStaff()" style="border-radius: 8px; font-size: 16px; padding: 14px;">Login as Staff</button>
+        </div>
+        
+        <div style="border:1px solid #e5e7eb; padding:30px; border-radius:16px; background:#f8fafc; box-shadow: 0 15px 35px rgba(0,0,0,0.05);">
+            <h3 class="text-center" style="color:var(--warning); margin-top:0; font-size: 18px;">Home Voting (Absentees Only)</h3>
+            <input type="text" id="homePhone" placeholder="Enter Registered Mobile Number" style="border-radius: 8px; font-size: 16px;">
+            <button onclick="loginHomeVoter()" style="background:var(--warning); border-radius: 8px; font-size: 16px; padding: 14px; color: #000;">Login to Ballot</button>
         </div>
     </div>
 
@@ -512,15 +527,22 @@
 
         function switchTab(tabId) {
             clearAllIntervals();
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            // Instantly swap active classes (No UI lag)
+            document.querySelectorAll('.tab-content.active').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn.active').forEach(el => el.classList.remove('active'));
+            
             document.getElementById(tabId).classList.add('active');
-            const btn = document.querySelector(`.nav-btn[data-target="${tabId}"]`); if(btn) btn.classList.add('active');
+            const btn = document.querySelector(`.nav-btn[data-target="${tabId}"]`); 
+            if(btn) btn.classList.add('active');
 
-            if(tabId === "tab2") { document.querySelector("#votersTablePending tbody").innerHTML = ""; document.querySelector("#votersTableProcessed tbody").innerHTML = ""; }
-            if(tabId === "tab3") startControlUnitPolling();
-            if(tabId === "tab4") startBallotUnitPolling();
-            if(tabId === "tab5") fetchVotingStats();
+            // Defer heavy rendering to the next animation frame to guarantee 60fps instant click feeling
+            requestAnimationFrame(() => {
+                if(tabId === "tab2") { document.querySelector("#votersTablePending tbody").innerHTML = ""; document.querySelector("#votersTableProcessed tbody").innerHTML = ""; }
+                if(tabId === "tab3") startControlUnitPolling();
+                if(tabId === "tab4") startBallotUnitPolling();
+                if(tabId === "tab5") fetchVotingStats();
+            });
         }
 
         // ==========================================
@@ -678,7 +700,6 @@
             
             if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
 
-            // Save results to Google Sheet backend
             let totalValid = res.stats.totalPolled - res.stats.invalid;
             await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
 
@@ -688,144 +709,135 @@
             document.getElementById('btnExportPDF').classList.remove('hidden');
             
             // Stats Update
-            document.getElementById('resStud').innerText = res.stats.totalStudents; 
-            document.getElementById('resPolled').innerText = res.stats.totalPolled; 
-            document.getElementById('resAbsent').innerText = res.stats.absentees; 
-            document.getElementById('resInvalid').innerText = res.stats.invalid;
+            document.getElementById('resStud').innerText = res.stats.totalStudents; document.getElementById('resPolled').innerText = res.stats.totalPolled; 
+            document.getElementById('resAbsent').innerText = res.stats.absentees; document.getElementById('resInvalid').innerText = res.stats.invalid;
             
-            // PDF Setup
-            const now = new Date();
-            document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            document.getElementById('pdfGeneratedBy').innerText = sessionData.username;
-            document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; 
+            const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; 
             document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents; document.getElementById('pdfPolled').innerText = res.stats.totalPolled; 
             document.getElementById('pdfAbsent').innerText = res.stats.absentees; document.getElementById('pdfMale').innerText = res.stats.maleVoters; 
             document.getElementById('pdfFemale').innerText = res.stats.femaleVoters; document.getElementById('pdfInvalid').innerText = res.stats.invalid;
 
-            const board = document.getElementById('animatedLeaderboard'); 
-            const pdfBody = document.getElementById('pdfTableBody');
+            const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
             board.innerHTML = ""; pdfBody.innerHTML = "";
             
             if(res.leaderboard.length > 0) {
-                // FIRE THE CONFETTI EXPLOSION!
                 fireConfetti();
-
-                // Assign Rank Numbers
                 let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
 
-                // Create Podium (Order: 2nd, 1st, 3rd)
-                let podiumItems = [];
-                if(rankedCandidates.length >= 2) podiumItems.push(rankedCandidates[1]); // 2nd
-                if(rankedCandidates.length >= 1) podiumItems.push(rankedCandidates[0]); // 1st
-                if(rankedCandidates.length >= 3) podiumItems.push(rankedCandidates[2]); // 3rd
-
-                let podiumHTML = `<div class="podium-container">`;
-                podiumItems.forEach((c) => {
+                // Render Slidable UI
+                let arenaHTML = `<div class="results-arena"><div class="results-slider-wrapper"><div class="results-slider">`;
+                
+                rankedCandidates.forEach((c, index) => {
                     let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                    let delay = c.rank * 0.4; // Staggered entrance
-                    let crown = c.rank === 1 ? '<div class="crown-icon">👑</div>' : '';
-                    
-                    podiumHTML += `
-                        <div class="podium-item podium-${c.rank}" style="animation: slideUpFade 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards; opacity: 0;">
-                            <div class="podium-photo-container">
-                                ${crown}
-                                <img src="${c.Photo}" class="podium-photo" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/130'">
-                            </div>
-                            <div class="podium-details">
-                                <div class="podium-rank-badge">Rank #${c.rank}</div>
-                                <h3 class="podium-name">${c.Name}</h3>
-                                <div class="podium-meta">Class ${cls}-${div}</div>
-                                <div class="podium-votes"><span class="count-up" data-target="${c.Votes}">0</span> Votes</div>
-                                <div class="podium-pct"><span class="count-up-float" data-target="${pct}">0</span>%</div>
-                            </div>
-                            <div class="podium-base"></div>
+                    let delay = index * 0.15; 
+                    let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
+                    let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
+
+                    arenaHTML += `
+                        <div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">
+                            ${crown}
+                            <div class="slide-rank-badge">#${c.rank}</div>
+                            <img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
+                            <div class="slide-name">${c.Name}</div>
+                            <div class="slide-meta">CLASS ${cls}-${div}</div>
+                            <div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div>
+                            <div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div>
                         </div>
                     `;
                 });
-                podiumHTML += `</div>`;
+                
+                arenaHTML += `</div></div></div>`; 
+                board.innerHTML = arenaHTML;
 
-                // Create Runner-Ups List (4th Place and onwards)
-                let runnerUpsHTML = `<div class="runner-up-list">`;
-                let runnerUps = rankedCandidates.slice(3);
-                runnerUps.forEach((c, index) => {
-                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                    let delay = (index + 4) * 0.2;
-                    
-                    runnerUpsHTML += `
-                        <div class="runner-up-card" style="animation: slideRightFade 0.6s ease-out ${delay}s forwards; opacity: 0;">
-                            <div class="ru-rank">#${c.rank}</div>
-                            <img src="${c.Photo}" class="ru-photo" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/60'">
-                            <div class="ru-info">
-                                <h4>${c.Name} <span class="ru-meta">(${cls}-${div})</span></h4>
-                                <div class="ru-bar-container">
-                                    <div class="ru-bar-fill" style="width: 0%; animation: fillBar 1.5s ease-out ${delay + 0.5}s forwards;" data-width="${pct}%"></div>
-                                </div>
-                            </div>
-                            <div class="ru-stats">
-                                <div class="ru-votes"><span class="count-up" data-target="${c.Votes}">0</span> v</div>
-                                <div class="ru-pct"><span class="count-up-float" data-target="${pct}">0</span>%</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                runnerUpsHTML += `</div>`;
-
-                board.innerHTML = podiumHTML + runnerUpsHTML;
-
-                // Build PDF Table (Silent Background Task)
+                // PDF Table Background Building
                 rankedCandidates.forEach((c) => {
                     let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
                     pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${c.rank}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
                 });
 
-                // Attach dynamically generated CSS for the Progress Bars
-                const styleId = 'dynamicProgressBarStyles'; let styleEl = document.getElementById(styleId);
-                if(styleEl) styleEl.remove(); styleEl = document.createElement('style'); styleEl.id = styleId;
-                let keyframes = ""; runnerUps.forEach((c) => { let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; keyframes += `@keyframes fillBar { to { width: ${pct}%; } }`; });
-                styleEl.innerHTML = keyframes; document.head.appendChild(styleEl);
-
-                // Start the counting animation for numbers
-                setTimeout(animateCountingNumbers, 500);
-
-            } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px; color:#888;'>No candidates found for this Class/Division.</h3>"; }
+                requestAnimationFrame(() => setTimeout(animateFastNumbers, 500));
+            } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
         }
 
-        // --- NEW ANIMATION HELPER FUNCTIONS ---
+        async function generatePDF() {
+            // PROMPT TO CONFIRM SAVING
+            const isConfirmed = await showModal("Save to PDF", "Are you sure you want to download the election results as a PDF document?", true);
+            if (!isConfirmed) return; // Stop if user clicks cancel
+            
+            if (typeof html2pdf === 'undefined') { await showModal("Error", "PDF Library failed to load. Please check your internet connection."); return; }
+            
+            showLoader();
+            try {
+                const cls = document.getElementById('resClass').value;
+                const div = document.getElementById('resDiv').value;
+                
+                const wrapper = document.getElementById('pdfReportData');
+                const element = document.getElementById('exportContent');
+                
+                wrapper.style.display = 'block';
+                wrapper.style.position = 'absolute';
+                wrapper.style.top = '0';
+                wrapper.style.left = '0';
+                wrapper.style.zIndex = '-9999';
 
-        function fireConfetti() {
-            if(typeof confetti !== 'undefined') {
-                var duration = 4000; var end = Date.now() + duration;
-                (function frame() {
-                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors:['#ffd700', '#1e3a8a', '#e11d48'] });
-                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors:['#ffd700', '#1e3a8a', '#e11d48'] });
-                    if (Date.now() < end) requestAnimationFrame(frame);
-                }());
+                var opt = {
+                  margin:       0.4,
+                  filename:     `Election_Result_Class_${cls}_Div_${div}.pdf`,
+                  image:        { type: 'jpeg', quality: 1 },
+                  html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
+                  jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+
+                await html2pdf().set(opt).from(element).save();
+                
+                wrapper.style.display = 'none';
+                wrapper.style.position = 'static';
+            } catch (err) {
+                console.error("PDF Generation Error:", err);
+                await showModal("Export Error", "Failed to save PDF. Check browser permissions.");
+            } finally {
+                hideLoader();
             }
         }
 
-        function animateCountingNumbers() {
-            const counters = document.querySelectorAll('.count-up, .count-up-float');
-            counters.forEach(counter => {
-                const target = parseFloat(counter.getAttribute('data-target'));
-                const isFloat = counter.classList.contains('count-up-float');
-                const duration = 2500; // 2.5 seconds to count up
-                const start = performance.now();
+        // Extremely optimized numbering animation
+        function animateFastNumbers() {
+            const counters = document.querySelectorAll('.fast-counter, .fast-counter-float');
+            const duration = 2000; // Fast 2-second spin
+            const start = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3); // Cubic ease out for snappiness
                 
-                function updateNumber(currentTime) {
-                    const elapsed = currentTime - start;
-                    const progress = Math.min(elapsed / duration, 1);
-                    // Easing formula (Ease-out quad)
-                    const easeOut = progress * (2 - progress);
+                let isFinished = true;
+                counters.forEach(counter => {
+                    if (!counter.hasAttribute('data-target')) return;
+                    const target = parseFloat(counter.getAttribute('data-target'));
+                    const isFloat = counter.classList.contains('fast-counter-float');
                     const current = easeOut * target;
                     
-                    if(isFloat) counter.innerText = current.toFixed(1);
-                    else counter.innerText = Math.floor(current);
-                    
-                    if(progress < 1) requestAnimationFrame(updateNumber);
+                    counter.innerText = isFloat ? current.toFixed(1) : Math.floor(current);
+                    if (progress < 1) isFinished = false;
                     else counter.innerText = isFloat ? target.toFixed(1) : target;
-                }
-                requestAnimationFrame(updateNumber);
-            });
+                });
+                
+                if (!isFinished) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function fireConfetti() {
+            if(typeof confetti !== 'undefined') {
+                var duration = 3000; var end = Date.now() + duration;
+                (function frame() {
+                    confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors:['#ffd700', '#38bdf8', '#ffffff'] });
+                    confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors:['#ffd700', '#38bdf8', '#ffffff'] });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                }());
+            }
         }
 
         async function generatePDF() {
