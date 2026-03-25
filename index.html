@@ -808,30 +808,6 @@
             if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='8' class='text-center'>No processed voters yet.</td></tr>";
         }
 
-        // Updated Ballot Polling to include Name Greeting
-        function startBallotUnitPolling() {
-            intervals.push(setInterval(async () => {
-                const res = await apiCall({ action: "checkBallotStatus" });
-                if(res.success) {
-                    setLEDs("bu", res.ready);
-                    if(res.ready && !currentBallotReady) { 
-                        currentBallotReady = true; 
-                        
-                        // Extract name safely from backend, fallback to STUDENT if missing
-                        let currentVoterName = res.voterName || "STUDENT";
-                        
-                        // Pass the 7th argument (currentVoterName) to the ballot render
-                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
-                    } 
-                    else if(!res.ready) { 
-                        currentBallotReady = false; 
-                        document.getElementById('ballotGreeting').classList.add('hidden'); 
-                        document.getElementById('ballotList').classList.add('hidden'); 
-                        document.getElementById('ballotWaiting').classList.remove('hidden'); 
-                    }
-                }
-            }, 2500));
-        }
         
         async function markAttendanceInstantly(admNo, status, name, gender, cls, div) {
             showLoader(); const res = await apiCall({ action: "markAttendance", AdmNo: admNo, Status: status, Name: name, Gender: gender, Class: cls, Div: div }); hideLoader();
@@ -880,8 +856,22 @@
                 const res = await apiCall({ action: "checkBallotStatus" });
                 if(res.success) {
                     setLEDs("bu", res.ready);
-                    if(res.ready && !currentBallotReady) { currentBallotReady = true; renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo); } 
-                    else if(!res.ready) { currentBallotReady = false; document.getElementById('ballotList').classList.add('hidden'); document.getElementById('ballotWaiting').classList.remove('hidden'); }
+                    
+                    if(res.ready && !currentBallotReady) { 
+                        currentBallotReady = true; 
+                        
+                        // Extract name safely from backend, fallback to STUDENT if missing
+                        let currentVoterName = res.voterName || "STUDENT";
+                        
+                        // Pass the 7th argument (currentVoterName) to the ballot render
+                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
+                    } 
+                    else if(!res.ready) { 
+                        currentBallotReady = false; 
+                        document.getElementById('ballotGreeting').classList.add('hidden'); 
+                        document.getElementById('ballotList').classList.add('hidden'); 
+                        document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                    }
                 }
             }, 2500));
         }
