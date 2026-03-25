@@ -108,12 +108,12 @@
         .slide-card.rank-other { width: 180px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); z-index: 7; opacity: 0.85; }
         .slide-card.rank-other:hover { opacity: 1; }
 
-        .slide-rank-badge { position: absolute; top: -25px; font-weight: 900; background: #0f172a; border-radius: 20px; padding: 5px 25px; border: 2px solid; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
-        .rank-1 .slide-rank-badge { border-color: #ffd700; color: #ffd700; font-size: 30px; top: -35px; box-shadow: 0 0 20px #ffd700; }
-        .rank-2 .slide-rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 24px; }
-        .rank-3 .slide-rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 20px; }
-        .rank-other .slide-rank-badge { border-color: #fff; color: #fff; font-size: 14px; top: -15px; padding: 3px 15px; }
-
+        .slide-rank-badge { position: absolute; top: -20px; left: -20px; font-weight: 900; background: #0f172a; border-radius: 20px; padding: 5px 25px; border: 2px solid; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; transform: rotate(-5deg); }
+        .rank-1 .slide-rank-badge { border-color: #ffd700; color: #ffd700; font-size: 30px; top: -25px; left: -35px; box-shadow: 0 0 20px #ffd700; transform: rotate(-10deg); }
+        .rank-2 .slide-rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 24px; left: -25px; }
+        .rank-3 .slide-rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 20px; left: -20px; }
+        .rank-other .slide-rank-badge { border-color: #fff; color: #fff; font-size: 14px; top: -15px; left: -15px; padding: 3px 15px; transform: rotate(0deg); }
+        
         .slide-avatar { border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,0.2); margin-bottom: 15px; background: white; z-index: 5; position: relative;}
         .rank-1 .slide-avatar { width: 170px; height: 170px; border: 6px solid #ffd700; box-shadow: 0 0 40px rgba(255,215,0,0.6); }
         .rank-2 .slide-avatar { width: 130px; height: 130px; border-color: #c0c0c0; }
@@ -178,6 +178,23 @@
             /* This completely hides the browser Date, URLs, and Page Titles */
             @page { margin: 0 !important; }
         }
+        /* For Candidate Poster */
+            body.print-poster #posterPrintArea, body.print-poster #posterPrintArea * { visibility: visible; }
+            body.print-poster #posterPrintArea { 
+                display: block !important; 
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                /* Force A4 Size and anchor to top left */
+                transform: scale(1) !important; 
+                transform-origin: top left !important;
+                width: 794px !important; 
+                height: 1123px !important; 
+                border: none !important; 
+                margin: 0 !important;
+                box-shadow: none !important;
+                background: white !important;
+            }
         
     </style>
 </head>
@@ -470,23 +487,38 @@
                         <h2 style="font-size: 36px; color: #475569; margin: 0; font-weight:bold;">Constituency: Class <span id="posterClass" style="color:var(--danger)">X</span> - <span id="posterDiv" style="color:var(--danger)">Y</span></h2>
                     </div>
                     
-                    <!-- Symbol precisely placed bottom-left above the Vote tag -->
-                    <div style="position: absolute; bottom: 125px; left: 60px; text-align: center;">
-                        <h3 style="margin: 0 0 10px 0; font-size: 20px; color:var(--primary); text-transform:uppercase; background: #e0f2fe; padding: 5px 15px; border-radius: 8px; display: inline-block;">Allotted Symbol</h3><br>
-                        <div style="padding: 10px; border: 4px dashed var(--secondary); border-radius: 15px; background: #f8fafc; display: inline-block;">
-                            <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 180px; height: 180px; object-fit:contain;">
+                    <!-- Symbol and Vote Banner perfectly aligned at the bottom -->
+                    <div style="position: absolute; bottom: 0; left: 0; width: 100%; display: flex; align-items: center; background: var(--primary); height: 230px; border-top: 10px solid var(--secondary);">
+                        
+                        <!-- Left Side: Two-line Vote Text -->
+                        <div style="flex: 1; padding: 0 20px; text-align: center;">
+                            <div style="font-size: 46px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 4px; line-height: 1.3;">
+                                VOTE FOR YOUR<br>
+                                <span style="color: #ffd700; font-size: 64px; letter-spacing: 8px; text-shadow: 0 5px 15px rgba(0,0,0,0.3);">LEADER</span>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div style="position: absolute; bottom: 60px; left: 0; width: 100%; text-align:center;">
-                        <div style="font-size: 36px; font-weight:900; color: white; background: var(--primary); padding: 25px 0; text-transform: uppercase; letter-spacing: 6px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1);">
-                            VOTE FOR YOUR LEADER
+                        
+                        <!-- Right Side: Symbol and Name Below -->
+                        <div style="width: 320px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2);">
+                            <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
+                            <div style="font-size: 20px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 6px 24px; border-radius: 8px; border: 2px dashed #7dd3fc;">ALLOTTED SYMBOL</div>
                         </div>
+
                     </div>
 
                 </div>
             </div>
         </div>
+        
+    <!-- Instant Vote Success Overlay -->
+    <div id="voteSuccessMsg" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; backdrop-filter: blur(10px); animation: fadeIn 0.3s ease-in-out;">
+        <h1 style="color: var(--success); font-size: 50px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);">Vote Recorded!</h1>
+        <div style="background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.2);">
+            <img id="successCandSymbol" src="" style="width: 180px; height: 180px; object-fit: contain; background: white; border-radius: 50%; padding: 15px; margin: 0 auto 20px; border: 6px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); display: none;">
+            <h2 id="successCandName" style="font-size: 45px; color: #ffd700; margin: 10px 0; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);">CANDIDATE NAME</h2>
+            <h3 style="font-size: 28px; color: #e2e8f0; margin-top: 20px; letter-spacing: 2px;">CLASS <span id="successClass" style="color: #38bdf8;"></span> <span style="color:#64748b;">|</span> DIV <span id="successDiv" style="color: #38bdf8;"></span></h3>
+        </div>
+    </div>    
 
     </main>
 
@@ -881,9 +913,7 @@
             
             // Activate the dynamic Voter Greeting
             if(voteType === "Standard") {
-                // Bulletproof fallback: If voterName is empty, force it to "STUDENT"
                 let displayName = (voterName && voterName.trim() !== "") ? voterName : "STUDENT";
-                
                 document.getElementById('bgName').innerText = displayName; 
                 document.getElementById('bgClass').innerText = cls;
                 document.getElementById('bgDiv').innerText = div;
@@ -892,28 +922,61 @@
 
             const bList = document.getElementById(voteType === "Standard" ? 'ballotList' : 'homeBallotArea'); 
             bList.classList.remove('hidden'); bList.innerHTML = "";
-            candidates.forEach((c, i) => { bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; });
-            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
+            
+            // Setup dynamic buttons that pass the Symbol URL as well
+            candidates.forEach((c, i) => { 
+                bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
+            });
+            
+            // Setup NOTA button
+            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
         }
 
-        async function castVote(candId, candName, voteType, cls, div, gender, voterAdmNo) {
-            showLoader(); playBeep(); 
-            await apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
-            hideLoader();
+        async function castVote(candId, candName, candSymbol, voteType, cls, div, gender, voterAdmNo) {
+            // 1. Instantly trigger the 5-second beep
+            playBeep(); 
             
+            // 2. Prepare and show the Instant Success Overlay
+            document.getElementById('successCandName').innerText = candName;
+            document.getElementById('successClass').innerText = cls;
+            document.getElementById('successDiv').innerText = div;
+            
+            const symImg = document.getElementById('successCandSymbol');
+            if (candId === "NOTA" || !candSymbol) {
+                symImg.style.display = 'none'; // Hide symbol for NOTA
+            } else {
+                symImg.style.display = 'block';
+                symImg.src = candSymbol;
+            }
+            
+            document.getElementById('voteSuccessMsg').classList.remove('hidden');
+            
+            // 3. Instantly hide background UI so they cannot double click
             if(voteType === "Standard") { 
-                currentBallotReady = false; 
-                // 2. Hide everything properly after the vote is cast
                 document.getElementById('ballotGreeting').classList.add('hidden'); 
                 document.getElementById('ballotList').classList.add('hidden'); 
-                document.getElementById('ballotWaiting').classList.remove('hidden'); 
                 setLEDs("bu", false); 
-            } 
-            else { 
+                currentBallotReady = false; 
+            } else { 
                 clearInterval(activeHomeVoterTimer); 
-                await showModal("Vote Cast", "Your vote has been recorded securely. Logging out."); 
-                logout(); 
+                document.getElementById('homeBallotArea').classList.add('hidden');
             }
+
+            // 4. Send the vote to the server in the background (Notice: no 'await', so timer runs smoothly)
+            apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
+            
+            // 5. Hide the message exactly 5 seconds later, perfectly synced when the beep stops!
+            setTimeout(() => {
+                document.getElementById('voteSuccessMsg').classList.add('hidden');
+                
+                if(voteType === "Standard") { 
+                    document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                } else { 
+                    showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => {
+                        logout(); 
+                    });
+                }
+            }, 5000);
         }
         
         function setLEDs(unit, isReady) { const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); if(isReady) { red.classList.remove('on'); green.classList.add('on'); } else { red.classList.add('on'); green.classList.remove('on'); } }
@@ -1203,10 +1266,28 @@
             document.getElementById('posterSymbol').src = cand.Symbol;
         }
         function printPoster() {
-            if(document.getElementById('posterCandSelect').value === "") { showModal("Select Candidate", "Please select a candidate first."); return; }
-            document.body.classList.add('print-poster'); // Activates full page poster CSS
-            window.print();
-            setTimeout(() => { document.body.classList.remove('print-poster'); }, 1000);
+            if(document.getElementById('posterCandSelect').value === "") { 
+                showModal("Select Candidate", "Please select a candidate first."); 
+                return; 
+            }
+            
+            // 1. Temporarily move the poster out of the hidden app container
+            const printArea = document.getElementById('posterPrintArea');
+            const originalParent = printArea.parentNode;
+            document.body.appendChild(printArea); 
+            
+            document.body.classList.add('print-poster');
+            
+            // 2. Give the browser a split second to render the layout, then print
+            setTimeout(() => {
+                window.print();
+                
+                // 3. Put the poster back exactly where it belongs after the print dialog closes
+                setTimeout(() => { 
+                    document.body.classList.remove('print-poster'); 
+                    originalParent.appendChild(printArea);
+                }, 500);
+            }, 100);
         }
 
         // FACTORY RESET (Tab 8)
