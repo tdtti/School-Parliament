@@ -364,7 +364,7 @@
             <h3 style="color: var(--primary); margin-top: 25px;">Pending Voters</h3>
             <div style="overflow-x: auto;"><table id="votersTablePending"><thead><tr><th>Slno</th><th>AdmNo</th><th>Name</th><th>Gender</th><th>Class</th><th>Div</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div>
             <h3 style="color: var(--success); margin-top: 40px;">Processed / Voted List</h3>
-            <div style="overflow-x: auto;"><table id="votersTableProcessed"><thead><tr><th>Slno</th><th>AdmNo</th><th>Name</th><th>Gender</th><th>Class</th><th>Div</th><th>Phone</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+            <div style="overflow-x: auto;"><table id="votersTableProcessed"><thead><tr><th>Slno</th><th>AdmNo</th><th>Name</th><th>Gender</th><th>Phone</th><th>Status</th><th>Date & Time</th></tr></thead><tbody></tbody></table></div>
         </div>
 
         <!-- TAB 3: Control Unit -->
@@ -592,11 +592,16 @@
     <div id="voteSuccessMsg" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; backdrop-filter: blur(10px); animation: fadeIn 0.3s ease-in-out;">
         <h1 style="color: var(--success); font-size: 50px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);">Vote Recorded!</h1>
         <div style="background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.2);">
-            <img id="successCandSymbol" src="" style="width: 180px; height: 180px; object-fit: contain; background: white; border-radius: 50%; padding: 15px; margin: 0 auto 20px; border: 6px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); display: none;">
+            
+            <div style="position: relative; width: 180px; height: 180px; margin: 0 auto 20px;">
+                <img id="successCandPhoto" src="" style="width: 100%; height: 100%; object-fit: cover; background: white; border-radius: 50%; border: 6px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); display: none;">
+                <img id="successCandSymbol" src="" style="position: absolute; bottom: -10px; left: -10px; width: 70px; height: 70px; object-fit: contain; background: white; border-radius: 50%; border: 4px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none;">
+            </div>
+
             <h2 id="successCandName" style="font-size: 45px; color: #ffd700; margin: 10px 0; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);">CANDIDATE NAME</h2>
             <h3 style="font-size: 28px; color: #e2e8f0; margin-top: 20px; letter-spacing: 2px;">CLASS <span id="successClass" style="color: #38bdf8;"></span> <span style="color:#64748b;">|</span> DIV <span id="successDiv" style="color: #38bdf8;"></span></h3>
         </div>
-    </div>    
+    </div>
 
     </main>
 
@@ -659,7 +664,7 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNN1mhD6m5MuVYugg4mYpGfRgS9qdRcztYcwLT7s4E5ny_1ISJJj_g1xcfiTmRW6D-ig/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxv4aS1mm0Zk6SG2bNar917GqbopSbHtiPr2gKfpgwIIIFV8KORgUtXZUmf7ryCliOsQQ/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
@@ -889,21 +894,21 @@
         // TAB 2: VOTERS LIST
         // ==========================================
         async function fetchVotersList() { showLoader(); const res = await apiCall({ action: "getVoters" }); hideLoader(); if(res.success) { localVotersData = res.data; renderVotersTables(); } else await showModal("Error", "Failed to fetch voters."); }
+        function formatDateCustom(dateStr) {
+            if(!dateStr) return "-";
+            const d = new Date(dateStr);
+            if(isNaN(d.getTime())) return "-";
+            return `${d.getDate().toString().padStart(2, '0')}:${(d.getMonth()+1).toString().padStart(2, '0')}:${d.getFullYear().toString().substring(2)} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+        }
+
         function renderVotersTables() {
             const selClass = document.getElementById('vlClass').value, selDiv = document.getElementById('vlDiv').value;
             const searchVal = document.getElementById('vlSearch') ? document.getElementById('vlSearch').value.toLowerCase().trim() : "";
             const pendingTbody = document.querySelector("#votersTablePending tbody"), processedTbody = document.querySelector("#votersTableProcessed tbody");
             pendingTbody.innerHTML = ""; processedTbody.innerHTML = ""; let pendingCount = 1, processedCount = 1;
 
-            // 1. Filter by Class & Division
             let filtered = localVotersData.filter(v => v.Class == selClass && v.Div == selDiv);
-            
-            // 2. Filter by Search Box
-            if (searchVal) {
-                filtered = filtered.filter(v => v.AdmNo.toString().toLowerCase().includes(searchVal) || (v.Name || "").toLowerCase().includes(searchVal));
-            }
-            
-            // 3. Alphabetical Sorting Default
+            if (searchVal) filtered = filtered.filter(v => v.AdmNo.toString().toLowerCase().includes(searchVal) || (v.Name || "").toLowerCase().includes(searchVal));
             filtered.sort((a,b) => (a.Name||"").localeCompare(b.Name||""));
 
             filtered.forEach(v => {
@@ -912,11 +917,12 @@
                     pendingTbody.innerHTML += `<tr><td>${pendingCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Class}</td><td>${v.Div}</td><td>${v.Phone}</td><td><span style="color:var(--warning); font-weight:bold;">Pending</span></td><td><button onclick="markAttendanceInstantly('${v.AdmNo}', 'Present', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--success); width:auto; padding:5px 10px;">Present</button> <button onclick="markAttendanceInstantly('${v.AdmNo}', 'Absent', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--danger); width:auto; padding:5px 10px;">Absent</button></td></tr>`;
                 } else {
                     let col = v.Status === 'Voted' ? 'var(--primary)' : (v.Status === 'Voting...' ? 'var(--warning)' : (v.Status === 'Absent' ? 'var(--danger)' : 'var(--success)'));
-                    processedTbody.innerHTML += `<tr><td>${processedCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Class}</td><td>${v.Div}</td><td>${v.Phone}</td><td><b style="color:${col}">${v.Status}</b></td></tr>`;
+                    // Notice Class and Div are removed here, and formatDateCustom is added
+                    processedTbody.innerHTML += `<tr><td>${processedCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Phone}</td><td><b style="color:${col}">${v.Status}</b></td><td><b style="color:#475569; font-size:13px;">${formatDateCustom(v.Time)}</b></td></tr>`;
                 }
             });
             if(pendingCount === 1) pendingTbody.innerHTML = "<tr><td colspan='9' class='text-center'>No pending voters found.</td></tr>";
-            if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='8' class='text-center'>No processed voters yet.</td></tr>";
+            if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='7' class='text-center'>No processed voters yet.</td></tr>";
         }
 
         
@@ -1004,31 +1010,35 @@
             
             // Setup dynamic buttons that pass the Symbol URL as well
             candidates.forEach((c, i) => { 
-                bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
+                bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
             });
             
             // Setup NOTA button
-            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
+            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
         }
 
-        async function castVote(candId, candName, candSymbol, voteType, cls, div, gender, voterAdmNo) {
-            // 1. Instantly trigger the 5-second beep
+        async function castVote(candId, candName, candSymbol, candPhoto, voteType, cls, div, gender, voterAdmNo) {
             playBeep(); 
             
-            // 2. Prepare and show the Instant Success Overlay
             document.getElementById('successCandName').innerText = candName;
             document.getElementById('successClass').innerText = cls;
             document.getElementById('successDiv').innerText = div;
             
             const symImg = document.getElementById('successCandSymbol');
+            const photoImg = document.getElementById('successCandPhoto');
+            
             if (candId === "NOTA" || !candSymbol) {
-                symImg.style.display = 'none'; // Hide symbol for NOTA
+                symImg.style.display = 'none'; 
+                photoImg.style.display = 'none';
             } else {
                 symImg.style.display = 'block';
                 symImg.src = candSymbol;
+                photoImg.style.display = 'block';
+                photoImg.src = candPhoto;
             }
             
             document.getElementById('voteSuccessMsg').classList.remove('hidden');
+            // ... (keep the rest of your castVote code exactly the same below this)
             
             // 3. Instantly hide background UI so they cannot double click
             if(voteType === "Standard") { 
@@ -1071,9 +1081,16 @@
                 document.getElementById('statMale').innerText = res.data.male; 
                 document.getElementById('statFemale').innerText = res.data.female; 
                 
-                let endBtn = document.querySelector("#tab5 button[style*='danger']");
-                if(res.data.pollEnded) { endBtn.innerText = "POLL ENDED"; endBtn.disabled = true; }
-                else { endBtn.innerText = "END ALL POLLS GLOBALLY"; endBtn.disabled = false; }
+                let endBtn = document.getElementById("btnGlobalEnd");
+                if(res.data.pollEnded) { 
+                    endBtn.innerText = "POLL ENDED"; 
+                    endBtn.disabled = true; 
+                    endBtn.style.background = "#9ca3af";
+                } else { 
+                    endBtn.innerText = "END ALL POLLS GLOBALLY"; 
+                    endBtn.disabled = false; 
+                    endBtn.style.background = "var(--danger)";
+                }
             }
         }
         async function endGlobalElection() {
@@ -1242,9 +1259,21 @@
         async function generatePDF() {
             const isConfirmed = await showModal("Save as PDF", "Click OK to open the Print/Save dialog. \n\nTip: In the dialog, set the 'Destination' to 'Save as PDF' to save it to your device.", true, "Open Print / Save");
             if (!isConfirmed) return;
-            document.body.classList.add('print-pdf'); // Activates Results PDF Mode
-            window.print();
-            setTimeout(() => { document.body.classList.remove('print-pdf'); }, 1000);
+            
+            const printArea = document.getElementById('exportContent');
+            const originalParent = printArea.parentNode;
+            
+            // Move it directly to body to completely bypass mobile iOS/Android hidden parent bugs
+            document.body.appendChild(printArea);
+            document.body.classList.add('print-pdf'); 
+            
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => { 
+                    document.body.classList.remove('print-pdf'); 
+                    originalParent.appendChild(printArea); // Move it back
+                }, 1000);
+            }, 100);
         }
 
         function fireConfetti() {
@@ -1504,16 +1533,27 @@
         }
 
         async function printParliament(section) {
-            // Confirm with user so they know to hit "Save as PDF"
             const isConfirmed = await showModal("Print / Save", `You are about to print or save the ${section} report. \n\nTip: You can assign positions in the dropdowns before clicking this to show them on the printout!`, true, "Proceed");
             if (!isConfirmed) return;
+            
+            const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection';
+            const printArea = document.getElementById(printId);
+            const originalParent = printArea.parentNode;
+            const originalNextSibling = printArea.nextSibling;
+            
+            // Move directly to body for 100% mobile compatibility
+            document.body.appendChild(printArea);
             
             const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition';
             document.body.classList.add(printClass);
             
             setTimeout(() => {
                 window.print();
-                setTimeout(() => { document.body.classList.remove(printClass); }, 1000);
+                setTimeout(() => { 
+                    document.body.classList.remove(printClass); 
+                    if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling);
+                    else originalParent.appendChild(printArea);
+                }, 1000);
             }, 100);
         }
         
