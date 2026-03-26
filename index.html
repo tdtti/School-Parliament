@@ -150,7 +150,7 @@
         /* --- NATIVE PRINT & PDF SAVING STYLES --- */
         @media print {
             body * { visibility: hidden; }
-            body { background: white; margin: 0; padding: 0; }
+            body, html { background: white; margin: 0; padding: 0; width: 100%; height: 100%; }
             #globalLoader, #customModal, header, nav, #loginScreen, #mainApp { display: none !important; }
             
             /* For Results PDF */
@@ -158,25 +158,38 @@
             body.print-pdf #pdfReportData { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
             body.print-pdf #exportContent { width: 100% !important; padding: 10px !important; margin: 0 !important; box-sizing: border-box !important; }
 
-            /* For Candidate Poster */
+            /* For Candidate Poster Print - STRICT MOBILE FIXES */
+            @page { size: A4 portrait; margin: 0 !important; }
+            
+            /* Prevents the browser from miscalculating height and printing a 2nd blank page */
+            body.print-poster {
+                overflow: hidden !important;
+                height: 100vh !important;
+                width: 100vw !important;
+            }
+
             body.print-poster #posterPrintArea, body.print-poster #posterPrintArea * { visibility: visible; }
+            
             body.print-poster #posterPrintArea { 
                 display: block !important; 
                 position: absolute !important; 
                 left: 0 !important; 
                 top: 0 !important; 
-                /* Overriding the scale so the poster prints FULL size */
-                transform: scale(1) !important; 
                 width: 100% !important; 
                 height: 100% !important; 
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                transform: none !important; 
                 border: none !important; 
-                padding: 40px !important; 
                 margin: 0 !important;
+                padding: 0 !important; /* Removed outer padding to stop bleed */
                 box-shadow: none !important;
+                background: white !important;
+                box-sizing: border-box !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+                page-break-inside: avoid !important;
             }
-
-            /* This completely hides the browser Date, URLs, and Page Titles */
-            @page { margin: 0 !important; }
         }
         /* For Candidate Poster */
             body.print-poster #posterPrintArea, body.print-poster #posterPrintArea * { visibility: visible; }
@@ -488,20 +501,23 @@
                     </div>
                     
                     <!-- Symbol and Vote Banner perfectly aligned at the bottom -->
-                    <div style="position: absolute; bottom: 0; left: 0; width: 100%; display: flex; align-items: center; background: var(--primary); height: 230px; border-top: 10px solid var(--secondary);">
+                    <div style="position: absolute; bottom: 0; left: 0; width: 100%; display: flex; align-items: center; background: var(--primary); height: 180px; border-top: 10px solid var(--secondary);">
                         
-                        <!-- Left Side: Two-line Vote Text -->
-                        <div style="flex: 1; padding: 0 20px; text-align: center;">
-                            <div style="font-size: 46px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 4px; line-height: 1.3;">
-                                VOTE FOR YOUR<br>
-                                <span style="color: #ffd700; font-size: 64px; letter-spacing: 8px; text-shadow: 0 5px 15px rgba(0,0,0,0.3);">LEADER</span>
+                        <!-- Left Side: VOTE FOR YOUR (CANDIDATE NAME) -->
+                        <div style="flex: 1; padding: 0 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; overflow: hidden;">
+                            <div style="font-size: 38px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; line-height: 1.1;">
+                                VOTE FOR YOUR
+                            </div>
+                            <!-- Candidate Name added here. It auto-shrinks if the name is too long using ellipsis -->
+                            <div id="posterLeaderName" style="color: #ffd700; font-size: 50px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 5px 15px rgba(0,0,0,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding-top: 8px;">
+                                CANDIDATE NAME
                             </div>
                         </div>
                         
-                        <!-- Right Side: Symbol and Name Below -->
-                        <div style="width: 320px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2);">
-                            <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
-                            <div id="posterSymbolLabel" style="font-size: 18px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 6px 20px; border-radius: 8px; border: 2px dashed #7dd3fc; text-align: center; line-height: 1.2;">ALLOTTED SYMBOL</div>
+                        <!-- Right Side: Optimized Symbol Block (Reduced width to save space) -->
+                        <div style="width: 125px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2); padding: 10px; box-sizing: border-box;">
+                            <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
+                            <div id="posterSymbolLabel" style="font-size: 14px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 4px 10px; border-radius: 8px; border: 2px dashed #7dd3fc; text-align: center; line-height: 1.0; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">VOTE FOR<br>SYMBOL</div>
                         </div>
 
                     </div>
@@ -1286,8 +1302,11 @@
             document.getElementById('posterPhoto').src = cand.Photo;
             document.getElementById('posterSymbol').src = cand.Symbol;
             
-            // Dynamically inject "VOTE FOR [LABEL]"
-            document.getElementById('posterSymbolLabel').innerHTML = `VOTE FOR<br><span style="color:var(--danger); font-size: 24px;">${cand.SymbolLabel}</span>`;
+            // Sets the Candidate Name dynamically in the new bottom banner
+            document.getElementById('posterLeaderName').innerText = cand.Name.toUpperCase();
+            
+            // Inject "VOTE FOR [LABEL]" with a slightly smaller font so it doesn't break boundaries
+            document.getElementById('posterSymbolLabel').innerHTML = `VOTE FOR<br><span style="color:var(--danger); font-size: 20px;">${cand.SymbolLabel}</span>`;
         }
         
         function printPoster() {
