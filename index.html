@@ -208,7 +208,15 @@
                 box-shadow: none !important;
                 background: white !important;
             }
-        
+        /* For Parliament Printing */
+            body.print-ministry #printMinistrySection, body.print-ministry #printMinistrySection * { visibility: visible; }
+            body.print-ministry #printMinistrySection { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; display: block !important; padding:0 !important; box-shadow:none !important; }
+            
+            body.print-opposition #printOppositionSection, body.print-opposition #printOppositionSection * { visibility: visible; }
+            body.print-opposition #printOppositionSection { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; display: block !important; padding:0 !important; box-shadow:none !important; }
+            
+            /* Make dropdowns look like plain text when printed */
+            body.print-ministry select, body.print-opposition select { appearance: none; -webkit-appearance: none; border: none; background: transparent; font-weight: bold; color: black; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -281,6 +289,7 @@
         <button class="nav-btn" data-target="tab7" onclick="switchTab('tab7')">Results</button>
         <button class="nav-btn" data-target="tab9" onclick="switchTab('tab9')">Downloads</button>
         <button class="nav-btn" data-target="tab10" onclick="switchTab('tab10')">Poster Generator</button>
+        <button class="nav-btn" data-target="tab11" onclick="switchTab('tab11')">Parliament</button>
         <button class="nav-btn" data-target="tab8" onclick="switchTab('tab8')" style="background:var(--danger); color:white;">System Reset</button>
     </nav>
 
@@ -528,13 +537,53 @@
                         </div>
                         
                         <!-- Right Side: Optimized Symbol Block (Reduced width to save space) -->
-                        <div style="width: 135px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2); padding: 10px; box-sizing: border-box;">
+                        <div style="width: 125px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2); padding: 10px; box-sizing: border-box;">
                             <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
                             <div id="posterSymbolLabel" style="font-size: 14px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 4px 10px; border-radius: 8px; border: 2px dashed #7dd3fc; text-align: center; line-height: 1.0; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">VOTE FOR<br>SYMBOL</div>
                         </div>
 
                     </div>
 
+                </div>
+            </div>
+        </div>
+        
+        
+        <!-- TAB 11: Parliament (Admin Only) -->
+        <div id="tab11" class="tab-content">
+            <h2 class="text-center" style="font-size:32px; color:var(--primary); text-transform:uppercase; margin-bottom: 30px;">School Parliament Assembly</h2>
+
+            <!-- MINISTRY SECTION -->
+            <div id="printMinistrySection" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 3px solid var(--success); padding-bottom: 15px; margin-bottom: 20px;">
+                    <div>
+                        <h3 style="margin: 0; color: var(--success); font-size:26px; text-transform:uppercase;">THE MINISTRY</h3>
+                        <p style="margin: 5px 0 0 0; color: #64748b;">(1st Place Winners of Each Class)</p>
+                    </div>
+                    <button onclick="printParliament('ministry')" style="background:var(--success); width:auto; padding:12px 25px; font-size:16px;">🖨️ Print / Save Ministry</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="ministryTable" style="width:100%; border: 1px solid #e5e7eb; text-align:center;">
+                        <thead style="background:var(--success); color:white;"><tr><th style="text-align:center;">Sl No</th><th style="text-align:center;">Photo</th><th style="text-align:center;">Name</th><th style="text-align:center;">Class & Div</th><th style="text-align:center;">Position</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- OPPOSITION SECTION -->
+            <div id="printOppositionSection" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 3px solid var(--danger); padding-bottom: 15px; margin-bottom: 20px;">
+                    <div>
+                        <h3 style="margin: 0; color: var(--danger); font-size:26px; text-transform:uppercase;">THE OPPOSITION</h3>
+                        <p style="margin: 5px 0 0 0; color: #64748b;">(2nd Place Runners-up of Each Class)</p>
+                    </div>
+                    <button onclick="printParliament('opposition')" style="background:var(--danger); width:auto; padding:12px 25px; font-size:16px;">🖨️ Print / Save Opposition</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="oppositionTable" style="width:100%; border: 1px solid #e5e7eb; text-align:center;">
+                        <thead style="background:var(--danger); color:white;"><tr><th style="text-align:center;">Sl No</th><th style="text-align:center;">Photo</th><th style="text-align:center;">Name</th><th style="text-align:center;">Class & Div</th><th style="text-align:center;">Position</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -610,11 +659,11 @@
         // ==========================================
         // CONFIGURATION
         // ==========================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAYolmUZ_0wnKw_1iX9A3lSnXGt3QbYfj2yewmmrqOmzg6NiqAyUD3q322LPF8Iax8ig/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNN1mhD6m5MuVYugg4mYpGfRgS9qdRcztYcwLT7s4E5ny_1ISJJj_g1xcfiTmRW6D-ig/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
-            "admin":     { pass: "admin123", tabs:["tab1","tab2","tab3","tab4","tab5","tab6","tab7","tab9", "tab10","tab8"] },
+            "admin":     { pass: "admin123", tabs:["tab1","tab2","tab3","tab4","tab5","tab6","tab7","tab9", "tab10","tab11","tab8"] },
             "polling":   { pass: "pol123",   tabs: ["tab2"] },
             "Control":   { pass: "con123",   tabs: ["tab3"] },
             "Balot":     { pass: "Bal123",   tabs: ["tab4"] },
@@ -801,6 +850,7 @@
                 if(tabId === "tab4") startBallotUnitPolling();
                 if(tabId === "tab5") fetchVotingStats();
                 if(tabId === "tab10") fetchCandidatesForPoster();
+                if(tabId === "tab11") fetchParliament(); // Add this line!
             });
         }
 
@@ -1390,6 +1440,81 @@
                 fileInput.removeAttribute('capture');
             }
             fileInput.click();
+        }
+        
+        // ==========================================
+        // TAB 11: PARLIAMENT ASSEMBLY
+        // ==========================================
+        async function fetchParliament() {
+            showLoader();
+            const res = await apiCall({ action: "getParliament" });
+            hideLoader();
+            
+            if (res.success) {
+                const mBody = document.querySelector('#ministryTable tbody');
+                const oBody = document.querySelector('#oppositionTable tbody');
+                mBody.innerHTML = ""; oBody.innerHTML = "";
+                
+                // Populate Ministry (Winners)
+                if (res.ministry.length === 0) { 
+                    mBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>No winners calculated yet. Ensure votes have been cast.</td></tr>"; 
+                } else {
+                    res.ministry.forEach((m, i) => {
+                        mBody.innerHTML += `<tr>
+                            <td style="font-weight:bold; font-size:16px;">${i+1}</td>
+                            <td><img src="${m.Photo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--success);" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/45'"></td>
+                            <td style="font-weight:900; color:var(--primary); text-transform:uppercase; font-size:16px;">${m.Name}</td>
+                            <td style="font-weight:bold; color:#475569;">${m.Class} - ${m.Div}</td>
+                            <td>
+                                <select style="margin:0; padding:8px; border-radius:5px; font-weight:bold; border: 1px solid #ccc; width:90%;">
+                                    <option value="" disabled selected>-- Assign Ministry --</option>
+                                    <option value="Chief Minister">Chief Minister</option>
+                                    <option value="Finance Minister">Finance Minister</option>
+                                    <option value="Home Affairs">Home Affairs</option>
+                                    <option value="Other Ministry">Other Ministry</option>
+                                </select>
+                            </td>
+                        </tr>`;
+                    });
+                }
+
+                // Populate Opposition (Runners-up)
+                if (res.opposition.length === 0) { 
+                    oBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>No runners-up calculated yet.</td></tr>"; 
+                } else {
+                    res.opposition.forEach((o, i) => {
+                        oBody.innerHTML += `<tr>
+                            <td style="font-weight:bold; font-size:16px;">${i+1}</td>
+                            <td><img src="${o.Photo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--danger);" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/45'"></td>
+                            <td style="font-weight:900; color:var(--primary); text-transform:uppercase; font-size:16px;">${o.Name}</td>
+                            <td style="font-weight:bold; color:#475569;">${o.Class} - ${o.Div}</td>
+                            <td>
+                                <select style="margin:0; padding:8px; border-radius:5px; font-weight:bold; border: 1px solid #ccc; width:90%;">
+                                    <option value="" disabled selected>-- Assign Role --</option>
+                                    <option value="Opposition Leader">Opposition Leader</option>
+                                    <option value="Opposition">Opposition</option>
+                                </select>
+                            </td>
+                        </tr>`;
+                    });
+                }
+            } else {
+                await showModal("Error", "Failed to load Parliament Assembly data.");
+            }
+        }
+
+        async function printParliament(section) {
+            // Confirm with user so they know to hit "Save as PDF"
+            const isConfirmed = await showModal("Print / Save", `You are about to print or save the ${section} report. \n\nTip: You can assign positions in the dropdowns before clicking this to show them on the printout!`, true, "Proceed");
+            if (!isConfirmed) return;
+            
+            const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition';
+            document.body.classList.add(printClass);
+            
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => { document.body.classList.remove(printClass); }, 1000);
+            }, 100);
         }
         
         
