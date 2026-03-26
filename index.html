@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +35,7 @@
         input, select, button { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
         button { background: var(--secondary); color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
         button:hover { filter: brightness(0.9); }
-        button:disabled { background: #9ca3af; cursor: not-allowed; }
+        button:disabled { background: #9ca3af !important; cursor: not-allowed; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
@@ -153,78 +154,30 @@
             body, html { background: white; margin: 0; padding: 0; width: 100%; height: 100%; }
             #globalLoader, #customModal, header, nav, #loginScreen, #mainApp { display: none !important; }
             
-            /* For Results PDF */
             body.print-pdf #pdfReportData, body.print-pdf #pdfReportData * { visibility: visible; }
             body.print-pdf #pdfReportData { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
             body.print-pdf #exportContent { width: 100% !important; padding: 10px !important; margin: 0 !important; box-sizing: border-box !important; }
 
-            /* For Candidate Poster Print - STRICT MOBILE FIXES */
             @page { size: A4 portrait; margin: 0 !important; }
             
-            /* Prevents the browser from miscalculating height and printing a 2nd blank page */
-            body.print-poster {
-                overflow: hidden !important;
-                height: 100vh !important;
-                width: 100vw !important;
-            }
-
+            body.print-poster { overflow: hidden !important; height: 100vh !important; width: 100vw !important; }
             body.print-poster #posterPrintArea, body.print-poster #posterPrintArea * { visibility: visible; }
+            body.print-poster #posterPrintArea { 
+                display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; max-width: 100vw !important; max-height: 100vh !important; transform: none !important; border: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; background: white !important; box-sizing: border-box !important; page-break-after: avoid !important; page-break-before: avoid !important; page-break-inside: avoid !important; 
+            }
             
-            body.print-poster #posterPrintArea { 
-                display: block !important; 
-                position: absolute !important; 
-                left: 0 !important; 
-                top: 0 !important; 
-                width: 100% !important; 
-                height: 100% !important; 
-                max-width: 100vw !important;
-                max-height: 100vh !important;
-                transform: none !important; 
-                border: none !important; 
-                margin: 0 !important;
-                padding: 0 !important; /* Removed outer padding to stop bleed */
-                box-shadow: none !important;
-                background: white !important;
-                box-sizing: border-box !important;
-                page-break-after: avoid !important;
-                page-break-before: avoid !important;
-                page-break-inside: avoid !important;
-            }
-        }
-        /* For Candidate Poster */
-            body.print-poster #posterPrintArea, body.print-poster #posterPrintArea * { visibility: visible; }
-            body.print-poster #posterPrintArea { 
-                display: block !important; 
-                position: absolute !important; 
-                left: 0 !important; 
-                top: 0 !important; 
-                /* Force A4 Size and anchor to top left */
-                transform: scale(1) !important; 
-                transform-origin: top left !important;
-                width: 794px !important; 
-                height: 1123px !important; 
-                border: none !important; 
-                margin: 0 !important;
-                box-shadow: none !important;
-                background: white !important;
-            }
-        /* For Parliament Printing */
             body.print-ministry #printMinistrySection, body.print-ministry #printMinistrySection * { visibility: visible; }
             body.print-ministry #printMinistrySection { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; display: block !important; padding:0 !important; box-shadow:none !important; }
-            
             body.print-opposition #printOppositionSection, body.print-opposition #printOppositionSection * { visibility: visible; }
             body.print-opposition #printOppositionSection { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; display: block !important; padding:0 !important; box-shadow:none !important; }
-            
-            /* Make dropdowns look like plain text when printed */
             body.print-ministry select, body.print-opposition select { appearance: none; -webkit-appearance: none; border: none; background: transparent; font-weight: bold; color: black; font-size: 16px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Full Screen Spinner -->
     <div id="globalLoader" class="global-spinner-overlay hidden"><div class="fast-spinner"></div></div>
 
-    <!-- Custom Internal Modal -->
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-box">
             <h2 id="modalTitle">Notice</h2>
@@ -236,7 +189,6 @@
         </div>
     </div>
 
-   <!-- Header -->
     <header id="mainHeader" class="hidden" style="display: flex; align-items: center; justify-content: space-between;">
         <div class="header-title" style="display: flex; align-items: center; gap: 15px;">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGka-p7C45PTqBMBKqSjulqicQlHmW_Ee1BCfUPpaW888vYnoPjElzW9DVm8az1kCOjdlabjA3qb_vS00GpCApyVWh2C0aIcOcvb-BWeeTI8AdLojSf25iCvNpMS6aENxrWO-SgM5xjqePEMsHfCLy4HinnGk2xAnDlKaapXYFY05jXQM/s56-c/Logo2.png" alt="School Logo" class="logo">
@@ -251,16 +203,12 @@
         </div>
     </header>
 
-    <!-- Login System -->
     <div id="loginScreen" class="container" style="max-width: 550px; margin-top: 50px; display:flex; flex-direction:column; gap:20px; background: transparent; box-shadow: none;">
-        
-        <!-- Centered Logo and Titles -->
         <div style="text-align: center; animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGka-p7C45PTqBMBKqSjulqicQlHmW_Ee1BCfUPpaW888vYnoPjElzW9DVm8az1kCOjdlabjA3qb_vS00GpCApyVWh2C0aIcOcvb-BWeeTI8AdLojSf25iCvNpMS6aENxrWO-SgM5xjqePEMsHfCLy4HinnGk2xAnDlKaapXYFY05jXQM/s56-c/Logo2.png" alt="School Logo" style="width: 110px; height: 110px; border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 5px solid white; margin-bottom: 15px; object-fit: contain; background: white;">
             <h1 style="color: var(--primary); margin: 0; font-size: 28px; font-weight: 900; text-transform: uppercase; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">TDTTI THURAVOOR</h1>
             <h2 style="color: var(--secondary); margin: 8px 0 20px 0; font-size: 15px; font-weight: 700; letter-spacing: 1px;">GENERAL SCHOOL ELECTION FOR THE YEAR 2026</h2>
         </div>
-
         <div style="border:1px solid #e5e7eb; padding:30px; border-radius:16px; background: white; box-shadow: 0 15px 35px rgba(0,0,0,0.05);">
             <h2 class="text-center" style="color:var(--primary); margin-top:0; font-size: 22px;">Staff Login</h2>
             <input type="text" id="loginId" placeholder="Username" style="border-radius: 8px; font-size: 16px;">
@@ -270,7 +218,6 @@
             </div>
             <button onclick="loginStaff()" style="border-radius: 8px; font-size: 16px; padding: 14px;">Login as Staff</button>
         </div>
-        
         <div style="border:1px solid #e5e7eb; padding:30px; border-radius:16px; background:#f8fafc; box-shadow: 0 15px 35px rgba(0,0,0,0.05);">
             <h3 class="text-center" style="color:var(--warning); margin-top:0; font-size: 18px;">Home Voting (Absentees Only)</h3>
             <input type="text" id="homePhone" placeholder="Enter Registered Mobile Number" style="border-radius: 8px; font-size: 16px;">
@@ -278,7 +225,6 @@
         </div>
     </div>
 
-    <!-- Navigation -->
     <nav id="mainNav" class="hidden">
         <button class="nav-btn" data-target="tab1" onclick="switchTab('tab1')">Admin Panel</button>
         <button class="nav-btn" data-target="tab2" onclick="switchTab('tab2')">Voters List</button>
@@ -293,35 +239,23 @@
         <button class="nav-btn" data-target="tab8" onclick="switchTab('tab8')" style="background:var(--danger); color:white;">System Reset</button>
     </nav>
 
-    <!-- Main Content -->
     <main id="mainApp" class="container hidden">
-        
-        <!-- NEW CENTRALIZED CLOCK UI -->
         <div id="liveClock" style="background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; border-radius: 16px; padding: 15px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border: 1px solid rgba(255,255,255,0.1);"></div>
 
-        <!-- TAB 1: Admin Panel -->
         <div id="tab1" class="tab-content">
-            <!-- New Media Upload Library -->
             <div style="background: #e0f2fe; padding: 20px; border-radius: 10px; border: 1px solid #bae6fd; margin-bottom: 25px;">
                 <h3 style="margin-top:0; color:var(--primary);">1. Upload Media Library (Photos & Symbols)</h3>
                 <p style="font-size:13px; color:#0369a1; margin-top:-5px; margin-bottom:15px;"><i>Note: For Candidate Photos, keep the subject centered for a square 35x35mm cut.</i></p>
-                
                 <div class="d-flex" style="flex-wrap:wrap; align-items:center;">
                     <select id="mediaType" style="flex:1; min-width:150px; margin-bottom:10px;"><option value="Photo">Candidate Photo</option><option value="Symbol">Election Symbol</option></select>
                     <input type="text" id="mediaLabel" placeholder="Enter Label (e.g., 'John Photo')" style="flex:2; min-width:200px; margin-bottom:10px;">
-                    
-                    <!-- Hidden File Input -->
                     <input type="file" id="mediaFile" accept="image/*" style="display:none;" onchange="document.getElementById('uploadFileName').innerText = this.files.length > 0 ? 'Selected: ' + this.files[0].name : ''">
-                    
-                    <!-- Browse & Camera Buttons -->
                     <div style="display:flex; gap:10px; flex:2; min-width:250px; margin-bottom:10px;">
                         <button onclick="triggerFileInput(false)" style="background:#64748b; margin:0; flex:1;">📂 Browse</button>
                         <button onclick="triggerFileInput(true)" style="background:#0ea5e9; margin:0; flex:1;">📷 Camera (35x35mm)</button>
                     </div>
-                    
                     <button onclick="uploadMedia()" style="background:var(--primary); width:150px; margin-bottom:10px;">Upload</button>
                 </div>
-                <!-- Displays the selected file or photo name -->
                 <div id="uploadFileName" style="margin-top: 5px; font-size: 14px; color: var(--primary); font-weight: bold; min-height: 20px;"></div>
             </div>
 
@@ -337,19 +271,15 @@
                     <input type="text" id="candGender" readonly>
                     <input type="text" id="candClass" readonly>
                     <input type="text" id="candDiv" readonly>
-                    
                     <label style="font-weight:bold;">Select Candidate Photo (From Library):</label>
                     <div class="d-flex"><select id="candPhotoSelect"><option value="">-- Fetching Media Library --</option></select><button onclick="fetchMediaLib()" style="width:100px; background:#9ca3af;">Refresh</button></div>
-                    
                     <label style="font-weight:bold;">Select Candidate Symbol (From Library):</label>
                     <div class="d-flex"><select id="candSymbolSelect"><option value="">-- Fetching Media Library --</option></select><button onclick="fetchMediaLib()" style="width:100px; background:#9ca3af;">Refresh</button></div>
-                    
                     <button onclick="adminSaveCandidate()" style="margin-top:20px; padding:15px; font-size:18px;">Save Candidate</button>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: Voters List -->
         <div id="tab2" class="tab-content">
             <h2>Voters List - Polling Station</h2>
             <div class="d-flex" style="background: #f3f4f6; padding: 15px; border-radius: 8px; flex-wrap:wrap;">
@@ -357,8 +287,6 @@
                 <select id="vlClass"><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
                 <select id="vlDiv"><option value="A">Division A</option><option value="B">Division B</option><option value="C">Division C</option><option value="D">Division D</option><option value="E">Division E</option></select>
                 <button onclick="fetchVotersList()" style="width: 150px; padding: 10px 20px; margin: 0;">Fetch List</button>
-                
-                <!-- NEW SEARCH BOX -->
                 <input type="text" id="vlSearch" placeholder="Search Adm No or Name..." style="flex:1; min-width: 250px; margin:0;" onkeyup="renderVotersTables()">
             </div>
             <h3 style="color: var(--primary); margin-top: 25px;">Pending Voters</h3>
@@ -367,18 +295,17 @@
             <div style="overflow-x: auto;"><table id="votersTableProcessed"><thead><tr><th>Slno</th><th>AdmNo</th><th>Name</th><th>Gender</th><th>Phone</th><th>Status</th><th>Date & Time</th></tr></thead><tbody></tbody></table></div>
         </div>
 
-        <!-- TAB 3: Control Unit -->
         <div id="tab3" class="tab-content text-center">
             <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
                 <h2 style="margin: 0; color: var(--primary); text-transform: uppercase;">Control Unit</h2>
                 <div class="led-container" style="margin: 0;">
-                    <div id="cuRed" class="led red on"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
+                    <!-- Default state: OFF (no "on" class) -->
+                    <div id="cuRed" class="led red"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
                     <div id="cuGreen" class="led green"></div> <span style="font-weight:900; font-size:18px; color:var(--success)">READY</span>
                 </div>
-                
             </div>
             
-            <div id="cuSetupArea" style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+            <div id="cuSetupArea" class="hidden" style="max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
                 <h3>Start Polling Session</h3>
                 <label>Select Class & Div to begin:</label>
                 <select id="cuClass"><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
@@ -393,18 +320,16 @@
             </div>
         </div>
 
-        <!-- TAB 4: Ballot Unit -->
         <div id="tab4" class="tab-content">
             <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
                 <h2 style="margin: 0; color: var(--primary); text-transform: uppercase;">Ballot Unit</h2>
                 <div class="led-container" style="margin: 0;">
-                    <div id="buRed" class="led red on"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
+                    <!-- Default state: OFF (no "on" class) -->
+                    <div id="buRed" class="led red"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
                     <div id="buGreen" class="led green"></div> <span style="font-weight:900; font-size:18px; color:var(--success)">READY</span>
                 </div>
-                
             </div>
             
-            <!-- VOTER GREETING -->
             <div id="ballotGreeting" class="hidden" style="text-align:center; margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 15px; border: 2px solid #7dd3fc; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
                 <h2 style="color: var(--primary); margin:0; font-size: 32px;">Hello <span id="bgName" style="color:#0284c7; font-weight: 900; text-transform: uppercase;"></span></h2>
                 <h4 style="margin:10px 0 0; color:#475569; font-size: 18px; letter-spacing: 2px;">CLASS <span id="bgClass"></span> | DIVISION <span id="bgDiv"></span></h4>
@@ -414,21 +339,22 @@
             <div id="ballotWaiting" class="text-center" style="padding: 50px;"><h3>Waiting for Control Unit activation...</h3></div>
         </div>
 
-        
-
-        <!-- TAB 5: Voting Records -->
         <div id="tab5" class="tab-content">
             <h2 id="vrTitle">Presiding Officer - Voting Records</h2>
+            
+            <!-- NEW GLOBAL START ELECTION BUTTON -->
+            <button id="btnGlobalStart" onclick="startGlobalElection()" style="background:var(--success); font-size:20px; padding:15px; margin-bottom:15px; width:100%;">START ELECTION</button>
+            
             <button onclick="fetchVotingStats()">Refresh Stats</button>
             <div style="display: flex; gap: 20px; justify-content: center; margin: 30px 0;">
                 <div style="padding: 20px; background: #e0f2fe; border-radius: 10px; text-align: center; width: 30%;"><h3>Total Votes</h3><h1 id="statTotal">0</h1></div>
                 <div style="padding: 20px; background: #dbeafe; border-radius: 10px; text-align: center; width: 30%;"><h3>Male Votes</h3><h1 id="statMale">0</h1></div>
                 <div style="padding: 20px; background: #fce7f3; border-radius: 10px; text-align: center; width: 30%;"><h3>Female Votes</h3><h1 id="statFemale">0</h1></div>
             </div>
-            <button onclick="endGlobalElection()" style="background: var(--danger); font-size: 20px; padding: 15px;">END ALL POLLS GLOBALLY</button>
+            <!-- Disabled by default via HTML attribute -->
+            <button id="btnGlobalEnd" onclick="endGlobalElection()" style="background: #9ca3af; font-size: 20px; padding: 15px;" disabled>END ALL POLLS GLOBALLY</button>
         </div>
 
-        <!-- TAB 6: Home Voters -->
         <div id="tab6" class="tab-content text-center">
             <h2>Home Voting Booth</h2>
             <div id="homeVoterLoginArea">
@@ -440,7 +366,6 @@
             <div id="homeBallotArea" class="hidden" style="max-width: 600px; margin: 20px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: inset 0 0 10px #ccc;"></div>
         </div>
 
-        <!-- TAB 7: Results -->
         <div id="tab7" class="tab-content">
             <h2 class="text-center">Election Results</h2>
             <div style="max-width: 600px; margin: 0 auto;" class="d-flex">
@@ -458,13 +383,10 @@
                     <div><b>Invalid:</b> <span id="resInvalid"></span></div>
                 </div>
 
-                <div id="animatedLeaderboard" class="leaderboard-container">
-                    <!-- Cards Injected Dynamically -->
-                </div>
+                <div id="animatedLeaderboard" class="leaderboard-container"></div>
             </div>
         </div>
         
-        <!-- TAB 8: System Reset (Admin Only) -->
         <div id="tab8" class="tab-content text-center">
             <h2 style="color: var(--danger); font-size:32px;">⚠️ DANGER ZONE: FACTORY RESET ⚠️</h2>
             <p style="font-size: 18px;">This action will permanently delete all Voters, Candidates, Votes, Logs, and Settings from the cloud database.</p>
@@ -484,7 +406,6 @@
             <button onclick="executeFactoryReset()" style="background: var(--danger); font-size: 22px; padding: 20px; width: 500px; max-width: 100%; border-radius: 12px; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);">ERASE & RESET ELECTION SYSTEM</button>
         </div>
 
-        <!-- TAB 9: Downloads (Admin Only) -->
         <div id="tab9" class="tab-content">
             <h2 class="text-center" style="margin-bottom: 30px;">Download Official Application Forms</h2>
             <div style="max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
@@ -499,7 +420,6 @@
             </div>
         </div>
 
-        <!-- TAB 10: Poster Generator -->
         <div id="tab10" class="tab-content">
             <h2 class="text-center">Candidate Poster Generator</h2>
             <div class="d-flex" style="max-width: 700px; margin: 0 auto 30px;">
@@ -510,50 +430,31 @@
             
             <div style="background:#e5e7eb; padding: 40px 20px; text-align:center; border-radius: 12px; overflow: hidden; display: flex; justify-content: center;">
                 <div id="posterPrintArea" style="width: 794px; height: 1123px; background: white; padding: 60px; box-sizing: border-box; position: relative; border: 1px solid #ccc; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transform: scale(0.6); transform-origin: top center; margin-bottom: -450px;">
-                    
                     <div style="text-align:center; margin-bottom: 40px; border-bottom: 4px solid var(--primary); padding-bottom: 20px;">
                         <h1 style="color:var(--primary); font-size:55px; margin:0; font-weight:900;">TDTTI THURAVOOR</h1>
                         <h2 style="color:var(--secondary); font-size:32px; margin:10px 0 0 0; letter-spacing: 2px;">SCHOOL PARLIAMENT ELECTION 2026</h2>
                     </div>
-                    
                     <div style="text-align:center;">
                         <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
                         <h1 id="posterName" style="font-size: 65px; text-transform:uppercase; margin: 0 0 10px 0; font-weight:900; color: #111;">CANDIDATE NAME</h1>
                         <h2 style="font-size: 36px; color: #475569; margin: 0; font-weight:bold;">Constituency: Class <span id="posterClass" style="color:var(--danger)">X</span> - <span id="posterDiv" style="color:var(--danger)">Y</span></h2>
                     </div>
-                    
-                    <!-- Symbol and Vote Banner perfectly aligned at the bottom -->
                     <div style="position: absolute; bottom: 0; left: 0; width: 100%; display: flex; align-items: center; background: var(--primary); height: 180px; border-top: 10px solid var(--secondary);">
-                        
-                        <!-- Left Side: VOTE FOR YOUR (CANDIDATE NAME) -->
                         <div style="flex: 1; padding: 0 20px; text-align: center; display: flex; flex-direction: column; justify-content: center; overflow: hidden;">
-                            <div style="font-size: 38px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; line-height: 1.1;">
-                                VOTE FOR YOUR
-                            </div>
-                            <!-- Candidate Name added here. It auto-shrinks if the name is too long using ellipsis -->
-                            <div id="posterLeaderName" style="color: #ffd700; font-size: 50px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 5px 15px rgba(0,0,0,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding-top: 8px;">
-                                CANDIDATE NAME
-                            </div>
+                            <div style="font-size: 38px; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 2px; line-height: 1.1;">VOTE FOR YOUR</div>
+                            <div id="posterLeaderName" style="color: #ffd700; font-size: 50px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 5px 15px rgba(0,0,0,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding-top: 8px;">CANDIDATE NAME</div>
                         </div>
-                        
-                        <!-- Right Side: Optimized Symbol Block (Reduced width to save space) -->
                         <div style="width: 125px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2); padding: 10px; box-sizing: border-box;">
                             <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
                             <div id="posterSymbolLabel" style="font-size: 14px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 4px 10px; border-radius: 8px; border: 2px dashed #7dd3fc; text-align: center; line-height: 1.0; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">VOTE FOR<br>SYMBOL</div>
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
         
-        
-        <!-- TAB 11: Parliament (Admin Only) -->
         <div id="tab11" class="tab-content">
             <h2 class="text-center" style="font-size:32px; color:var(--primary); text-transform:uppercase; margin-bottom: 30px;">School Parliament Assembly</h2>
-
-            <!-- MINISTRY SECTION -->
             <div id="printMinistrySection" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
                 <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 3px solid var(--success); padding-bottom: 15px; margin-bottom: 20px;">
                     <div>
@@ -569,8 +470,6 @@
                     </table>
                 </div>
             </div>
-
-            <!-- OPPOSITION SECTION -->
             <div id="printOppositionSection" style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
                 <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 3px solid var(--danger); padding-bottom: 15px; margin-bottom: 20px;">
                     <div>
@@ -588,16 +487,13 @@
             </div>
         </div>
         
-    <!-- Instant Vote Success Overlay -->
     <div id="voteSuccessMsg" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; backdrop-filter: blur(10px); animation: fadeIn 0.3s ease-in-out;">
         <h1 style="color: var(--success); font-size: 50px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);">Vote Recorded!</h1>
         <div style="background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.2);">
-            
             <div style="position: relative; width: 180px; height: 180px; margin: 0 auto 20px;">
                 <img id="successCandPhoto" src="" style="width: 100%; height: 100%; object-fit: cover; background: white; border-radius: 50%; border: 6px solid #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); display: none;">
                 <img id="successCandSymbol" src="" style="position: absolute; bottom: -10px; left: -10px; width: 70px; height: 70px; object-fit: contain; background: white; border-radius: 50%; border: 4px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: none;">
             </div>
-
             <h2 id="successCandName" style="font-size: 45px; color: #ffd700; margin: 10px 0; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);">CANDIDATE NAME</h2>
             <h3 style="font-size: 28px; color: #e2e8f0; margin-top: 20px; letter-spacing: 2px;">CLASS <span id="successClass" style="color: #38bdf8;"></span> <span style="color:#64748b;">|</span> DIV <span id="successDiv" style="color: #38bdf8;"></span></h3>
         </div>
@@ -605,9 +501,6 @@
 
     </main>
 
-    <!-- Hidden Layout for PDF Generation -->
-    <div id="pdfReportData" style="position: absolute; left: -9999px; top: 0px; width: 800px; background: white; z-index: -1;">
-        <!-- Hidden Layout for PDF Generation -->
     <div id="pdfReportData" style="display: none;">
         <div id="exportContent" style="padding: 40px; background: white; color: black; font-family: Arial, sans-serif; width: 794px; box-sizing: border-box; position: relative;">
             <div style="text-align:center; border-bottom:3px solid #1e3a8a; padding-bottom:15px; margin-bottom:30px;">
@@ -616,7 +509,6 @@
                 <h3 style="margin:0; font-size:16px;">Class: <span id="pdfClass"></span> &nbsp;|&nbsp; Division: <span id="pdfDiv"></span></h3>
                 <h4 style="margin:5px 0; font-size:14px; font-weight:normal; color:#555;">Generated on: <span id="pdfDateTime"></span><br>Generated by: <span id="pdfGeneratedBy"></span></h4>
             </div>
-            
             <table style="width:100%; margin-bottom:30px; font-size:16px; border:none;">
                 <tr><td style="padding:8px; width:40%;">1) No of Total Students in Class</td><td>: <strong id="pdfTotalStud"></strong></td></tr>
                 <tr><td style="padding:8px;">2) No of Voters Polled</td><td>: <strong id="pdfPolled"></strong></td></tr>
@@ -625,46 +517,21 @@
                 <tr><td style="padding:8px;">5) No of Female Voters</td><td>: <strong id="pdfFemale"></strong></td></tr>
                 <tr><td style="padding:8px; color:#dc2626;">6) No of Invalid Votes</td><td>: <strong id="pdfInvalid" style="color:#dc2626;"></strong></td></tr>
             </table>
-
             <h3 style="margin-bottom: 10px; color:#1e3a8a;">Winners Record (As per votes gained)</h3>
             <table style="width:100%; border-collapse: collapse; border: 1px solid #000; text-align:center;" border="1">
-                <thead style="background:#f0f0f0;">
-                    <tr>
-                        <th style="padding:10px;">Sl No</th>
-                        <th>Photo</th>
-                        <th>Name</th>
-                        <th>Symbol</th>
-                        <th>Votes Gained</th>
-                        <th>% of Votes</th>
-                    </tr>
-                </thead>
+                <thead style="background:#f0f0f0;"><tr><th style="padding:10px;">Sl No</th><th>Photo</th><th>Name</th><th>Symbol</th><th>Votes Gained</th><th>% of Votes</th></tr></thead>
                 <tbody id="pdfTableBody"></tbody>
             </table>
-
-            <!-- Signatures Section -->
             <div style="margin-top: 80px; display: flex; justify-content: space-between; text-align: center; width: 100%;">
-                <div style="width: 30%;">
-                    <p style="margin-bottom: 50px; font-weight:bold;">Polling Officer</p>
-                    <p>___________________</p>
-                </div>
-                <div style="width: 30%;">
-                    <p style="margin-bottom: 50px; font-weight:bold;">Presiding Officer</p>
-                    <p>___________________</p>
-                </div>
-                <div style="width: 30%;">
-                    <p style="margin-bottom: 50px; font-weight:bold;">Returning Officer</p>
-                    <p>___________________</p>
-                </div>
+                <div style="width: 30%;"><p style="margin-bottom: 50px; font-weight:bold;">Polling Officer</p><p>___________________</p></div>
+                <div style="width: 30%;"><p style="margin-bottom: 50px; font-weight:bold;">Presiding Officer</p><p>___________________</p></div>
+                <div style="width: 30%;"><p style="margin-bottom: 50px; font-weight:bold;">Returning Officer</p><p>___________________</p></div>
             </div>
-
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // CONFIGURATION
-        // ==========================================
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWruYbc2WAgSU078x-L1XniDvP3PDKG6QYZGb2Fm0sE8KILhR47OMXwVxjSnRxQmWz2g/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlQZGT6Mk0UBu6yc_3iIqaTt51N6EsdIfb7CEPmmXu2KlxlSoZEqh3lkNEXousfCUFtQ/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
@@ -679,9 +546,9 @@
         let sessionData = { username: "", loginTime: null, role: "", homeData: null };
         let intervals =[], localVotersData =[], activeHomeVoterTimer;
 
-        // ==========================================
-        // UTILITIES & CUSTOM MODALS
-        // ==========================================
+        // NEW GLOBAL STATE TRACKERS FOR FRONTEND
+        let currentCuClass = "", currentCuDiv = "", currentCuState = "";
+
         function showLoader() { document.getElementById('globalLoader').classList.remove('hidden'); }
         function hideLoader() { document.getElementById('globalLoader').classList.add('hidden'); }
         
@@ -690,7 +557,7 @@
                 document.getElementById('modalTitle').innerText = title;
                 document.getElementById('modalMsg').innerText = msg;
                 document.getElementById('modalBtnCancel').style.display = isConfirm ? 'inline-block' : 'none';
-                document.getElementById('modalBtnOk').innerText = confirmText; // Dynamic button text
+                document.getElementById('modalBtnOk').innerText = confirmText;
                 document.getElementById('modalBtnOk').onclick = () => { closeUI(); resolve(true); };
                 document.getElementById('modalBtnCancel').onclick = () => { closeUI(); resolve(false); };
                 document.getElementById('customModal').classList.remove('hidden');
@@ -698,17 +565,8 @@
         }
         
         function closeUI() { document.getElementById('customModal').classList.add('hidden'); }
-
         function formatDateTime(date) { return `${date.getDate().toString().padStart(2, '0')}:${(date.getMonth()+1).toString().padStart(2, '0')}:${date.getFullYear().toString().substring(2)} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`; }
-        
-        function calculateDuration(start, end) { 
-            let diff = Math.floor((end - start) / 1000); 
-            let h = Math.floor(diff / 3600).toString().padStart(2, '0'); 
-            let m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0'); 
-            let s = (diff % 60).toString().padStart(2, '0'); 
-            return `${h}:${m}:${s}`; 
-        }
-
+        function calculateDuration(start, end) { let diff = Math.floor((end - start) / 1000); let h = Math.floor(diff / 3600).toString().padStart(2, '0'); let m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0'); let s = (diff % 60).toString().padStart(2, '0'); return `${h}:${m}:${s}`; }
         function playBeep() { try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.setValueAtTime(1000, ctx.currentTime); osc.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 5); } catch(e) {} }
 
         async function apiCall(payload) {
@@ -725,19 +583,13 @@
 
         function clearAllIntervals() { intervals.forEach(clearInterval); intervals =[]; }
 
-        // LIVE CLOCK AND DURATION
         function startLiveClock() {
             setInterval(() => {
                 const now = new Date();
                 const days =["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                 const day = days[now.getDay()];
                 const date = now.getDate().toString().padStart(2, '0') + ':' + (now.getMonth() + 1).toString().padStart(2, '0') + ':' + now.getFullYear();
-                
-                // Format AM/PM Time perfectly
-                let hours = now.getHours();
-                let ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12; 
+                let hours = now.getHours(); let ampm = hours >= 12 ? 'PM' : 'AM'; hours = hours % 12; hours = hours ? hours : 12; 
                 const time = hours.toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0') + ':' + now.getSeconds().toString().padStart(2, '0') + ' ' + ampm;
                 
                 let durationStr = "";
@@ -750,20 +602,11 @@
                 }
 
                 const clockEl = document.getElementById('liveClock');
-                if(clockEl) {
-                    clockEl.innerHTML = `<div style="font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #f8fafc; display:flex; align-items:center; justify-content:center; gap:15px;"><span>${day}, ${date}</span> <span style="color:#38bdf8;">|</span> <span>${time}</span></div>${durationStr}`;
-                }
+                if(clockEl) clockEl.innerHTML = `<div style="font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #f8fafc; display:flex; align-items:center; justify-content:center; gap:15px;"><span>${day}, ${date}</span> <span style="color:#38bdf8;">|</span> <span>${time}</span></div>${durationStr}`;
             }, 1000);
         }
 
-        // ==========================================
-        // AUTHENTICATION
-        // ==========================================
-        window.onload = () => { 
-            startLiveClock();
-            const saved = localStorage.getItem("electionSession"); 
-            if(saved) { sessionData = JSON.parse(saved); initSession(); } 
-        };
+        window.onload = () => { startLiveClock(); const saved = localStorage.getItem("electionSession"); if(saved) { sessionData = JSON.parse(saved); initSession(); } };
 
         async function loginStaff() {
             const user = document.getElementById('loginId').value.trim(); const pass = document.getElementById('loginPass').value.trim();
@@ -787,46 +630,23 @@
         }
 
         function initSession() {
-            // 1. Show main layout elements (except Nav)
             document.getElementById('loginScreen').classList.add('hidden'); 
             document.getElementById('mainHeader').classList.remove('hidden'); 
             document.getElementById('mainApp').classList.remove('hidden');
             
             document.getElementById('userInfoText').innerHTML = `<b>${sessionData.username}</b><br>Logged in: ${formatDateTime(new Date(sessionData.loginTime))}`;
             
-            // 2. STRICT LOGOUT VISIBILITY CONTROL
             const logoutBtn = document.getElementById('btnLogout');
-            if(logoutBtn) {
-                if(sessionData.role === "admin") {
-                    logoutBtn.style.display = 'inline-block';
-                } else {
-                    logoutBtn.style.display = 'none';
-                }
-            }
+            if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'none'; }
 
-            // 3. STRICT TAB NAVIGATION VISIBILITY CONTROL
-            // If the user is an admin, show the tabs. Otherwise, hide the whole tab bar.
             const navMenu = document.getElementById('mainNav');
-            if(navMenu) {
-                if(sessionData.role === "admin") {
-                    navMenu.classList.remove('hidden');
-                } else {
-                    navMenu.classList.add('hidden');
-                }
-            }
+            if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
 
-            // 4. Figure out which tabs they are allowed to access and load the first one automatically
             document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
             const allowedTabs = sessionData.role === "Home" ? ["tab6"] : ROLES[sessionData.role].tabs;
             
-            allowedTabs.forEach(tab => { 
-                const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); 
-                if(btn) btn.style.display = 'block'; 
-            });
-            
-            // Instantly switch to their assigned screen
+            allowedTabs.forEach(tab => { const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); if(btn) btn.style.display = 'block'; });
             switchTab(allowedTabs[0]);
-            
             if(sessionData.role === "Home") document.getElementById('hvName').innerText = sessionData.homeData.Name;
         }
 
@@ -848,20 +668,27 @@
             if(btn) btn.classList.add('active');
 
             requestAnimationFrame(() => {
-                // Fetch dynamic library data when opening certain tabs
                 if(tabId === "tab1") fetchMediaLib();
-                if(tabId === "tab2") { document.querySelector("#votersTablePending tbody").innerHTML = ""; document.querySelector("#votersTableProcessed tbody").innerHTML = ""; }
+                if(tabId === "tab2") { 
+                    document.querySelector("#votersTablePending tbody").innerHTML = ""; 
+                    document.querySelector("#votersTableProcessed tbody").innerHTML = ""; 
+                    // Add an interval to dynamically listen to CU changes while on this tab
+                    intervals.push(setInterval(async () => {
+                        const res = await apiCall({ action: "checkControlStatus" });
+                        if(res.success) {
+                            currentCuClass = res.cuClass; currentCuDiv = res.cuDiv; currentCuState = res.state;
+                            renderVotersTables(); 
+                        }
+                    }, 5000));
+                }
                 if(tabId === "tab3") startControlUnitPolling();
                 if(tabId === "tab4") startBallotUnitPolling();
                 if(tabId === "tab5") fetchVotingStats();
                 if(tabId === "tab10") fetchCandidatesForPoster();
-                if(tabId === "tab11") fetchParliament(); // Add this line!
+                if(tabId === "tab11") fetchParliament(); 
             });
         }
 
-        // ==========================================
-        // TAB 1: ADMIN
-        // ==========================================
         async function adminFetchVoter() {
             const term = document.getElementById('adminSearch').value.trim();
             if(!term) { await showModal("Input Required", "Please enter Admission No or Name to fetch."); return; }
@@ -873,31 +700,26 @@
         }
         
         async function adminSaveCandidate() {
-            const photoUrl = document.getElementById('candPhotoSelect').value; 
-            const symbolUrl = document.getElementById('candSymbolSelect').value;
+            const photoUrl = document.getElementById('candPhotoSelect').value; const symbolUrl = document.getElementById('candSymbolSelect').value;
             if(!photoUrl || !symbolUrl) { await showModal("Error", "Please select a Photo and a Symbol from the library dropdowns."); return; }
-            
             showLoader();
             const payload = { action: "saveCandidate", AdmNo: document.getElementById('candAdmNo').value, Name: document.getElementById('candName').value, Gender: document.getElementById('candGender').value, Class: document.getElementById('candClass').value, Div: document.getElementById('candDiv').value, Photo: photoUrl, Symbol: symbolUrl };
-            const res = await apiCall(payload); 
-            hideLoader();
-            
-            if(res.success) { 
-                await showModal("Success", "Candidate Saved Perfectly"); 
-                document.getElementById('adminForm').classList.add('hidden'); 
-                document.getElementById('adminSearch').value = "";
-                document.getElementById('candPhotoSelect').value = ""; document.getElementById('candSymbolSelect').value = "";
-            } else await showModal("Error", res.message);
+            const res = await apiCall(payload); hideLoader();
+            if(res.success) { await showModal("Success", "Candidate Saved Perfectly"); document.getElementById('adminForm').classList.add('hidden'); document.getElementById('adminSearch').value = ""; document.getElementById('candPhotoSelect').value = ""; document.getElementById('candSymbolSelect').value = ""; } else await showModal("Error", res.message);
         }
 
-        // ==========================================
-        // TAB 2: VOTERS LIST
-        // ==========================================
-        async function fetchVotersList() { showLoader(); const res = await apiCall({ action: "getVoters" }); hideLoader(); if(res.success) { localVotersData = res.data; renderVotersTables(); } else await showModal("Error", "Failed to fetch voters."); }
+        async function fetchVotersList() { 
+            showLoader(); const res = await apiCall({ action: "getVoters" }); hideLoader(); 
+            if(res.success) { 
+                localVotersData = res.data; 
+                // Capture state from backend
+                currentCuClass = res.cuClass; currentCuDiv = res.cuDiv; currentCuState = res.cuState;
+                renderVotersTables(); 
+            } else await showModal("Error", "Failed to fetch voters."); 
+        }
+
         function formatDateCustom(dateStr) {
-            if(!dateStr) return "-";
-            const d = new Date(dateStr);
-            if(isNaN(d.getTime())) return "-";
+            if(!dateStr) return "-"; const d = new Date(dateStr); if(isNaN(d.getTime())) return "-";
             return `${d.getDate().toString().padStart(2, '0')}:${(d.getMonth()+1).toString().padStart(2, '0')}:${d.getFullYear().toString().substring(2)} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
         }
 
@@ -914,10 +736,17 @@
             filtered.forEach(v => {
                 if (!v.Status || v.Status === "") { 
                     const safeName = (v.Name || "").replace(/'/g, "\\'"), safeGender = (v.Gender || "").replace(/'/g, "\\'");
-                    pendingTbody.innerHTML += `<tr><td>${pendingCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Class}</td><td>${v.Div}</td><td>${v.Phone}</td><td><span style="color:var(--warning); font-weight:bold;">Pending</span></td><td><button onclick="markAttendanceInstantly('${v.AdmNo}', 'Present', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--success); width:auto; padding:5px 10px;">Present</button> <button onclick="markAttendanceInstantly('${v.AdmNo}', 'Absent', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--danger); width:auto; padding:5px 10px;">Absent</button></td></tr>`;
+                    
+                    // Conditionally show buttons or hide them if CU is not active for this class
+                    let isActionAllowed = (v.Class == currentCuClass && v.Div == currentCuDiv && currentCuState && currentCuState !== "Stopped");
+                    let actionHtml = isActionAllowed ? 
+                        `<button onclick="markAttendanceInstantly('${v.AdmNo}', 'Present', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--success); width:auto; padding:5px 10px;">Present</button> 
+                         <button onclick="markAttendanceInstantly('${v.AdmNo}', 'Absent', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--danger); width:auto; padding:5px 10px;">Absent</button>` 
+                        : `<span style="color:#94a3b8; font-size:12px; font-weight:bold;">Waiting for CU...</span>`;
+
+                    pendingTbody.innerHTML += `<tr><td>${pendingCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Class}</td><td>${v.Div}</td><td>${v.Phone}</td><td><span style="color:var(--warning); font-weight:bold;">Pending</span></td><td>${actionHtml}</td></tr>`;
                 } else {
                     let col = v.Status === 'Voted' ? 'var(--primary)' : (v.Status === 'Voting...' ? 'var(--warning)' : (v.Status === 'Absent' ? 'var(--danger)' : 'var(--success)'));
-                    // Notice Class and Div are removed here, and formatDateCustom is added
                     processedTbody.innerHTML += `<tr><td>${processedCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Phone}</td><td><b style="color:${col}">${v.Status}</b></td><td><b style="color:#475569; font-size:13px;">${formatDateCustom(v.Time)}</b></td></tr>`;
                 }
             });
@@ -925,7 +754,6 @@
             if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='7' class='text-center'>No processed voters yet.</td></tr>";
         }
 
-        
         async function markAttendanceInstantly(admNo, status, name, gender, cls, div) {
             showLoader(); const res = await apiCall({ action: "markAttendance", AdmNo: admNo, Status: status, Name: name, Gender: gender, Class: cls, Div: div }); hideLoader();
             if(res.success) { const idx = localVotersData.findIndex(v => v.AdmNo == admNo); if (idx > -1) localVotersData[idx].Status = status === "Present" ? "Voting..." : "Absent"; renderVotersTables(); } 
@@ -933,22 +761,48 @@
         }
 
         // ==========================================
-        // TAB 3: CONTROL UNIT
+        // DYNAMIC LED FUNCTION (Handles True/False/Null)
         // ==========================================
+        function setLEDs(unit, isReady) { 
+            const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); 
+            red.classList.remove('on'); green.classList.remove('on');
+            if(isReady === true) { green.classList.add('on'); } 
+            else if (isReady === false) { red.classList.add('on'); } 
+            // If isReady is null, both stay off.
+        }
+
         let cuCurrentClass = "", cuCurrentDiv = "";
         async function startControlUnitSession() {
             const cls = document.getElementById('cuClass').value, div = document.getElementById('cuDiv').value;
-            showLoader(); await apiCall({ action: "startClassVoting", Class: cls, Div: div }); hideLoader();
-            document.getElementById('cuSetupArea').classList.add('hidden'); document.getElementById('cuActiveArea').classList.remove('hidden'); document.getElementById('lblCuClass').innerText = cls; document.getElementById('lblCuDiv').innerText = div; cuCurrentClass = cls; cuCurrentDiv = div;
-            await showModal("System Active", `Voting Session started for Class ${cls} Div ${div}. Voters list unit can now assign voters.`);
+            showLoader(); const res = await apiCall({ action: "startClassVoting", Class: cls, Div: div }); hideLoader();
+            if(res.success) {
+                document.getElementById('cuSetupArea').classList.add('hidden'); document.getElementById('cuActiveArea').classList.remove('hidden'); document.getElementById('lblCuClass').innerText = cls; document.getElementById('lblCuDiv').innerText = div; cuCurrentClass = cls; cuCurrentDiv = div;
+                await showModal("System Active", `Voting Session started for Class ${cls} Div ${div}. Voters list unit can now assign voters.`);
+            } else {
+                await showModal("Action Blocked", res.message);
+            }
         }
+        
         function startControlUnitPolling() {
             intervals.push(setInterval(async () => {
                 const res = await apiCall({ action: "checkControlStatus" });
                 if(res.success) {
-                    if(res.state === "Stopped") { document.getElementById('cuSetupArea').classList.remove('hidden'); document.getElementById('cuActiveArea').classList.add('hidden'); setLEDs("cu", false); } 
-                    else {
-                        document.getElementById('cuSetupArea').classList.add('hidden'); document.getElementById('cuActiveArea').classList.remove('hidden'); document.getElementById('lblCuClass').innerText = res.cuClass; document.getElementById('lblCuDiv').innerText = res.cuDiv;
+                    if (res.globalStatus !== "Started") {
+                        // Global Election Not Started -> Hide everything, LEDs OFF
+                        document.getElementById('cuSetupArea').classList.add('hidden'); 
+                        document.getElementById('cuActiveArea').classList.add('hidden'); 
+                        setLEDs("cu", null); 
+                    } else if(res.state === "Stopped" || res.state === "" || res.state == null) { 
+                        // Global Started, but no specific class session running
+                        document.getElementById('cuSetupArea').classList.remove('hidden'); 
+                        document.getElementById('cuActiveArea').classList.add('hidden'); 
+                        setLEDs("cu", null); 
+                    } else {
+                        // Active session
+                        document.getElementById('cuSetupArea').classList.add('hidden'); 
+                        document.getElementById('cuActiveArea').classList.remove('hidden'); 
+                        document.getElementById('lblCuClass').innerText = res.cuClass; document.getElementById('lblCuDiv').innerText = res.cuDiv;
+                        
                         const vDiv = document.getElementById('cuVoterDetails'), btn = document.getElementById('cuBtn');
                         if(res.state === "Waiting") { vDiv.innerHTML = `<p style="color:var(--warning); font-weight:bold;">Waiting for Polling Officer to mark a voter as 'Present'...</p>`; btn.disabled = true; setLEDs("cu", false); } 
                         else if(res.state === "VoterReady") { vDiv.innerHTML = `<h3 style="margin:0; color:var(--primary);">Active Voter Loaded:</h3><p style="font-size:22px; font-weight:bold; margin:5px 0;">${res.voter.Name} (${res.voter.Gender})</p><p style="margin:0;">Adm No: ${res.voter.AdmNo}</p>`; btn.disabled = false; setLEDs("cu", true); } 
@@ -957,6 +811,7 @@
                 }
             }, 2500));
         }
+
         async function allowVote() { showLoader(); await apiCall({ action: "enableBallot" }); hideLoader(); }
         async function endPollClass() {
             if(await showModal("Confirm End Poll", `Are you sure you want to end polling for Class ${cuCurrentClass} Div ${cuCurrentDiv}? Results will be finalized for this class.`, true)) {
@@ -964,30 +819,32 @@
             }
         }
 
-        // ==========================================
-        // TAB 4: BALLOT UNIT
-        // ==========================================
         let currentBallotReady = false;
         function startBallotUnitPolling() {
             intervals.push(setInterval(async () => {
                 const res = await apiCall({ action: "checkBallotStatus" });
                 if(res.success) {
-                    setLEDs("bu", res.ready);
-                    
-                    if(res.ready && !currentBallotReady) { 
-                        currentBallotReady = true; 
-                        
-                        // Extract name safely from backend, fallback to STUDENT if missing
-                        let currentVoterName = res.voterName || "STUDENT";
-                        
-                        // Pass the 7th argument (currentVoterName) to the ballot render
-                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
-                    } 
-                    else if(!res.ready) { 
+                    if (res.globalStatus !== "Started" || res.cuState === "Stopped" || !res.cuState) {
+                        // Election Not Started globally OR no active class session
+                        setLEDs("bu", null);
                         currentBallotReady = false; 
                         document.getElementById('ballotGreeting').classList.add('hidden'); 
                         document.getElementById('ballotList').classList.add('hidden'); 
                         document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                        document.getElementById('ballotWaiting').innerHTML = "<h3>Waiting for Control Unit activation...</h3>";
+                    } else if(res.ready && !currentBallotReady) { 
+                        setLEDs("bu", true);
+                        currentBallotReady = true; 
+                        let currentVoterName = res.voterName || "STUDENT";
+                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
+                    } else if(!res.ready && currentBallotReady) { 
+                        setLEDs("bu", false);
+                        currentBallotReady = false; 
+                        document.getElementById('ballotGreeting').classList.add('hidden'); 
+                        document.getElementById('ballotList').classList.add('hidden'); 
+                        document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                    } else if(!res.ready) {
+                        setLEDs("bu", false); // Busy
                     }
                 }
             }, 2500));
@@ -996,82 +853,46 @@
         function renderBallot(candidates, voteType, cls, div, gender, admNo = null, voterName = "STUDENT") {
             document.getElementById(voteType === "Standard" ? 'ballotWaiting' : 'homeVoterLoginArea').classList.add('hidden'); 
             
-            // Activate the dynamic Voter Greeting
             if(voteType === "Standard") {
                 let displayName = (voterName && voterName.trim() !== "") ? voterName : "STUDENT";
-                document.getElementById('bgName').innerText = displayName; 
-                document.getElementById('bgClass').innerText = cls;
-                document.getElementById('bgDiv').innerText = div;
+                document.getElementById('bgName').innerText = displayName; document.getElementById('bgClass').innerText = cls; document.getElementById('bgDiv').innerText = div;
                 document.getElementById('ballotGreeting').classList.remove('hidden');
             }
 
             const bList = document.getElementById(voteType === "Standard" ? 'ballotList' : 'homeBallotArea'); 
             bList.classList.remove('hidden'); bList.innerHTML = "";
             
-            // Setup dynamic buttons that pass the Symbol URL as well
             candidates.forEach((c, i) => { 
                 bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
             });
-            
-            // Setup NOTA button
             bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
         }
 
         async function castVote(candId, candName, candSymbol, candPhoto, voteType, cls, div, gender, voterAdmNo) {
             playBeep(); 
+            document.getElementById('successCandName').innerText = candName; document.getElementById('successClass').innerText = cls; document.getElementById('successDiv').innerText = div;
+            const symImg = document.getElementById('successCandSymbol'); const photoImg = document.getElementById('successCandPhoto');
             
-            document.getElementById('successCandName').innerText = candName;
-            document.getElementById('successClass').innerText = cls;
-            document.getElementById('successDiv').innerText = div;
-            
-            const symImg = document.getElementById('successCandSymbol');
-            const photoImg = document.getElementById('successCandPhoto');
-            
-            if (candId === "NOTA" || !candSymbol) {
-                symImg.style.display = 'none'; 
-                photoImg.style.display = 'none';
-            } else {
-                symImg.style.display = 'block';
-                symImg.src = candSymbol;
-                photoImg.style.display = 'block';
-                photoImg.src = candPhoto;
-            }
+            if (candId === "NOTA" || !candSymbol) { symImg.style.display = 'none'; photoImg.style.display = 'none'; } 
+            else { symImg.style.display = 'block'; symImg.src = candSymbol; photoImg.style.display = 'block'; photoImg.src = candPhoto; }
             
             document.getElementById('voteSuccessMsg').classList.remove('hidden');
-            // ... (keep the rest of your castVote code exactly the same below this)
             
-            // 3. Instantly hide background UI so they cannot double click
             if(voteType === "Standard") { 
-                document.getElementById('ballotGreeting').classList.add('hidden'); 
-                document.getElementById('ballotList').classList.add('hidden'); 
-                setLEDs("bu", false); 
-                currentBallotReady = false; 
-            } else { 
-                clearInterval(activeHomeVoterTimer); 
-                document.getElementById('homeBallotArea').classList.add('hidden');
-            }
+                document.getElementById('ballotGreeting').classList.add('hidden'); document.getElementById('ballotList').classList.add('hidden'); setLEDs("bu", false); currentBallotReady = false; 
+            } else { clearInterval(activeHomeVoterTimer); document.getElementById('homeBallotArea').classList.add('hidden'); }
 
-            // 4. Send the vote to the server in the background (Notice: no 'await', so timer runs smoothly)
             apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
             
-            // 5. Hide the message exactly 5 seconds later, perfectly synced when the beep stops!
             setTimeout(() => {
                 document.getElementById('voteSuccessMsg').classList.add('hidden');
-                
-                if(voteType === "Standard") { 
-                    document.getElementById('ballotWaiting').classList.remove('hidden'); 
-                } else { 
-                    showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => {
-                        logout(); 
-                    });
-                }
+                if(voteType === "Standard") { document.getElementById('ballotWaiting').classList.remove('hidden'); } 
+                else { showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => { logout(); }); }
             }, 5000);
         }
-        
-        function setLEDs(unit, isReady) { const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); if(isReady) { red.classList.remove('on'); green.classList.add('on'); } else { red.classList.add('on'); green.classList.remove('on'); } }
 
         // ==========================================
-        // TAB 5: VOTING RECORDS
+        // TAB 5: VOTING RECORDS & ELECTION CONTROLS
         // ==========================================
         async function fetchVotingStats() {
             showLoader(); const res = await apiCall({ action: "getStats" }); hideLoader();
@@ -1081,27 +902,45 @@
                 document.getElementById('statMale').innerText = res.data.male; 
                 document.getElementById('statFemale').innerText = res.data.female; 
                 
+                let startBtn = document.getElementById("btnGlobalStart");
                 let endBtn = document.getElementById("btnGlobalEnd");
-                if(res.data.pollEnded) { 
-                    endBtn.innerText = "POLL ENDED"; 
-                    endBtn.disabled = true; 
-                    endBtn.style.background = "#9ca3af";
-                } else { 
-                    endBtn.innerText = "END ALL POLLS GLOBALLY"; 
-                    endBtn.disabled = false; 
+                
+                if(res.data.globalStatus === "Started") {
+                    startBtn.innerText = "ELECTION IN PROGRESS";
+                    startBtn.disabled = true;
+                    startBtn.style.background = "#9ca3af";
+                    
+                    endBtn.innerText = "END ALL POLLS GLOBALLY";
+                    endBtn.disabled = false;
                     endBtn.style.background = "var(--danger)";
+                } else {
+                    startBtn.innerText = "START ELECTION";
+                    startBtn.disabled = false;
+                    startBtn.style.background = "var(--success)";
+                    
+                    endBtn.innerText = "POLL ENDED / INACTIVE";
+                    endBtn.disabled = true;
+                    endBtn.style.background = "#9ca3af";
                 }
             }
         }
+        
+        async function startGlobalElection() {
+            if(await showModal("Start Election", "Are you sure you want to open the polls and start the global election?", true, "YES, START ELECTION")) {
+                showLoader(); 
+                await apiCall({ action: "startGlobalElection" }); 
+                hideLoader(); 
+                fetchVotingStats(); 
+                await showModal("Election Started", "The election is now live. Control Unit can now start sessions.");
+            }
+        }
+        
         async function endGlobalElection() {
-            if(await showModal("CRITICAL WARNING", "Are you sure you want to end the ENTIRE school election? This stops all active voting globally.", true)) {
+            if(await showModal("CRITICAL WARNING", "Are you sure you want to end the ENTIRE school election? This stops all active voting globally.", true, "END ELECTION")) {
                 showLoader(); await apiCall({ action: "endPoll" }); hideLoader(); fetchVotingStats(); await showModal("System Halted", "All voting operations have been securely ended.");
             }
         }
 
-        // ==========================================
-        // TAB 6: HOME VOTERS
-        // ==========================================
         function startHomeVoting() {
             const data = sessionData.homeData; document.getElementById('homeVoterLoginArea').style.display = 'none'; renderBallot(data.candidates, "Home", data.Class, data.Div, data.Gender, data.AdmNo);
             let time = 300; const display = document.getElementById('hvTimer'); document.getElementById('homeBallotArea').insertBefore(display, document.getElementById('homeBallotArea').firstChild);
@@ -1111,453 +950,156 @@
             }, 1000);
         }
 
-        // ==========================================
-        // TAB 7: RESULTS & PDF & SAVING TO SHEET
-        // ==========================================
-        function getOrdinalSuffix(i) {
-            var j = i % 10, k = i % 100;
-            if (j == 1 && k != 11) return i + "st";
-            if (j == 2 && k != 12) return i + "nd";
-            if (j == 3 && k != 13) return i + "rd";
-            return i + "th";
-        }
+        function getOrdinalSuffix(i) { var j = i % 10, k = i % 100; if (j == 1 && k != 11) return i + "st"; if (j == 2 && k != 12) return i + "nd"; if (j == 3 && k != 13) return i + "rd"; return i + "th"; }
 
         async function fetchResults(event) {
-            if(event) event.preventDefault(); 
-            
-            showLoader();
-            
+            if(event) event.preventDefault(); showLoader();
             try {
-                const cls = document.getElementById('resClass').value; 
-                const div = document.getElementById('resDiv').value;
+                const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
                 const res = await apiCall({ action: "getResults", Class: cls, Div: div });
-                
                 if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
 
-                // Save to Google Sheet
                 let totalValid = res.stats.totalPolled - res.stats.invalid;
                 await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
-
                 hideLoader();
-
-                document.getElementById('resultData').classList.remove('hidden');
-                document.getElementById('btnExportPDF').classList.remove('hidden');
                 
-                // Set Stats Safely
-                document.getElementById('resStud').innerText = res.stats.totalStudents || 0; 
-                document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; 
-                document.getElementById('resAbsent').innerText = res.stats.absentees || 0; 
-                document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
+                document.getElementById('resultData').classList.remove('hidden'); document.getElementById('btnExportPDF').classList.remove('hidden');
+                document.getElementById('resStud').innerText = res.stats.totalStudents || 0; document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; document.getElementById('resAbsent').innerText = res.stats.absentees || 0; document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
                 
-                const now = new Date(); 
-                document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-                document.getElementById('pdfGeneratedBy').innerText = sessionData.username; 
-                document.getElementById('pdfClass').innerText = cls; 
-                document.getElementById('pdfDiv').innerText = div; 
-                document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; 
-                document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; 
-                document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; 
-                document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; 
-                document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; 
-                document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
+                const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
 
-                const board = document.getElementById('animatedLeaderboard'); 
-                const pdfBody = document.getElementById('pdfTableBody');
+                const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
                 board.innerHTML = ""; pdfBody.innerHTML = "";
                 
                 if(res.leaderboard && res.leaderboard.length > 0) {
-                    
-                    // Trigger Confetti properly
-                    fireConfetti();
-                    
-                    let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
-
+                    fireConfetti(); let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
                     let arenaHTML = `<div class="results-arena"><div class="results-slider-wrapper"><div class="results-slider">`;
                     
                     rankedCandidates.forEach((c, index) => {
-                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                        let delay = index * 0.15; 
+                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let delay = index * 0.15; 
                         let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
                         let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
-
-                        // Apply 1st, 2nd, 3rd format here
                         let rankText = getOrdinalSuffix(c.rank);
-
-                        arenaHTML += `
-                            <div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">
-                                ${crown}
-                                <div class="slide-rank-badge">${rankText}</div>
-                                <img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
-                                <div class="slide-name">${c.Name}</div>
-                                <div class="slide-meta">CLASS ${cls}-${div}</div>
-                                <div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div>
-                                <div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div>
-                            </div>
-                        `;
+                        arenaHTML += `<div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">${crown}<div class="slide-rank-badge">${rankText}</div><img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'"><div class="slide-name">${c.Name}</div><div class="slide-meta">CLASS ${cls}-${div}</div><div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div><div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div></div>`;
                     });
                     
-                    arenaHTML += `</div></div></div>`; 
-                    board.innerHTML = arenaHTML;
+                    arenaHTML += `</div></div></div>`; board.innerHTML = arenaHTML;
 
-                    // Build PDF Data quietly
                     rankedCandidates.forEach((c) => {
-                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0;
-                        let rankText = getOrdinalSuffix(c.rank);
+                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let rankText = getOrdinalSuffix(c.rank);
                         pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
                     });
-
-                    // Wait slightly longer to ensure DOM is fully painted before animating numbers
                     setTimeout(animateFastNumbers, 600);
-                } else { 
-                    board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; 
-                }
-            } catch (error) {
-                console.error("Result Rendering Error:", error);
-                hideLoader();
-                await showModal("Render Error", "An error occurred while displaying results.");
-            }
+                } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
+            } catch (error) { console.error(error); hideLoader(); await showModal("Render Error", "An error occurred while displaying results."); }
         }
 
-        // Bulletproof Number Animation
         function animateFastNumbers() {
-            const counters = document.querySelectorAll('.fast-counter, .fast-counter-float');
-            
-            counters.forEach(counter => {
-                const targetAttr = counter.getAttribute('data-target');
-                const target = parseFloat(targetAttr) || 0;
-                const isFloat = counter.classList.contains('fast-counter-float');
-                
-                // If 0, instantly set it and skip animation to prevent getting stuck
-                if (target === 0) {
-                    counter.innerText = isFloat ? "0.0" : "0";
-                    return;
-                }
-
-                const duration = 2000;
-                const start = performance.now();
-                
+            document.querySelectorAll('.fast-counter, .fast-counter-float').forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target')) || 0; const isFloat = counter.classList.contains('fast-counter-float');
+                if (target === 0) { counter.innerText = isFloat ? "0.0" : "0"; return; }
+                const duration = 2000, start = performance.now();
                 function update(currentTime) {
-                    const elapsed = currentTime - start;
-                    const progress = Math.min(elapsed / duration, 1);
-                    // Smooth Ease-out formula
-                    const easeOut = 1 - Math.pow(1 - progress, 3); 
-                    const current = easeOut * target;
-                    
+                    const progress = Math.min((currentTime - start) / duration, 1);
+                    const current = (1 - Math.pow(1 - progress, 3)) * target;
                     counter.innerText = isFloat ? current.toFixed(1) : Math.floor(current);
-                    
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    } else {
-                        // Ensure it hits the exact target number at the very end
-                        counter.innerText = isFloat ? target.toFixed(1) : Math.floor(target);
-                    }
-                }
-                requestAnimationFrame(update);
+                    if (progress < 1) { requestAnimationFrame(update); } else { counter.innerText = isFloat ? target.toFixed(1) : Math.floor(target); }
+                } requestAnimationFrame(update);
             });
         }
 
         async function generatePDF() {
             const isConfirmed = await showModal("Save as PDF", "Click OK to open the Print/Save dialog. \n\nTip: In the dialog, set the 'Destination' to 'Save as PDF' to save it to your device.", true, "Open Print / Save");
             if (!isConfirmed) return;
-            
-            const printArea = document.getElementById('exportContent');
-            const originalParent = printArea.parentNode;
-            
-            // Move it directly to body to completely bypass mobile iOS/Android hidden parent bugs
-            document.body.appendChild(printArea);
-            document.body.classList.add('print-pdf'); 
-            
-            setTimeout(() => {
-                window.print();
-                setTimeout(() => { 
-                    document.body.classList.remove('print-pdf'); 
-                    originalParent.appendChild(printArea); // Move it back
-                }, 1000);
-            }, 100);
+            const printArea = document.getElementById('exportContent'); const originalParent = printArea.parentNode;
+            document.body.appendChild(printArea); document.body.classList.add('print-pdf'); 
+            setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('print-pdf'); originalParent.appendChild(printArea); }, 1000); }, 100);
         }
 
         function fireConfetti() {
-            if (typeof confetti === 'undefined') {
-                const script = document.createElement('script');
-                script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
-                script.onload = launchParticles;
-                document.head.appendChild(script);
-            } else {
-                launchParticles();
-            }
-
+            if (typeof confetti === 'undefined') { const script = document.createElement('script'); script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"; script.onload = launchParticles; document.head.appendChild(script); } else { launchParticles(); }
             function launchParticles() {
                 var duration = 4000; var end = Date.now() + duration;
-                (function frame() {
-                    confetti({ particleCount: 7, angle: 60, spread: 65, origin: { x: 0 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] });
-                    confetti({ particleCount: 7, angle: 120, spread: 65, origin: { x: 1 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] });
-                    if (Date.now() < end) requestAnimationFrame(frame);
-                }());
+                (function frame() { confetti({ particleCount: 7, angle: 60, spread: 65, origin: { x: 0 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] }); confetti({ particleCount: 7, angle: 120, spread: 65, origin: { x: 1 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] }); if (Date.now() < end) requestAnimationFrame(frame); }());
             }
         }
 
-        // MEDIA LIBRARY UPLOAD (Admin Tab 1)
         async function uploadMedia() {
-            const type = document.getElementById('mediaType').value;
-            const label = document.getElementById('mediaLabel').value.trim();
-            
-            // 1. Validate Input
+            const type = document.getElementById('mediaType').value; const label = document.getElementById('mediaLabel').value.trim();
             if(!label) { await showModal("Missing Input", "Please enter a label for this media."); return; }
-            
-            showLoader(); // Start the loading spinner
-            
-            // 2. Upload the file to ImgBB
-            const url = await uploadImage('mediaFile');
-            if(!url) { 
-                hideLoader(); 
-                return; // Stop if the image upload failed (error modal already handled in uploadImage)
-            } 
-            
-            // 3. Send the image URL and details to Google Sheets
-            const res = await apiCall({ action: "saveMedia", Type: type, Label: label, URL: url });
-            hideLoader(); // Stop the loading spinner
-            
-            // 4. Handle Backend Response
-            if(res.success) {
-                await showModal("Success", `${type} uploaded to Media Library successfully.`);
-                
-                // Clear the form for the next upload
-                document.getElementById('mediaLabel').value = ""; 
-                document.getElementById('mediaFile').value = "";
-                
-                // Clear the UI text displaying the file name (added in the previous step)
-                const fileNameDisplay = document.getElementById('uploadFileName');
-                if (fileNameDisplay) fileNameDisplay.innerText = ""; 
-                
-                // Refresh the dropdown lists so the new photo/symbol appears immediately
-                fetchMediaLib();
-            } else {
-                await showModal("Error", res.message);
-            }
+            showLoader(); const url = await uploadImage('mediaFile'); if(!url) { hideLoader(); return; } 
+            const res = await apiCall({ action: "saveMedia", Type: type, Label: label, URL: url }); hideLoader(); 
+            if(res.success) { await showModal("Success", `${type} uploaded to Media Library successfully.`); document.getElementById('mediaLabel').value = ""; document.getElementById('mediaFile').value = ""; const fileNameDisplay = document.getElementById('uploadFileName'); if (fileNameDisplay) fileNameDisplay.innerText = ""; fetchMediaLib(); } else { await showModal("Error", res.message); }
         }
 
         async function fetchMediaLib() {
-            // Fetch both media AND existing candidates simultaneously
-            const [mediaRes, candRes] = await Promise.all([
-                apiCall({ action: "getMedia" }),
-                apiCall({ action: "getAllCandidates" })
-            ]);
-
+            const[mediaRes, candRes] = await Promise.all([apiCall({ action: "getMedia" }), apiCall({ action: "getAllCandidates" })]);
             if(mediaRes.success && candRes.success) {
-                // Extract URLs that are already being used by an allotted candidate
-                const usedPhotos = candRes.data.map(c => c.Photo);
-                const usedSymbols = candRes.data.map(c => c.Symbol);
-
-                const pSel = document.getElementById('candPhotoSelect'); 
-                const sSel = document.getElementById('candSymbolSelect');
-                pSel.innerHTML = '<option value="">-- Select Photo --</option>'; 
-                sSel.innerHTML = '<option value="">-- Select Symbol --</option>';
-                
+                const usedPhotos = candRes.data.map(c => c.Photo); const usedSymbols = candRes.data.map(c => c.Symbol);
+                const pSel = document.getElementById('candPhotoSelect'); const sSel = document.getElementById('candSymbolSelect');
+                pSel.innerHTML = '<option value="">-- Select Photo --</option>'; sSel.innerHTML = '<option value="">-- Select Symbol --</option>';
                 let availablePhotos = 0, availableSymbols = 0;
-
-                // Only append media to dropdowns if it is NOT in the used lists
                 mediaRes.data.forEach(m => {
-                    if(m.Type === "Photo" && !usedPhotos.includes(m.URL)) {
-                        pSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`;
-                        availablePhotos++;
-                    }
-                    if(m.Type === "Symbol" && !usedSymbols.includes(m.URL)) {
-                        sSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`;
-                        availableSymbols++;
-                    }
+                    if(m.Type === "Photo" && !usedPhotos.includes(m.URL)) { pSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`; availablePhotos++; }
+                    if(m.Type === "Symbol" && !usedSymbols.includes(m.URL)) { sSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`; availableSymbols++; }
                 });
-
-                // Helper text if everything is used
                 if(availablePhotos === 0) pSel.innerHTML = '<option value="">-- All uploaded photos are in use --</option>';
                 if(availableSymbols === 0) sSel.innerHTML = '<option value="">-- All uploaded symbols are in use --</option>';
             }
         }
 
-        // POSTER GENERATOR (Tab 10)
         let allCandidates =[];
-        
         async function fetchCandidatesForPoster() {
-            // Fetch both Candidates and Media Library to match the Symbol URLs to their Labels
-            const[candRes, mediaRes] = await Promise.all([
-                apiCall({ action: "getAllCandidates" }),
-                apiCall({ action: "getMedia" })
-            ]);
-            
+            const[candRes, mediaRes] = await Promise.all([ apiCall({ action: "getAllCandidates" }), apiCall({ action: "getMedia" }) ]);
             if(candRes.success) {
-                // Map the symbol URLs to their Labels
-                let mediaMap = {};
-                if(mediaRes.success) {
-                    mediaRes.data.forEach(m => { mediaMap[m.URL] = m.Label; });
-                }
-                
-                // Store candidates with their matched symbol label
-                allCandidates = candRes.data.map(c => ({
-                    ...c, 
-                    SymbolLabel: mediaMap[c.Symbol] || "SYMBOL"
-                }));
-                
-                const sel = document.getElementById('posterCandSelect');
-                sel.innerHTML = '<option value="">Select Candidate...</option>';
-                allCandidates.forEach((c, idx) => { 
-                    sel.innerHTML += `<option value="${idx}">${c.Name} (Class ${c.Class}-${c.Div})</option>`; 
-                });
+                let mediaMap = {}; if(mediaRes.success) { mediaRes.data.forEach(m => { mediaMap[m.URL] = m.Label; }); }
+                allCandidates = candRes.data.map(c => ({ ...c, SymbolLabel: mediaMap[c.Symbol] || "SYMBOL" }));
+                const sel = document.getElementById('posterCandSelect'); sel.innerHTML = '<option value="">Select Candidate...</option>';
+                allCandidates.forEach((c, idx) => { sel.innerHTML += `<option value="${idx}">${c.Name} (Class ${c.Class}-${c.Div})</option>`; });
             }
         }
         
         function generatePosterPreview() {
-            const idx = document.getElementById('posterCandSelect').value;
-            if(idx === "") return;
-            const cand = allCandidates[idx];
-            
-            document.getElementById('posterName').innerText = cand.Name;
-            document.getElementById('posterClass').innerText = cand.Class;
-            document.getElementById('posterDiv').innerText = cand.Div;
-            document.getElementById('posterPhoto').src = cand.Photo;
-            document.getElementById('posterSymbol').src = cand.Symbol;
-            
-            // Sets the Candidate Name dynamically in the new bottom banner
-            document.getElementById('posterLeaderName').innerText = cand.Name.toUpperCase();
-            
-            // Inject "VOTE FOR [LABEL]" with a slightly smaller font so it doesn't break boundaries
-            document.getElementById('posterSymbolLabel').innerHTML = `VOTE FOR<br><span style="color:var(--danger); font-size: 20px;">${cand.SymbolLabel}</span>`;
+            const idx = document.getElementById('posterCandSelect').value; if(idx === "") return; const cand = allCandidates[idx];
+            document.getElementById('posterName').innerText = cand.Name; document.getElementById('posterClass').innerText = cand.Class; document.getElementById('posterDiv').innerText = cand.Div; document.getElementById('posterPhoto').src = cand.Photo; document.getElementById('posterSymbol').src = cand.Symbol; document.getElementById('posterLeaderName').innerText = cand.Name.toUpperCase(); document.getElementById('posterSymbolLabel').innerHTML = `VOTE FOR<br><span style="color:var(--danger); font-size: 20px;">${cand.SymbolLabel}</span>`;
         }
         
         function printPoster() {
-            if(document.getElementById('posterCandSelect').value === "") { 
-                showModal("Select Candidate", "Please select a candidate first."); 
-                return; 
-            }
-            
-            // 1. Temporarily move the poster out of the hidden app container
-            const printArea = document.getElementById('posterPrintArea');
-            const originalParent = printArea.parentNode;
-            document.body.appendChild(printArea); 
-            
-            document.body.classList.add('print-poster');
-            
-            // 2. Give the browser a split second to render the layout, then print
-            setTimeout(() => {
-                window.print();
-                
-                // 3. Put the poster back exactly where it belongs after the print dialog closes
-                setTimeout(() => { 
-                    document.body.classList.remove('print-poster'); 
-                    originalParent.appendChild(printArea);
-                }, 500);
-            }, 100);
+            if(document.getElementById('posterCandSelect').value === "") { showModal("Select Candidate", "Please select a candidate first."); return; }
+            const printArea = document.getElementById('posterPrintArea'); const originalParent = printArea.parentNode; document.body.appendChild(printArea); document.body.classList.add('print-poster');
+            setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('print-poster'); originalParent.appendChild(printArea); }, 500); }, 100);
         }
 
-        // FACTORY RESET (Tab 8)
         async function executeFactoryReset() {
-            if(!document.getElementById('resetConfirm1').checked || !document.getElementById('resetConfirm2').checked) {
-                await showModal("Action Blocked", "You must check both confirmation boxes to proceed."); return;
-            }
+            if(!document.getElementById('resetConfirm1').checked || !document.getElementById('resetConfirm2').checked) { await showModal("Action Blocked", "You must check both confirmation boxes to proceed."); return; }
             if(await showModal("CRITICAL WARNING", "Are you absolutely sure you want to wipe the entire database? This is final.", true, "YES, DELETE EVERYTHING")) {
                 showLoader(); const res = await apiCall({ action: "resetElection" }); hideLoader();
-                if(res.success) { await showModal("System Reset", "The election system has been wiped. Logging out."); logout(); } 
-                else await showModal("Error", res.message);
+                if(res.success) { await showModal("System Reset", "The election system has been wiped. Logging out."); logout(); } else await showModal("Error", res.message);
             }
         }
 
-        function triggerFileInput(useCamera) {
-            const fileInput = document.getElementById('mediaFile');
-            if (useCamera) {
-                // 'environment' natively forces the mobile phone to open its rear camera
-                fileInput.setAttribute('capture', 'environment'); 
-            } else {
-                // Removes the attribute so 'Browse' opens the normal gallery/file picker
-                fileInput.removeAttribute('capture');
-            }
-            fileInput.click();
-        }
+        function triggerFileInput(useCamera) { const fileInput = document.getElementById('mediaFile'); if (useCamera) { fileInput.setAttribute('capture', 'environment'); } else { fileInput.removeAttribute('capture'); } fileInput.click(); }
         
-        // ==========================================
-        // TAB 11: PARLIAMENT ASSEMBLY
-        // ==========================================
         async function fetchParliament() {
-            showLoader();
-            const res = await apiCall({ action: "getParliament" });
-            hideLoader();
-            
+            showLoader(); const res = await apiCall({ action: "getParliament" }); hideLoader();
             if (res.success) {
-                const mBody = document.querySelector('#ministryTable tbody');
-                const oBody = document.querySelector('#oppositionTable tbody');
-                mBody.innerHTML = ""; oBody.innerHTML = "";
-                
-                // Populate Ministry (Winners)
-                if (res.ministry.length === 0) { 
-                    mBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>No winners calculated yet. Ensure votes have been cast.</td></tr>"; 
-                } else {
-                    res.ministry.forEach((m, i) => {
-                        mBody.innerHTML += `<tr>
-                            <td style="font-weight:bold; font-size:16px;">${i+1}</td>
-                            <td><img src="${m.Photo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--success);" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/45'"></td>
-                            <td style="font-weight:900; color:var(--primary); text-transform:uppercase; font-size:16px;">${m.Name}</td>
-                            <td style="font-weight:bold; color:#475569;">${m.Class} - ${m.Div}</td>
-                            <td>
-                                <select style="margin:0; padding:8px; border-radius:5px; font-weight:bold; border: 1px solid #ccc; width:90%;">
-                                    <option value="" disabled selected>-- Assign Ministry --</option>
-                                    <option value="Chief Minister">Chief Minister</option>
-                                    <option value="Finance Minister">Finance Minister</option>
-                                    <option value="Home Affairs">Home Affairs</option>
-                                    <option value="Other Ministry">Other Ministry</option>
-                                </select>
-                            </td>
-                        </tr>`;
-                    });
+                const mBody = document.querySelector('#ministryTable tbody'); const oBody = document.querySelector('#oppositionTable tbody'); mBody.innerHTML = ""; oBody.innerHTML = "";
+                if (res.ministry.length === 0) { mBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>No winners calculated yet. Ensure votes have been cast.</td></tr>"; } else {
+                    res.ministry.forEach((m, i) => { mBody.innerHTML += `<tr><td style="font-weight:bold; font-size:16px;">${i+1}</td><td><img src="${m.Photo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--success);" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/45'"></td><td style="font-weight:900; color:var(--primary); text-transform:uppercase; font-size:16px;">${m.Name}</td><td style="font-weight:bold; color:#475569;">${m.Class} - ${m.Div}</td><td><select style="margin:0; padding:8px; border-radius:5px; font-weight:bold; border: 1px solid #ccc; width:90%;"><option value="" disabled selected>-- Assign Ministry --</option><option value="Chief Minister">Chief Minister</option><option value="Finance Minister">Finance Minister</option><option value="Home Affairs">Home Affairs</option><option value="Other Ministry">Other Ministry</option></select></td></tr>`; });
                 }
-
-                // Populate Opposition (Runners-up)
-                if (res.opposition.length === 0) { 
-                    oBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>No runners-up calculated yet.</td></tr>"; 
-                } else {
-                    res.opposition.forEach((o, i) => {
-                        oBody.innerHTML += `<tr>
-                            <td style="font-weight:bold; font-size:16px;">${i+1}</td>
-                            <td><img src="${o.Photo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--danger);" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/45'"></td>
-                            <td style="font-weight:900; color:var(--primary); text-transform:uppercase; font-size:16px;">${o.Name}</td>
-                            <td style="font-weight:bold; color:#475569;">${o.Class} - ${o.Div}</td>
-                            <td>
-                                <select style="margin:0; padding:8px; border-radius:5px; font-weight:bold; border: 1px solid #ccc; width:90%;">
-                                    <option value="" disabled selected>-- Assign Role --</option>
-                                    <option value="Opposition Leader">Opposition Leader</option>
-                                    <option value="Opposition">Opposition</option>
-                                </select>
-                            </td>
-                        </tr>`;
-                    });
+                if (res.opposition.length === 0) { oBody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>No runners-up calculated yet.</td></tr>"; } else {
+                    res.opposition.forEach((o, i) => { oBody.innerHTML += `<tr><td style="font-weight:bold; font-size:16px;">${i+1}</td><td><img src="${o.Photo}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--danger);" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/45'"></td><td style="font-weight:900; color:var(--primary); text-transform:uppercase; font-size:16px;">${o.Name}</td><td style="font-weight:bold; color:#475569;">${o.Class} - ${o.Div}</td><td><select style="margin:0; padding:8px; border-radius:5px; font-weight:bold; border: 1px solid #ccc; width:90%;"><option value="" disabled selected>-- Assign Role --</option><option value="Opposition Leader">Opposition Leader</option><option value="Opposition">Opposition</option></select></td></tr>`; });
                 }
-            } else {
-                await showModal("Error", "Failed to load Parliament Assembly data.");
-            }
+            } else { await showModal("Error", "Failed to load Parliament Assembly data."); }
         }
 
         async function printParliament(section) {
-            const isConfirmed = await showModal("Print / Save", `You are about to print or save the ${section} report. \n\nTip: You can assign positions in the dropdowns before clicking this to show them on the printout!`, true, "Proceed");
-            if (!isConfirmed) return;
-            
-            const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection';
-            const printArea = document.getElementById(printId);
-            const originalParent = printArea.parentNode;
-            const originalNextSibling = printArea.nextSibling;
-            
-            // Move directly to body for 100% mobile compatibility
-            document.body.appendChild(printArea);
-            
-            const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition';
-            document.body.classList.add(printClass);
-            
-            setTimeout(() => {
-                window.print();
-                setTimeout(() => { 
-                    document.body.classList.remove(printClass); 
-                    if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling);
-                    else originalParent.appendChild(printArea);
-                }, 1000);
-            }, 100);
+            const isConfirmed = await showModal("Print / Save", `You are about to print or save the ${section} report. \n\nTip: You can assign positions in the dropdowns before clicking this to show them on the printout!`, true, "Proceed"); if (!isConfirmed) return;
+            const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection'; const printArea = document.getElementById(printId); const originalParent = printArea.parentNode; const originalNextSibling = printArea.nextSibling;
+            document.body.appendChild(printArea); const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition'; document.body.classList.add(printClass);
+            setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove(printClass); if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling); else originalParent.appendChild(printArea); }, 1000); }, 100);
         }
-        
-        
     </script>
 </body>
 </html>
