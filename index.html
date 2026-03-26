@@ -295,12 +295,25 @@
             <!-- New Media Upload Library -->
             <div style="background: #e0f2fe; padding: 20px; border-radius: 10px; border: 1px solid #bae6fd; margin-bottom: 25px;">
                 <h3 style="margin-top:0; color:var(--primary);">1. Upload Media Library (Photos & Symbols)</h3>
-                <div class="d-flex" style="flex-wrap:wrap;">
-                    <select id="mediaType" style="flex:1; min-width:150px;"><option value="Photo">Candidate Photo</option><option value="Symbol">Election Symbol</option></select>
-                    <input type="text" id="mediaLabel" placeholder="Enter Label (e.g., 'John Photo' or 'Star Symbol')" style="flex:2; min-width:200px;">
-                    <input type="file" id="mediaFile" accept="image/*" style="flex:2; min-width:200px; margin-bottom:15px;">
-                    <button onclick="uploadMedia()" style="background:var(--primary); width:200px; margin:0;">Upload Media</button>
+                <p style="font-size:13px; color:#0369a1; margin-top:-5px; margin-bottom:15px;"><i>Note: For Candidate Photos, keep the subject centered for a square 35x35mm cut.</i></p>
+                
+                <div class="d-flex" style="flex-wrap:wrap; align-items:center;">
+                    <select id="mediaType" style="flex:1; min-width:150px; margin-bottom:10px;"><option value="Photo">Candidate Photo</option><option value="Symbol">Election Symbol</option></select>
+                    <input type="text" id="mediaLabel" placeholder="Enter Label (e.g., 'John Photo')" style="flex:2; min-width:200px; margin-bottom:10px;">
+                    
+                    <!-- Hidden File Input -->
+                    <input type="file" id="mediaFile" accept="image/*" style="display:none;" onchange="document.getElementById('uploadFileName').innerText = this.files.length > 0 ? 'Selected: ' + this.files[0].name : ''">
+                    
+                    <!-- Browse & Camera Buttons -->
+                    <div style="display:flex; gap:10px; flex:2; min-width:250px; margin-bottom:10px;">
+                        <button onclick="triggerFileInput(false)" style="background:#64748b; margin:0; flex:1;">📂 Browse</button>
+                        <button onclick="triggerFileInput(true)" style="background:#0ea5e9; margin:0; flex:1;">📷 Camera (35x35mm)</button>
+                    </div>
+                    
+                    <button onclick="uploadMedia()" style="background:var(--primary); width:150px; margin-bottom:10px;">Upload</button>
                 </div>
+                <!-- Displays the selected file or photo name -->
+                <div id="uploadFileName" style="margin-top: 5px; font-size: 14px; color: var(--primary); font-weight: bold; min-height: 20px;"></div>
             </div>
 
             <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
@@ -1208,19 +1221,40 @@
         async function uploadMedia() {
             const type = document.getElementById('mediaType').value;
             const label = document.getElementById('mediaLabel').value.trim();
+            
+            // 1. Validate Input
             if(!label) { await showModal("Missing Input", "Please enter a label for this media."); return; }
             
-            showLoader();
-            const url = await uploadImage('mediaFile');
-            if(!url) { hideLoader(); return; } // Error already shown in uploadImage()
+            showLoader(); // Start the loading spinner
             
+            // 2. Upload the file to ImgBB
+            const url = await uploadImage('mediaFile');
+            if(!url) { 
+                hideLoader(); 
+                return; // Stop if the image upload failed (error modal already handled in uploadImage)
+            } 
+            
+            // 3. Send the image URL and details to Google Sheets
             const res = await apiCall({ action: "saveMedia", Type: type, Label: label, URL: url });
-            hideLoader();
+            hideLoader(); // Stop the loading spinner
+            
+            // 4. Handle Backend Response
             if(res.success) {
-                await showModal("Success", `${type} uploaded to Media Library.`);
-                document.getElementById('mediaLabel').value = ""; document.getElementById('mediaFile').value = "";
+                await showModal("Success", `${type} uploaded to Media Library successfully.`);
+                
+                // Clear the form for the next upload
+                document.getElementById('mediaLabel').value = ""; 
+                document.getElementById('mediaFile').value = "";
+                
+                // Clear the UI text displaying the file name (added in the previous step)
+                const fileNameDisplay = document.getElementById('uploadFileName');
+                if (fileNameDisplay) fileNameDisplay.innerText = ""; 
+                
+                // Refresh the dropdown lists so the new photo/symbol appears immediately
                 fetchMediaLib();
-            } else await showModal("Error", res.message);
+            } else {
+                await showModal("Error", res.message);
+            }
         }
 
         async function fetchMediaLib() {
@@ -1346,6 +1380,18 @@
             }
         }
 
+        function triggerFileInput(useCamera) {
+            const fileInput = document.getElementById('mediaFile');
+            if (useCamera) {
+                // 'environment' natively forces the mobile phone to open its rear camera
+                fileInput.setAttribute('capture', 'environment'); 
+            } else {
+                // Removes the attribute so 'Browse' opens the normal gallery/file picker
+                fileInput.removeAttribute('capture');
+            }
+            fileInput.click();
+        }
+        
         
     </script>
 </body>
