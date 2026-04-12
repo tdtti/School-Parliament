@@ -596,7 +596,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzw3mMrf-oewFFJJlLg6rI4lw5sGSrx4FizmDKb1CFYAOheBLNK-9PVQU5hCZ59MehJlg/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRtHe6mqy3IyPpNuroOlZXWfSGvRzPn9m181b8JV-QIawk1jNxBU5DvMmA09lITAXhDQ/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
@@ -998,17 +998,37 @@
             
             if(voteType === "Standard") {
                 let displayName = (voterName && voterName.trim() !== "") ? voterName : "STUDENT";
-                document.getElementById('bgName').innerText = displayName; document.getElementById('bgClass').innerText = cls; document.getElementById('bgDiv').innerText = div;
+                document.getElementById('bgName').innerText = displayName; 
+                document.getElementById('bgClass').innerText = cls; 
+                document.getElementById('bgDiv').innerText = div;
                 document.getElementById('ballotGreeting').classList.remove('hidden');
             }
 
             const bList = document.getElementById(voteType === "Standard" ? 'ballotList' : 'homeBallotArea'); 
-            bList.classList.remove('hidden'); bList.innerHTML = "";
+            bList.classList.remove('hidden'); 
+            bList.innerHTML = "";
             
+            // Render Candidates
             candidates.forEach((c, i) => { 
-                bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
+                bList.innerHTML += `<div class="ballot-item">
+                    <div style="font-size:24px; font-weight:bold;">${i+1}</div>
+                    <div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div>
+                    <div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div>
+                    <div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div>
+                    <button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
+                </div>`; 
             });
-            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
+            
+            // Render NOTA with 100% Unblockable SVG Vector Image (Ballot box with Red X)
+            const notaImg = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='white'/%3E%3Crect x='25' y='15' width='50' height='70' fill='none' stroke='%231e3a8a' stroke-width='5' rx='5'/%3E%3Cline x1='35' y1='35' x2='65' y2='65' stroke='%23dc2626' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='65' y1='35' x2='35' y2='65' stroke='%23dc2626' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E";
+            
+            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;">
+                <div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div>
+                <div><img src="${notaImg}" class="ballot-img" style="background:white; border-color:var(--danger);"></div>
+                <div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; color:var(--danger);">N O T A</div>
+                <div><img src="${notaImg}" class="ballot-img" style="border-radius:0; border:none; background:transparent;"></div>
+                <button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '${notaImg}', '${notaImg}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
+            </div>`;
         }
 
         async function castVote(candId, candName, candSymbol, candPhoto, voteType, cls, div, gender, voterAdmNo) {
@@ -1048,11 +1068,11 @@
                 const symImg = document.getElementById('successCandSymbol'); 
                 const photoImg = document.getElementById('successCandPhoto');
                 
-                if (candId === "NOTA" || !candSymbol) { 
-                    symImg.style.display = 'none'; photoImg.style.display = 'none'; 
-                } else { 
-                    symImg.style.display = 'block'; symImg.src = candSymbol; 
-                    photoImg.style.display = 'block'; photoImg.src = candPhoto; 
+                if (!candSymbol) { 
+                symImg.style.display = 'none'; photoImg.style.display = 'none'; 
+                    } else { 
+                symImg.style.display = 'block'; symImg.src = candSymbol; 
+                photoImg.style.display = 'block'; photoImg.src = candPhoto; 
                 }
                 
                 document.getElementById('voteSuccessMsg').classList.remove('hidden');
@@ -1203,10 +1223,13 @@
                     let currentRank = 1;
                     let rankedCandidates = res.leaderboard.map((c, i, arr) => {
                         if (i > 0) {
+                            // If they have fewer votes than the person above, they drop down 1 rank
                             if (c.Votes < arr[i-1].Votes) {
-                                currentRank = i + 1; // Lower vote gets lower rank
-                            } else if (c.Votes === arr[i-1].Votes && arr[i-1].isTossWinner) {
-                                currentRank = i + 1; // If tied, but the guy above won the toss, they get the rank, you go down!
+                                currentRank++; 
+                            } 
+                            // If they have the SAME votes, but the person above WON a toss, the loser drops down 1 rank!
+                            else if (c.Votes === arr[i-1].Votes && c.tossWinOrder > arr[i-1].tossWinOrder) {
+                                currentRank++; 
                             }
                         }
                         return { ...c, rank: currentRank };
@@ -1215,35 +1238,35 @@
                     window.lastRankedCandidates = rankedCandidates; // Save for toss memory
 
                     // Identify unresolved Ties to show Toss Buttons (ONLY for 1st and 2nd place)
-                    let tieScoresCount = {};
-                    rankedCandidates.forEach(c => { 
-                        if(c.Votes > 0) tieScoresCount[c.Votes] = (tieScoresCount[c.Votes] || 0) + 1; 
+                    let tiesToResolve = [];
+                    let rankGroups = {};
+                    rankedCandidates.forEach(c => {
+                        // Group candidates by their current assigned rank (Only care about Rank 1 and 2)
+                        if(c.Votes > 0 && (c.rank === 1 || c.rank === 2)) {
+                            if(!rankGroups[c.rank]) rankGroups[c.rank] = [];
+                            rankGroups[c.rank].push(c);
+                        }
                     });
                     
-                    let pendingTossScores = [];
-                    for (let score in tieScoresCount) {
-                        score = parseInt(score);
-                        if (tieScoresCount[score] > 1) {
-                            let sampleCand = rankedCandidates.find(c => c.Votes === score);
-                            // ONLY Trigger Toss if they are tied for 1st or 2nd place!
-                            if (sampleCand && (sampleCand.rank === 1 || sampleCand.rank === 2)) {
-                                if (!res.leaderboard.some(c => c.Votes === score && c.isTossWinner)) {
-                                    pendingTossScores.push(score);
-                                }
-                            }
+                    for (let r in rankGroups) {
+                        // If more than 1 person shares Rank 1 or Rank 2, a Toss is required!
+                        if (rankGroups[r].length > 1) { 
+                            let score = rankGroups[r][0].Votes;
+                            tiesToResolve.push({ rank: parseInt(r), score: score });
                         }
                     }
                     
                     // Sort descending so 1st place toss shows above 2nd place toss
-                    pendingTossScores.sort((a,b) => b - a);
+                    tiesToResolve.sort((a,b) => a.rank - b.rank);
                     
                     let tieHtml = "";
-                    if (pendingTossScores.length > 0) {
+                    if (tiesToResolve.length > 0) {
                         tieHtml = `<div style="background: #fef08a; border: 2px solid #eab308; padding: 20px; border-radius: 12px; margin-bottom: 30px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); animation: popIn 0.5s;">
                             <h3 style="margin: 0 0 10px 0; color: #854d0e; font-size:22px;">⚠️ Tie Detected!</h3>
-                            <p style="margin:0 0 15px 0; color:#a16207;">Multiple candidates received the same number of votes.</p>`;
-                        pendingTossScores.forEach(score => {
-                            tieHtml += `<button onclick="openTossModal(${score})" style="background: #eab308; color: #000; width: auto; margin: 5px; font-size:16px;">🎲 TOSS COIN (For ${score} Votes)</button>`;
+                            <p style="margin:0 0 15px 0; color:#a16207;">Multiple candidates are tied for a winning position.</p>`;
+                        tiesToResolve.forEach(tie => {
+                            let position = tie.rank === 1 ? "1st Place" : "2nd Place (Runner-up)";
+                            tieHtml += `<button onclick="openTossModal(${tie.rank}, ${tie.score})" style="background: #eab308; color: #000; width: auto; margin: 5px; font-size:16px;">🎲 TOSS COIN (For ${position})</button>`;
                         });
                         tieHtml += `</div>`;
                     }
@@ -1269,7 +1292,20 @@
                     rankedCandidates.forEach((c) => {
                         let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; 
                         let rankText = getOrdinalSuffix(c.rank);
-                        pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
+                        
+                        // NEW: Check if this candidate officially won a toss (tossWinOrder is less than 999)
+                        let tossBadge = (c.tossWinOrder && c.tossWinOrder < 999) 
+                            ? `<br><span style="font-size:12px; color:#16a34a; font-weight:900;">(TOSS WINNER)</span>` 
+                            : "";
+
+                        pdfBody.innerHTML += `<tr>
+                            <td style="padding:10px;"><b>${rankText}</b></td>
+                            <td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td>
+                            <td style="font-weight:bold;">${c.Name}</td>
+                            <td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td>
+                            <td style="font-size:18px; font-weight:bold; line-height:1.2; padding:8px;">${c.Votes}${tossBadge}</td>
+                            <td>${pct}%</td>
+                        </tr>`;
                     });
                     
                     setTimeout(animateFastNumbers, 600);
@@ -1283,9 +1319,11 @@
             }
         }
 
-        function openTossModal(score) {
-            currentTossCandidates = window.lastRankedCandidates.filter(c => c.Votes === score);
-            document.getElementById('tossVoteCount').innerText = score;
+        function openTossModal(rank, score) {
+            // Only pull the candidates competing for this specific rank
+            currentTossCandidates = window.lastRankedCandidates.filter(c => c.rank === rank && c.Votes === score);
+            document.getElementById('tossVoteCount').innerText = `${score} Votes (For ${rank === 1 ? '1st' : '2nd'} Place)`;
+            
             const container = document.getElementById('tossCandidates');
             container.innerHTML = "";
             
@@ -1307,7 +1345,9 @@
             const cands = currentTossCandidates;
             
             let cycles = 0, speed = 50, lastIdx = 0;
-            const spin = () => {
+            
+            // We use an async function for the spin so we can await the database save!
+            const spin = async () => {
                 document.getElementById(`tossCand_${lastIdx}`).style.borderColor = "transparent";
                 lastIdx = Math.floor(Math.random() * cands.length);
                 document.getElementById(`tossCand_${lastIdx}`).style.borderColor = "#ffd700";
@@ -1319,14 +1359,19 @@
                 } else {
                     const winner = cands[lastIdx];
                     document.getElementById(`tossCand_${lastIdx}`).style.backgroundColor = "rgba(255,215,0,0.3)";
-                    document.getElementById('tossWinnerName').innerText = winner.Name;
+                    
+                    // Show winner, but tell user we are saving
+                    document.getElementById('tossWinnerName').innerHTML = `${winner.Name} <br><span style="font-size:16px; color:#ccc;">(Saving to Database...)</span>`;
                     document.getElementById('tossWinnerAnnouncement').classList.remove('hidden');
+                    
+                    // === CRITICAL FIX: WAIT FOR GOOGLE SHEETS TO CONFIRM ===
+                    const cls = document.getElementById('resClass').value, div = document.getElementById('resDiv').value;
+                    await apiCall({ action: "saveTossWinner", Class: cls, Div: div, CandidateAdmNo: winner.AdmNo, Score: currentTossCandidates[0].Votes });
+                    
+                    // NOW we show the confetti and the close button, because it's safely saved!
+                    document.getElementById('tossWinnerName').innerText = winner.Name;
                     document.getElementById('btnCloseToss').classList.remove('hidden');
                     fireConfetti();
-                    
-                    const cls = document.getElementById('resClass').value, div = document.getElementById('resDiv').value;
-                    // Tells Code.gs to save this winner to the System tab
-                    apiCall({ action: "saveTossWinner", Class: cls, Div: div, CandidateAdmNo: winner.AdmNo, Score: currentTossCandidates[0].Votes });
                 }
             };
             spin();
