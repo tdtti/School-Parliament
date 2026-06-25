@@ -531,7 +531,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlQZGT6Mk0UBu6yc_3iIqaTt51N6EsdIfb7CEPmmXu2KlxlSoZEqh3lkNEXousfCUFtQ/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIzGpR4q1MXeiJUWsAn77cXAGtbup3DtK-DVwP8R0mQHpaKg_TjuPfg7oUmPi0-3jSxA/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
         const ROLES = {
@@ -609,13 +609,33 @@
         window.onload = () => { startLiveClock(); const saved = localStorage.getItem("electionSession"); if(saved) { sessionData = JSON.parse(saved); initSession(); } };
 
         async function loginStaff() {
-            const user = document.getElementById('loginId').value.trim(); const pass = document.getElementById('loginPass').value.trim();
-            if(ROLES[user] && ROLES[user].pass === pass) {
-                sessionData = { username: user, loginTime: new Date().getTime(), role: user };
-                if(document.getElementById('keepLoggedIn').checked) localStorage.setItem("electionSession", JSON.stringify(sessionData));
+            const user = document.getElementById('loginId').value.trim(); 
+            const pass = document.getElementById('loginPass').value.trim();
+            
+            if(!user || !pass) { 
+                await showModal("Input Required", "Please enter both Username and Password."); 
+                return; 
+            }
+            
+            showLoader();
+            const res = await apiCall({ action: "staffLogin", username: user, password: pass });
+            hideLoader();
+            
+            if(res.success) {
+                sessionData = { 
+                    username: res.username, 
+                    loginTime: new Date().getTime(), 
+                    role: res.username, 
+                    tabs: res.tabs 
+                };
+                if(document.getElementById('keepLoggedIn').checked) {
+                    localStorage.setItem("electionSession", JSON.stringify(sessionData));
+                }
                 apiCall({ action: "logLogin", username: sessionData.username, loginTime: formatDateTime(new Date(sessionData.loginTime)) });
                 initSession();
-            } else { await showModal("Access Denied", "Invalid staff credentials."); }
+            } else { 
+                await showModal("Access Denied", res.message || "Invalid staff credentials."); 
+            }
         }
 
         async function loginHomeVoter() {
@@ -643,7 +663,9 @@
             if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
 
             document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
-            const allowedTabs = sessionData.role === "Home" ? ["tab6"] : ROLES[sessionData.role].tabs;
+            
+            // Dynamic access list lookup from database session
+            const allowedTabs = sessionData.role === "Home" ? ["tab6"] : (sessionData.tabs || []);
             
             allowedTabs.forEach(tab => { const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); if(btn) btn.style.display = 'block'; });
             switchTab(allowedTabs[0]);
