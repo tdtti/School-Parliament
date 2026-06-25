@@ -534,15 +534,7 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIzGpR4q1MXeiJUWsAn77cXAGtbup3DtK-DVwP8R0mQHpaKg_TjuPfg7oUmPi0-3jSxA/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
-        const ROLES = {
-            "admin":     { pass: "admin123", tabs:["tab1","tab2","tab3","tab4","tab5","tab6","tab7","tab9", "tab10","tab11","tab8"] },
-            "polling":   { pass: "pol123",   tabs: ["tab2"] },
-            "Control":   { pass: "con123",   tabs: ["tab3"] },
-            "Balot":     { pass: "Bal123",   tabs: ["tab4"] },
-            "presiding": { pass: "pre123",   tabs:["tab5"] },
-            "RESULT":    { pass: "RES123",   tabs:["tab7"] }
-        };
-
+        
         let sessionData = { username: "", loginTime: null, role: "", homeData: null };
         let intervals =[], localVotersData =[], activeHomeVoterTimer;
 
