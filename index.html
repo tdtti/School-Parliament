@@ -1850,37 +1850,7 @@
             }
         }
 
-        let currentBallotReady = false;
-        function startBallotUnitPolling() {
-            intervals.push(setInterval(async () => {
-                const res = await apiCall({ action: "checkBallotStatus" });
-                if(res.success) {
-                    if (res.globalStatus !== "Started" || res.cuState === "Stopped" || !res.cuState) {
-                        setLEDs("bu", null);
-                        currentBallotReady = false; 
-                        document.getElementById('ballotGreeting').classList.add('hidden'); 
-                        document.getElementById('ballotList').classList.add('hidden'); 
-                        document.getElementById('ballotList').innerHTML = ""; 
-                        document.getElementById('ballotWaiting').classList.remove('hidden'); 
-                        document.getElementById('ballotWaiting').innerHTML = "<h3>Waiting for Control Unit activation...</h3>";
-                    } else if(res.ready && res.admNo !== lastVotedAdmNo && !currentBallotReady) { 
-                        setLEDs("bu", true);
-                        currentBallotReady = true; 
-                        let currentVoterName = res.voterName || "STUDENT";
-                        renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
-                    } else if((!res.ready || res.admNo === lastVotedAdmNo) && currentBallotReady) { 
-                        setLEDs("bu", false);
-                        currentBallotReady = false; 
-                        document.getElementById('ballotGreeting').classList.add('hidden'); 
-                        document.getElementById('ballotList').classList.add('hidden'); 
-                        document.getElementById('ballotList').innerHTML = ""; 
-                        document.getElementById('ballotWaiting').classList.remove('hidden'); 
-                    } else if(!res.ready) {
-                        setLEDs("bu", false); 
-                    }
-                }
-            }, 2500));
-        }
+        
         
         function renderBallot(candidates, voteType, cls, div, gender, admNo = null, voterName = "STUDENT") {
             document.getElementById(voteType === "Standard" ? 'ballotWaiting' : 'homeVoterLoginArea').classList.add('hidden'); 
