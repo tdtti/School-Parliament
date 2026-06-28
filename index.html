@@ -1,4 +1,3 @@
-<html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,25 +47,356 @@
         .led.green { background: #005500; } .led.green.on { background: #00ff00; box-shadow: 0 0 20px #00ff00; }
         .big-btn { font-size: 20px; padding: 25px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-top: 20px;}
         
-        .ballot-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #f9fafb; }
-        .ballot-img { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid var(--primary); }
-        .vote-btn { width: 80px; height: 40px; background: var(--primary); border-radius: 20px; margin: 0; }
+        /* Ballot List Responsive Grid */
+        .ballot-item {
+            display: grid;
+            grid-template-columns: 40px 60px 1fr 60px 100px;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f9fafb;
+        }
+        .ballot-sl {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: var(--primary);
+        }
+        .ballot-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+        }
+        .ballot-img.symbol {
+            border-radius: 0;
+            border: none;
+            object-fit: contain;
+        }
+        .ballot-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text);
+        }
+        .ballot-vote-container {
+            display: flex;
+            justify-content: center;
+        }
+        .vote-btn {
+            width: 100%;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 20px;
+            margin: 0;
+            font-weight: bold;
+            cursor: pointer;
+        }
         
-        /* Leaderboard Animations */
-        .leaderboard-container { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; }
-        .candidate-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.05); opacity: 0; animation: popIn 0.5s ease-out forwards; }
-        .candidate-card.rank-1 { border: 2px solid gold; background: #fffdf0; transform: scale(1.02); }
-        .candidate-card.rank-2 { border: 2px solid silver; background: #f8f9fa; }
-        .candidate-card.rank-3 { border: 2px solid #cd7f32; background: #fdfaf7; }
+        /* Mobile View Optimization for Ballot */
+        @media (max-width: 600px) {
+            .ballot-item {
+                grid-template-columns: 40px 50px 1fr 50px;
+                grid-template-rows: auto auto;
+                gap: 8px;
+                padding: 10px;
+            }
+            .ballot-sl {
+                grid-column: 1;
+                grid-row: 1 / span 2;
+                font-size: 20px;
+            }
+            .ballot-photo-container {
+                grid-column: 2;
+                grid-row: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .ballot-img {
+                width: 45px;
+                height: 45px;
+            }
+            .ballot-name {
+                grid-column: 3;
+                grid-row: 1;
+                font-size: 16px;
+                align-self: center;
+            }
+            .ballot-symbol-container {
+                grid-column: 4;
+                grid-row: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .ballot-vote-container {
+                grid-column: 2 / span 3;
+                grid-row: 2;
+                width: 100%;
+            }
+            .vote-btn {
+                height: 36px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+        }
         
-        .cand-rank { font-size: 24px; font-weight: bold; width: 40px; text-align: center; color: var(--primary); }
-        .rank-1 .cand-rank { color: gold; font-size: 28px; }
-        .cand-info { flex: 1; padding: 0 15px; }
-        .cand-info h3 { margin: 0 0 5px 0; }
-        .progress-track { width: 100%; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--secondary); transition: width 1.5s ease-out; width: 0%; }
-        .rank-1 .progress-fill { background: gold; }
-        .cand-stats { text-align: right; width: 100px; font-weight: bold; font-size: 18px; color: var(--text); }
+        /* Responsive Grid Results Arena */
+        .results-arena {
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            border-radius: 24px;
+            padding: 40px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            margin-top: 30px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .results-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            text-align: center;
+            padding: 35px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .results-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+
+        .results-card.rank-1 {
+            border: 3px solid #ffd700;
+            background: linear-gradient(180deg, rgba(255,215,0,0.12), rgba(0,0,0,0.5));
+            box-shadow: 0 10px 30px rgba(255,215,0,0.15);
+        }
+        .results-card.rank-2 {
+            border: 2px solid #c0c0c0;
+            background: linear-gradient(180deg, rgba(192,192,192,0.08), rgba(0,0,0,0.45));
+            box-shadow: 0 8px 25px rgba(192,192,192,0.1);
+        }
+        .results-card.rank-3 {
+            border: 2px solid #cd7f32;
+            background: linear-gradient(180deg, rgba(205,127,50,0.08), rgba(0,0,0,0.45));
+            box-shadow: 0 8px 20px rgba(205,127,50,0.08);
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: -18px;
+            font-weight: 900;
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 5px 20px;
+            border: 2px solid;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            z-index: 10;
+            transform: rotate(-3deg);
+        }
+        .rank-1 .rank-badge { border-color: #ffd700; color: #ffd700; font-size: 18px; top: -22px; }
+        .rank-2 .rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 15px; }
+        .rank-3 .rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 14px; }
+        .rank-other .rank-badge { border-color: #fff; color: #fff; font-size: 12px; top: -12px; transform: rotate(0deg); }
+
+        .card-avatar {
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255,255,255,0.2);
+            margin-bottom: 15px;
+            background: white;
+            z-index: 5;
+            width: 90px;
+            height: 90px;
+        }
+        .rank-1 .card-avatar { width: 140px; height: 140px; border: 5px solid #ffd700; box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+        .rank-2 .card-avatar { width: 110px; height: 110px; border-color: #c0c0c0; }
+        .rank-3 .card-avatar { width: 100px; height: 100px; border-color: #cd7f32; }
+
+        .card-name { font-weight: 900; color: #fff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 5px; }
+        .rank-1 .card-name { font-size: 26px; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
+        .rank-2 .card-name { font-size: 20px; color: #c0c0c0; }
+        .rank-3 .card-name { font-size: 18px; color: #cd7f32; }
+        .rank-other .card-name { font-size: 15px; color: #e2e8f0; }
+
+        .card-meta { font-weight: bold; color: #94a3b8; margin-bottom: 15px; font-size: 12px; }
+        .rank-1 .card-meta { font-size: 14px; }
+
+        .card-votes { font-weight: 900; line-height: 1; margin-bottom: 15px; }
+        .rank-1 .card-votes { font-size: 48px; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.4); }
+        .rank-2 .card-votes { font-size: 38px; color: #fff; }
+        .rank-3 .card-votes { font-size: 38px; color: #fff; }
+        .rank-other .card-votes { font-size: 24px; color: #fff; }
+
+        .card-pct { font-weight: 900; display: inline-block; border-radius: 30px; }
+        .rank-1 .card-pct { font-size: 18px; color: #000; background: #ffd700; padding: 5px 20px; box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+        .rank-2 .card-pct { font-size: 15px; color: #0f172a; background: #c0c0c0; padding: 4px 15px; }
+        .rank-3 .card-pct { font-size: 13px; color: #fff; background: rgba(205,127,50,0.5); border: 1px solid #cd7f32; padding: 3px 12px; }
+        .rank-other .card-pct { font-size: 11px; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; padding: 3px 10px; }
+
+        /* Transparent automated dice tie indicator styling */
+        .tie-breaker-badge {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px dashed #f59e0b;
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Screen photo resizing so all candidates are visible together on small devices */
+        @media (max-width: 600px) {
+            .results-grid {
+                grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+                gap: 8px;
+            }
+            .results-card {
+                padding: 12px 6px;
+                border-radius: 12px;
+            }
+            .card-avatar {
+                width: 42px !important;
+                height: 42px !important;
+                border-width: 2px !important;
+            }
+            .rank-1 .card-avatar {
+                width: 55px !important;
+                height: 55px !important;
+                border-width: 3px !important;
+            }
+            .card-name {
+                font-size: 10px !important;
+            }
+            .rank-1 .card-name {
+                font-size: 12px !important;
+            }
+            .card-votes {
+                font-size: 16px !important;
+            }
+            .rank-1 .card-votes {
+                font-size: 22px !important;
+            }
+            .card-pct {
+                font-size: 8px !important;
+                padding: 2px 4px !important;
+            }
+            .rank-badge {
+                font-size: 8px !important;
+                padding: 1px 6px !important;
+                top: -8px !important;
+            }
+            .tie-breaker-badge {
+                font-size: 7.5px !important;
+                padding: 2px 4px !important;
+                margin-top: 6px !important;
+            }
+        }
+
+        /* Interactive 3D Coin Flipping Engine Styles */
+        .coin-container {
+            perspective: 1000px;
+            width: 140px;
+            height: 140px;
+            margin: 20px auto;
+        }
+        .coin {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+        .coin-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 6px solid #d97706;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+            background: #fef08a;
+            overflow: hidden;
+        }
+        .coin-front {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+        .coin-back {
+            transform: rotateY(180deg);
+        }
+        .coin-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            opacity: 0.85;
+        }
+        .coin-label {
+            position: relative;
+            z-index: 2;
+            background: rgba(15, 23, 42, 0.9);
+            color: #fbbf24;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid #fbbf24;
+            margin-top: auto;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        /* Shaking Lottery jar styles */
+        .chit-box {
+            font-size: 70px;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            margin: 20px auto;
+            cursor: pointer;
+            user-select: none;
+        }
+        .chit-box.shaking {
+            animation: boxShake 0.4s ease-in-out infinite alternate;
+        }
+        @keyframes boxShake {
+            0% { transform: translateY(0) rotate(-4deg); }
+            100% { transform: translateY(-10px) rotate(4deg); }
+        }
 
         /* Full Screen Loader Spinner */
         .global-spinner-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; }
@@ -81,6 +411,7 @@
         .live-clock-panel { text-align: right; font-weight: bold; font-size: 16px; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;}
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pulse { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
         @keyframes popIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -90,64 +421,39 @@
         @keyframes snapIn { from { opacity: 0; transform: scale(0.98) translateZ(0); } to { opacity: 1; transform: scale(1) translateZ(0); } }
         .global-spinner-overlay { backdrop-filter: blur(4px); transition: opacity 0.2s ease; }
         
-        /* Horizontal Slidable Graphics Arena */
-        .results-arena { background: linear-gradient(145deg, #0f172a, #1e1b4b); border-radius: 24px; padding: 20px 0; box-shadow: 0 30px 60px rgba(0,0,0,0.4); position: relative; margin-top: 30px; }
-        .results-slider-wrapper { width: 100%; overflow: hidden; position: relative; }
-        .results-slider { display: flex; gap: 40px; overflow-x: auto; padding: 60px 40px; align-items: center; scroll-behavior: smooth; }
-        
-        .results-slider::-webkit-scrollbar { height: 12px; }
-        .results-slider::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; margin: 0 20px; }
-        .results-slider::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.6); border-radius: 10px; }
-
-        .slide-card { position: relative; flex-shrink: 0; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 24px; text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .slide-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.08); }
-
-        /* Rank Scaling & Styling */
-        .slide-card.rank-1 { width: 340px; border: 4px solid #ffd700; background: linear-gradient(180deg, rgba(255,215,0,0.15), rgba(0,0,0,0.5)); z-index: 10; animation: glow1 2s infinite alternate; }
-        .slide-card.rank-2 { width: 280px; border: 3px solid #c0c0c0; background: linear-gradient(180deg, rgba(192,192,192,0.1), rgba(0,0,0,0.4)); box-shadow: 0 0 30px rgba(192,192,192,0.3); z-index: 9; }
-        .slide-card.rank-3 { width: 240px; border: 3px solid #cd7f32; background: linear-gradient(180deg, rgba(205,127,50,0.1), rgba(0,0,0,0.4)); box-shadow: 0 0 20px rgba(205,127,50,0.3); z-index: 8; }
-        .slide-card.rank-other { width: 180px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); z-index: 7; opacity: 0.85; }
-        .slide-card.rank-other:hover { opacity: 1; }
-
-        .slide-rank-badge { position: absolute; top: -20px; left: -20px; font-weight: 900; background: #0f172a; border-radius: 20px; padding: 5px 25px; border: 2px solid; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; transform: rotate(-5deg); }
-        .rank-1 .slide-rank-badge { border-color: #ffd700; color: #ffd700; font-size: 30px; top: -25px; left: -35px; box-shadow: 0 0 20px #ffd700; transform: rotate(-10deg); }
-        .rank-2 .slide-rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 24px; left: -25px; }
-        .rank-3 .slide-rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 20px; left: -20px; }
-        .rank-other .slide-rank-badge { border-color: #fff; color: #fff; font-size: 14px; top: -15px; left: -15px; padding: 3px 15px; transform: rotate(0deg); }
-        
-        .slide-avatar { border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,0.2); margin-bottom: 15px; background: white; z-index: 5; position: relative;}
-        .rank-1 .slide-avatar { width: 170px; height: 170px; border: 6px solid #ffd700; box-shadow: 0 0 40px rgba(255,215,0,0.6); }
-        .rank-2 .slide-avatar { width: 130px; height: 130px; border-color: #c0c0c0; }
-        .rank-3 .slide-avatar { width: 110px; height: 110px; border-color: #cd7f32; }
-        .rank-other .slide-avatar { width: 80px; height: 80px; border-width: 2px; }
-
-        .slide-name { font-weight: 900; color: #fff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 5px; }
-        .rank-1 .slide-name { font-size: 32px; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.5); }
-        .rank-2 .slide-name { font-size: 26px; color: #c0c0c0; }
-        .rank-3 .slide-name { font-size: 20px; color: #cd7f32; }
-        .rank-other .slide-name { font-size: 15px; color: #e2e8f0; }
-
-        .slide-meta { font-weight: bold; color: #94a3b8; margin-bottom: 15px; }
-        .rank-1 .slide-meta { font-size: 18px; }
-        .rank-2 .slide-meta { font-size: 15px; }
-        .rank-3 .slide-meta { font-size: 13px; }
-        .rank-other .slide-meta { font-size: 11px; margin-bottom: 10px; }
-
-        .slide-votes { font-weight: 900; line-height: 1; margin-bottom: 15px; }
-        .rank-1 .slide-votes { font-size: 60px; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        .rank-2 .slide-votes { font-size: 45px; color: #fff; }
-        .rank-3 .slide-votes { font-size: 35px; color: #fff; }
-        .rank-other .slide-votes { font-size: 24px; color: #fff; }
-
-        .slide-pct { font-weight: 900; display: inline-block; border-radius: 30px; }
-        .rank-1 .slide-pct { font-size: 22px; color: #000; background: #ffd700; padding: 6px 25px; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
-        .rank-2 .slide-pct { font-size: 18px; color: #0f172a; background: #c0c0c0; padding: 4px 18px; }
-        .rank-3 .slide-pct { font-size: 15px; color: #fff; background: rgba(205,127,50,0.5); border: 1px solid #cd7f32; padding: 4px 15px; }
-        .rank-other .slide-pct { font-size: 12px; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; padding: 3px 12px; }
-
         @keyframes slideInRight { from { opacity: 0; transform: translateX(80px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
-        @keyframes glow1 { from { box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1); } to { box-shadow: 0 0 60px rgba(255,215,0,0.8), inset 0 0 40px rgba(255,215,0,0.3); } }
         
+        /* Coin Spin & Chit Shuffle animations */
+        .spinning-coin {
+            width: 120px;
+            height: 120px;
+            background: #eab308;
+            border-radius: 50%;
+            border: 5px solid #ca8a04;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.5);
+            animation: coinSpin 1.2s ease-in-out infinite alternate;
+        }
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg) scale(1); }
+            100% { transform: rotateY(720deg) scale(1.1); }
+        }
+
+        .shaking-chit-box {
+            font-size: 80px;
+            animation: boxShake 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes boxShake {
+            0% { transform: translateY(0) rotate(-4deg); }
+            100% { transform: translateY(-10px) rotate(4deg); }
+        }
+
         /* --- NATIVE PRINT & PDF SAVING STYLES --- */
         @media print {
             body * { visibility: hidden; }
@@ -186,6 +492,29 @@
                 <button id="modalBtnCancel" style="background:#9ca3af; display:none; width:120px;">Cancel</button>
                 <button id="modalBtnOk" style="background:var(--primary); width:120px;">OK</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Before Result reveal Curtain Screen [2] -->
+    <div id="revealCurtain" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #1e3a8a, #0f172a); z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGka-p7C45PTqBMBKqSjulqicQlHmW_Ee1BCfUPpaW888vYnoPjElzW9DVm8az1kCOjdlabjA3qb_vS00GpCApyVWh2C0aIcOcvb-BWeeTI8AdLojSf25iCvNpMS6aENxrWO-SgM5xjqePEMsHfCLy4HinnGk2xAnDlKaapXYFY05jXQM/s56-c/Logo2.png" alt="School Logo" style="width: 100px; height: 100px; border-radius: 50%; background: white; padding: 5px; margin-bottom: 20px; box-shadow: 0 0 30px rgba(255,255,255,0.2);">
+        <h1 style="font-size: 42px; font-weight: 900; margin-bottom: 10px; color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);">TDTTI THURAVOOR</h1>
+        <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; color: #cbd5e1; letter-spacing: 2px;">ELECTION RESULTS COMPILED</h2>
+        <div style="font-size: 24px; padding: 15px 40px; border: 2px solid #fbbf24; border-radius: 30px; animation: pulse 1.5s infinite; color: #fbbf24; font-weight: bold; cursor: pointer;">
+            PRESS ANY KEY TO REVEAL VERDICT
+        </div>
+    </div>
+
+    <!-- Verifiable Physical Tie-Breaker Resolution Arena Overlay [2] -->
+    <div id="fullScreenTieModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 100001; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 40px; box-sizing: border-box; overflow-y: auto;">
+        <div style="max-width: 900px; width: 100%; text-align: center;">
+            <h1 style="color: #fbbf24; font-size: 40px; margin-bottom: 5px; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); text-transform: uppercase;">
+                🎲 Tie-Break Presentation Arena
+            </h1>
+            <p style="color: #94a3b8; font-size: 16px; margin-bottom: 40px;">
+                Verifiable Simulated Tie Resolution (Press any key to close and return)
+            </p>
+            <div id="fullScreenTieCandidatesList" style="display: flex; flex-direction: column; gap: 30px; width: 100%;"></div>
         </div>
     </div>
 
@@ -299,7 +628,6 @@
             <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
                 <h2 style="margin: 0; color: var(--primary); text-transform: uppercase;">Control Unit</h2>
                 <div class="led-container" style="margin: 0;">
-                    <!-- Default state: OFF (no "on" class) -->
                     <div id="cuRed" class="led red"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
                     <div id="cuGreen" class="led green"></div> <span style="font-weight:900; font-size:18px; color:var(--success)">READY</span>
                 </div>
@@ -324,7 +652,6 @@
             <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
                 <h2 style="margin: 0; color: var(--primary); text-transform: uppercase;">Ballot Unit</h2>
                 <div class="led-container" style="margin: 0;">
-                    <!-- Default state: OFF (no "on" class) -->
                     <div id="buRed" class="led red"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
                     <div id="buGreen" class="led green"></div> <span style="font-weight:900; font-size:18px; color:var(--success)">READY</span>
                 </div>
@@ -335,14 +662,12 @@
                 <h4 style="margin:10px 0 0; color:#475569; font-size: 18px; letter-spacing: 2px;">CLASS <span id="bgClass"></span> | DIVISION <span id="bgDiv"></span></h4>
             </div>
 
-            <div id="ballotList" class="hidden" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: inset 0 0 10px #ccc;"></div>
+            <div id="ballotList" class="hidden" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px;"></div>
             <div id="ballotWaiting" class="text-center" style="padding: 50px;"><h3>Waiting for Control Unit activation...</h3></div>
         </div>
 
         <div id="tab5" class="tab-content">
             <h2 id="vrTitle">Presiding Officer - Voting Records</h2>
-            
-            <!-- NEW GLOBAL START ELECTION BUTTON -->
             <button id="btnGlobalStart" onclick="startGlobalElection()" style="background:var(--success); font-size:20px; padding:15px; margin-bottom:15px; width:100%;">START ELECTION</button>
             
             <button onclick="fetchVotingStats()">Refresh Stats</button>
@@ -351,7 +676,6 @@
                 <div style="padding: 20px; background: #dbeafe; border-radius: 10px; text-align: center; width: 30%;"><h3>Male Votes</h3><h1 id="statMale">0</h1></div>
                 <div style="padding: 20px; background: #fce7f3; border-radius: 10px; text-align: center; width: 30%;"><h3>Female Votes</h3><h1 id="statFemale">0</h1></div>
             </div>
-            <!-- Disabled by default via HTML attribute -->
             <button id="btnGlobalEnd" onclick="endGlobalElection()" style="background: #9ca3af; font-size: 20px; padding: 15px;" disabled>END ALL POLLS GLOBALLY</button>
         </div>
 
@@ -374,6 +698,20 @@
                 <button onclick="fetchResults(event)" style="width:50%;">Publish Results</button>
                 <button id="btnExportPDF" class="hidden" onclick="generatePDF()" style="background:#dc2626; width:50%;">Save as PDF</button>
             </div>
+
+            <!-- Simulated Physical Tie-Breaker Embedded Audit Panel with close (X) toggle [2] -->
+            <div id="manualTieBreakerCard" class="hidden" style="background: rgba(245, 158, 11, 0.05); border: 2px dashed #f59e0b; border-radius: 16px; padding: 20px; margin: 25px auto; max-width: 600px; text-align: center; position: relative;">
+                <button onclick="document.getElementById('manualTieBreakerCard').classList.add('hidden')" style="position: absolute; top: 10px; right: 15px; width: auto; background: transparent; border: none; color: #d97706; font-size: 22px; font-weight: bold; cursor: pointer; margin: 0; padding: 0;">&times;</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-right: 25px;">
+                    <h3 style="margin: 0; color: #d97706; display: flex; align-items: center; gap: 8px;">
+                        🎲 Verifiable Tie-Break Resolution Log
+                    </h3>
+                    <button onclick="openFullScreenTieBreaker()" style="width: auto; padding: 8px 16px; background: #d97706; margin: 0; font-size: 14px; border-radius: 8px; color: white;">
+                        🖥 nighttime present Audit
+                    </button>
+                </div>
+                <div id="tieCandidatesSelectionList" style="margin-top: 15px; text-align: left;"></div>
+            </div>
             
             <div id="resultData" class="hidden" style="margin-top: 30px;">
                 <div class="d-flex" style="justify-content: space-between; background:var(--primary); color:white; padding:15px; border-radius:8px;">
@@ -383,7 +721,7 @@
                     <div><b>Invalid:</b> <span id="resInvalid"></span></div>
                 </div>
 
-                <div id="animatedLeaderboard" class="leaderboard-container"></div>
+                <div id="animatedLeaderboard"></div>
             </div>
         </div>
         
@@ -435,7 +773,7 @@
                         <h2 style="color:var(--secondary); font-size:32px; margin:10px 0 0 0; letter-spacing: 2px;">SCHOOL PARLIAMENT ELECTION 2026</h2>
                     </div>
                     <div style="text-align:center;">
-                        <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
+                        <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); transform: scale(0.6); transform-origin: top center; margin-bottom: -450px;">
                         <h1 id="posterName" style="font-size: 65px; text-transform:uppercase; margin: 0 0 10px 0; font-weight:900; color: #111;">CANDIDATE NAME</h1>
                         <h2 style="font-size: 36px; color: #475569; margin: 0; font-weight:bold;">Constituency: Class <span id="posterClass" style="color:var(--danger)">X</span> - <span id="posterDiv" style="color:var(--danger)">Y</span></h2>
                     </div>
@@ -501,6 +839,7 @@
 
     </main>
 
+    <!-- Printable PDF template container -->
     <div id="pdfReportData" style="display: none;">
         <div id="exportContent" style="padding: 40px; background: white; color: black; font-family: Arial, sans-serif; width: 794px; box-sizing: border-box; position: relative;">
             <div style="text-align:center; border-bottom:3px solid #1e3a8a; padding-bottom:15px; margin-bottom:30px;">
@@ -531,14 +870,19 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyIzGpR4q1MXeiJUWsAn77cXAGtbup3DtK-DVwP8R0mQHpaKg_TjuPfg7oUmPi0-3jSxA/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzM_O2v97BaHbXECBohDQ0nooPYRUNkYmy9FcmS3wxnY6nLKMX2guviHfLe_uzZRRzwvA/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
-        
-        let sessionData = { username: "", loginTime: null, role: "", homeData: null };
+        let sessionData = { username: "", loginTime: null, role: "", tabs: [], homeData: null };
         let intervals =[], localVotersData =[], activeHomeVoterTimer;
+        let lastVotedAdmNo = ""; // Latency guard for client checks
 
-        // NEW GLOBAL STATE TRACKERS FOR FRONTEND
+        // Global states for keyboard reveal flow [2]
+        let resultsRevealReady = false;
+        let resultsRevealed = false;
+        let pendingResultsData = null;
+
+        // GLOBAL STATE TRACKERS FOR FRONTEND
         let currentCuClass = "", currentCuDiv = "", currentCuState = "";
 
         function showLoader() { document.getElementById('globalLoader').classList.remove('hidden'); }
@@ -598,21 +942,48 @@
             }, 1000);
         }
 
-        window.onload = () => { startLiveClock(); const saved = localStorage.getItem("electionSession"); if(saved) { sessionData = JSON.parse(saved); initSession(); } };
+        window.onload = () => { 
+            startLiveClock(); 
+            const saved = localStorage.getItem("electionSession"); 
+            if(saved) { 
+                sessionData = JSON.parse(saved); 
+                initSession(); 
+            } 
+            
+            // Dynamic multi-stage keyboard controller [2]
+            window.addEventListener('keydown', function(event) {
+                if (resultsRevealReady) {
+                    // First stage: Reveal curtain is lifted
+                    resultsRevealReady = false;
+                    document.getElementById('revealCurtain').classList.add('hidden');
+                    renderRevealedResults(pendingResultsData);
+                    resultsRevealed = true;
+                } else if (resultsRevealed) {
+                    // Second stage: Dismiss public tie presentation modal and clear overlays
+                    closeFullScreenTieBreaker();
+                }
+            });
+        };
+
+        function openFullScreenTieBreaker() {
+            document.getElementById('fullScreenTieModal').classList.remove('hidden');
+            // Auto-trigger timeouts removed. Operator controls launch sequences manually [2].
+        }
+        
+        function closeFullScreenTieBreaker() {
+            document.getElementById('fullScreenTieModal').classList.add('hidden');
+        }
 
         async function loginStaff() {
             const user = document.getElementById('loginId').value.trim(); 
             const pass = document.getElementById('loginPass').value.trim();
-            
             if(!user || !pass) { 
                 await showModal("Input Required", "Please enter both Username and Password."); 
                 return; 
             }
-            
             showLoader();
             const res = await apiCall({ action: "staffLogin", username: user, password: pass });
             hideLoader();
-            
             if(res.success) {
                 sessionData = { 
                     username: res.username, 
@@ -635,7 +1006,7 @@
             if(!phone) { await showModal("Error", "Please enter phone number."); return; }
             showLoader(); const res = await apiCall({ action: "homeVoterLogin", Phone: phone }); hideLoader();
             if(res.success) {
-                sessionData = { username: "HomeVoter_" + phone, loginTime: new Date().getTime(), role: "Home", homeData: res.data };
+                sessionData = { username: "HomeVoter_" + phone, loginTime: new Date().getTime(), role: "Home", tabs: ["tab6"], homeData: res.data };
                 apiCall({ action: "logLogin", username: sessionData.username, loginTime: formatDateTime(new Date(sessionData.loginTime)) });
                 initSession();
             } else { await showModal("Login Failed", res.message); }
@@ -655,8 +1026,6 @@
             if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
 
             document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
-            
-            // Dynamic access list lookup from database session
             const allowedTabs = sessionData.role === "Home" ? ["tab6"] : (sessionData.tabs || []);
             
             allowedTabs.forEach(tab => { const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); if(btn) btn.style.display = 'block'; });
@@ -686,7 +1055,6 @@
                 if(tabId === "tab2") { 
                     document.querySelector("#votersTablePending tbody").innerHTML = ""; 
                     document.querySelector("#votersTableProcessed tbody").innerHTML = ""; 
-                    // Add an interval to dynamically listen to CU changes while on this tab
                     intervals.push(setInterval(async () => {
                         const res = await apiCall({ action: "checkControlStatus" });
                         if(res.success) {
@@ -717,7 +1085,7 @@
             const photoUrl = document.getElementById('candPhotoSelect').value; const symbolUrl = document.getElementById('candSymbolSelect').value;
             if(!photoUrl || !symbolUrl) { await showModal("Error", "Please select a Photo and a Symbol from the library dropdowns."); return; }
             showLoader();
-            const payload = { action: "saveCandidate", AdmNo: document.getElementById('candAdmNo').value, Name: document.getElementById('candName').value, Gender: document.getElementById('candGender').value, Class: document.getElementById('candClass').value, Div: document.getElementById('candDiv').value, Photo: photoUrl, Symbol: symbolUrl };
+            const payload = { action: "saveCandidate", AdmNo: document.getElementById('candAdmNo').value, Name: document.getElementById('candName').value, Gender: document.getElementById('candGender').value, Class: document.getElementById('candDiv').value, Photo: photoUrl, Symbol: symbolUrl };
             const res = await apiCall(payload); hideLoader();
             if(res.success) { await showModal("Success", "Candidate Saved Perfectly"); document.getElementById('adminForm').classList.add('hidden'); document.getElementById('adminSearch').value = ""; document.getElementById('candPhotoSelect').value = ""; document.getElementById('candSymbolSelect').value = ""; } else await showModal("Error", res.message);
         }
@@ -726,7 +1094,6 @@
             showLoader(); const res = await apiCall({ action: "getVoters" }); hideLoader(); 
             if(res.success) { 
                 localVotersData = res.data; 
-                // Capture state from backend
                 currentCuClass = res.cuClass; currentCuDiv = res.cuDiv; currentCuState = res.cuState;
                 renderVotersTables(); 
             } else await showModal("Error", "Failed to fetch voters."); 
@@ -751,7 +1118,6 @@
                 if (!v.Status || v.Status === "") { 
                     const safeName = (v.Name || "").replace(/'/g, "\\'"), safeGender = (v.Gender || "").replace(/'/g, "\\'");
                     
-                    // Conditionally show buttons or hide them if CU is not active for this class
                     let isActionAllowed = (v.Class == currentCuClass && v.Div == currentCuDiv && currentCuState && currentCuState !== "Stopped");
                     let actionHtml = isActionAllowed ? 
                         `<button onclick="markAttendanceInstantly('${v.AdmNo}', 'Present', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--success); width:auto; padding:5px 10px;">Present</button> 
@@ -768,21 +1134,11 @@
             if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='7' class='text-center'>No processed voters yet.</td></tr>";
         }
 
-        async function markAttendanceInstantly(admNo, status, name, gender, cls, div) {
-            showLoader(); const res = await apiCall({ action: "markAttendance", AdmNo: admNo, Status: status, Name: name, Gender: gender, Class: cls, Div: div }); hideLoader();
-            if(res.success) { const idx = localVotersData.findIndex(v => v.AdmNo == admNo); if (idx > -1) localVotersData[idx].Status = status === "Present" ? "Voting..." : "Absent"; renderVotersTables(); } 
-            else await showModal("Action Blocked", res.message);
-        }
-
-        // ==========================================
-        // DYNAMIC LED FUNCTION (Handles True/False/Null)
-        // ==========================================
         function setLEDs(unit, isReady) { 
             const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); 
             red.classList.remove('on'); green.classList.remove('on');
             if(isReady === true) { green.classList.add('on'); } 
             else if (isReady === false) { red.classList.add('on'); } 
-            // If isReady is null, both stay off.
         }
 
         let cuCurrentClass = "", cuCurrentDiv = "";
@@ -802,17 +1158,14 @@
                 const res = await apiCall({ action: "checkControlStatus" });
                 if(res.success) {
                     if (res.globalStatus !== "Started") {
-                        // Global Election Not Started -> Hide everything, LEDs OFF
                         document.getElementById('cuSetupArea').classList.add('hidden'); 
                         document.getElementById('cuActiveArea').classList.add('hidden'); 
                         setLEDs("cu", null); 
                     } else if(res.state === "Stopped" || res.state === "" || res.state == null) { 
-                        // Global Started, but no specific class session running
                         document.getElementById('cuSetupArea').classList.remove('hidden'); 
                         document.getElementById('cuActiveArea').classList.add('hidden'); 
                         setLEDs("cu", null); 
                     } else {
-                        // Active session
                         document.getElementById('cuSetupArea').classList.add('hidden'); 
                         document.getElementById('cuActiveArea').classList.remove('hidden'); 
                         document.getElementById('lblCuClass').innerText = res.cuClass; document.getElementById('lblCuDiv').innerText = res.cuDiv;
@@ -839,26 +1192,27 @@
                 const res = await apiCall({ action: "checkBallotStatus" });
                 if(res.success) {
                     if (res.globalStatus !== "Started" || res.cuState === "Stopped" || !res.cuState) {
-                        // Election Not Started globally OR no active class session
                         setLEDs("bu", null);
                         currentBallotReady = false; 
                         document.getElementById('ballotGreeting').classList.add('hidden'); 
                         document.getElementById('ballotList').classList.add('hidden'); 
+                        document.getElementById('ballotList').innerHTML = ""; 
                         document.getElementById('ballotWaiting').classList.remove('hidden'); 
                         document.getElementById('ballotWaiting').innerHTML = "<h3>Waiting for Control Unit activation...</h3>";
-                    } else if(res.ready && !currentBallotReady) { 
+                    } else if(res.ready && res.admNo !== lastVotedAdmNo && !currentBallotReady) { 
                         setLEDs("bu", true);
                         currentBallotReady = true; 
                         let currentVoterName = res.voterName || "STUDENT";
                         renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
-                    } else if(!res.ready && currentBallotReady) { 
+                    } else if((!res.ready || res.admNo === lastVotedAdmNo) && currentBallotReady) { 
                         setLEDs("bu", false);
                         currentBallotReady = false; 
                         document.getElementById('ballotGreeting').classList.add('hidden'); 
                         document.getElementById('ballotList').classList.add('hidden'); 
+                        document.getElementById('ballotList').innerHTML = ""; 
                         document.getElementById('ballotWaiting').classList.remove('hidden'); 
                     } else if(!res.ready) {
-                        setLEDs("bu", false); // Busy
+                        setLEDs("bu", false); 
                     }
                 }
             }, 2500));
@@ -877,9 +1231,31 @@
             bList.classList.remove('hidden'); bList.innerHTML = "";
             
             candidates.forEach((c, i) => { 
-                bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
+                bList.innerHTML += `
+                <div class="ballot-item">
+                    <div class="ballot-sl">${i+1}</div>
+                    <div class="ballot-photo-container">
+                        <img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'">
+                    </div>
+                    <div class="ballot-name">${c.Name}</div>
+                    <div class="ballot-symbol-container">
+                        <img src="${c.Symbol}" class="ballot-img symbol" onerror="this.src='https://via.placeholder.com/60'">
+                    </div>
+                    <div class="ballot-vote-container">
+                        <button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
+                    </div>
+                </div>`; 
             });
-            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
+            bList.innerHTML += `
+            <div class="ballot-item" style="background:#fee2e2;">
+                <div class="ballot-sl">${candidates.length+1}</div>
+                <div class="ballot-photo-container"></div>
+                <div class="ballot-name" style="text-align:center; font-weight:900;">N O T A</div>
+                <div class="ballot-symbol-container"></div>
+                <div class="ballot-vote-container">
+                    <button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
+                </div>
+            </div>`;
         }
 
         async function castVote(candId, candName, candSymbol, candPhoto, voteType, cls, div, gender, voterAdmNo) {
@@ -893,21 +1269,30 @@
             document.getElementById('voteSuccessMsg').classList.remove('hidden');
             
             if(voteType === "Standard") { 
-                document.getElementById('ballotGreeting').classList.add('hidden'); document.getElementById('ballotList').classList.add('hidden'); setLEDs("bu", false); currentBallotReady = false; 
-            } else { clearInterval(activeHomeVoterTimer); document.getElementById('homeBallotArea').classList.add('hidden'); }
+                lastVotedAdmNo = voterAdmNo; 
+                currentBallotReady = false;
+                document.getElementById('ballotGreeting').classList.add('hidden'); 
+                document.getElementById('ballotList').classList.add('hidden'); 
+                document.getElementById('ballotList').innerHTML = ""; 
+                setLEDs("bu", false); 
+            } else { 
+                clearInterval(activeHomeVoterTimer); 
+                document.getElementById('homeBallotArea').classList.add('hidden'); 
+                document.getElementById('homeBallotArea').innerHTML = "";
+            }
 
             apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
             
             setTimeout(() => {
                 document.getElementById('voteSuccessMsg').classList.add('hidden');
-                if(voteType === "Standard") { document.getElementById('ballotWaiting').classList.remove('hidden'); } 
-                else { showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => { logout(); }); }
+                if(voteType === "Standard") { 
+                    document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                } else { 
+                    showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => { logout(); }); 
+                }
             }, 5000);
         }
 
-        // ==========================================
-        // TAB 5: VOTING RECORDS & ELECTION CONTROLS
-        // ==========================================
         async function fetchVotingStats() {
             showLoader(); const res = await apiCall({ action: "getStats" }); hideLoader();
             if(res.success) { 
@@ -966,47 +1351,262 @@
 
         function getOrdinalSuffix(i) { var j = i % 10, k = i % 100; if (j == 1 && k != 11) return i + "st"; if (j == 2 && k != 12) return i + "nd"; if (j == 3 && k != 13) return i + "rd"; return i + "th"; }
 
+        // Fetch results with pre-result reveal screen integration [2]
         async function fetchResults(event) {
             if(event) event.preventDefault(); showLoader();
             try {
                 const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
                 const res = await apiCall({ action: "getResults", Class: cls, Div: div });
-                if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
-
-                let totalValid = res.stats.totalPolled - res.stats.invalid;
-                await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
                 hideLoader();
                 
-                document.getElementById('resultData').classList.remove('hidden'); document.getElementById('btnExportPDF').classList.remove('hidden');
-                document.getElementById('resStud').innerText = res.stats.totalStudents || 0; document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; document.getElementById('resAbsent').innerText = res.stats.absentees || 0; document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
-                
-                const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-                document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
+                if(!res.success) { await showModal("Not Ready", res.message); return; }
 
-                const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
-                board.innerHTML = ""; pdfBody.innerHTML = "";
+                // Save data to global pending payload & configure pre-result reveal curtain
+                pendingResultsData = res;
+                resultsRevealReady = true;
                 
-                if(res.leaderboard && res.leaderboard.length > 0) {
-                    fireConfetti(); let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
-                    let arenaHTML = `<div class="results-arena"><div class="results-slider-wrapper"><div class="results-slider">`;
-                    
-                    rankedCandidates.forEach((c, index) => {
-                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let delay = index * 0.15; 
-                        let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
-                        let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
-                        let rankText = getOrdinalSuffix(c.rank);
-                        arenaHTML += `<div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">${crown}<div class="slide-rank-badge">${rankText}</div><img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'"><div class="slide-name">${c.Name}</div><div class="slide-meta">CLASS ${cls}-${div}</div><div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div><div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div></div>`;
-                    });
-                    
-                    arenaHTML += `</div></div></div>`; board.innerHTML = arenaHTML;
+                document.getElementById('revealCurtain').classList.remove('hidden');
+            } catch (error) { console.error(error); hideLoader(); await showModal("Render Error", "An error occurred while compiling results."); }
+        }
 
-                    rankedCandidates.forEach((c) => {
-                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let rankText = getOrdinalSuffix(c.rank);
-                        pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
+        // Render result lists after curtain transition keypress is caught [2]
+        async function renderRevealedResults(res) {
+            const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
+            let totalValid = res.stats.totalPolled - res.stats.invalid;
+            
+            showLoader();
+            await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
+            hideLoader();
+
+            document.getElementById('resultData').classList.remove('hidden'); document.getElementById('btnExportPDF').classList.remove('hidden');
+            document.getElementById('resStud').innerText = res.stats.totalStudents || 0; document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; document.getElementById('resAbsent').innerText = res.stats.absentees || 0; document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
+            
+            const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
+
+            const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
+            board.innerHTML = ""; pdfBody.innerHTML = "";
+            
+            if(res.leaderboard && res.leaderboard.length > 0) {
+                fireConfetti(); 
+                
+                const candidatesOnly = res.leaderboard.filter(c => c.AdmNo !== "NOTA");
+                
+                // Identify ties to build dynamic audit scenarios [2]
+                let tiesMap = {};
+                let tieGroups = [];
+                let votesGroup = {};
+                
+                candidatesOnly.forEach(c1 => {
+                    let count = candidatesOnly.filter(c2 => c2.Votes === c1.Votes && c1.Votes > 0).length;
+                    if (count > 1) {
+                        tiesMap[c1.AdmNo] = true;
+                        if(!votesGroup[c1.Votes]) votesGroup[c1.Votes] = [];
+                        // Avoid double adding
+                        if(!votesGroup[c1.Votes].some(c => c.AdmNo === c1.AdmNo)) {
+                            votesGroup[c1.Votes].push(c1);
+                        }
+                    }
+                });
+
+                for (let votesVal in votesGroup) {
+                    if (votesGroup[votesVal].length > 1) {
+                        tieGroups.push({
+                            votes: votesVal,
+                            candidates: votesGroup[votesVal] // Sorted already by backend LCG roll values
+                        });
+                    }
+                }
+
+                // --- GENERATE DETAILED TRANSPARENT AUDIT DESCRIPTIONS WITH VIRTUAL PHYSICAL INTERFACE --- [2]
+                const tiePanel = document.getElementById('manualTieBreakerCard');
+                const embeddedSelectionList = document.getElementById('tieCandidatesSelectionList');
+                const fullScreenSelectionList = document.getElementById('fullScreenTieCandidatesList');
+
+                if (tieGroups.length > 0) {
+                    tiePanel.classList.remove('hidden');
+                    embeddedSelectionList.innerHTML = "";
+                    fullScreenSelectionList.innerHTML = "";
+                    
+                    tieGroups.forEach(group => {
+                        let scenarioTitle = "";
+                        let auditExplanation = "";
+                        let presentationGraphics = "";
+                        
+                        let cand1 = group.candidates[0];
+                        let cand2 = group.candidates[1];
+
+                        if (group.candidates.length === 2) {
+                            scenarioTitle = "Scenario A: Two-Way Tie resolved by Verifiable Coin Toss";
+                            
+                            // Define visual coin flip: Since cand1 is HEADS and is the winner, it lands on HEADS [2]
+                            let flipOutcome = "HEADS";
+                            
+                            auditExplanation = `
+                            <div style="font-size: 14px; margin-top: 8px; color: #b45309; line-height: 1.5;">
+                                Candidates are tied at <strong>${group.votes} votes</strong>. A virtual Coin Toss was executed. 
+                                Senior candidate <strong>${cand1.Name}</strong> represents <strong>HEADS</strong>. 
+                                Challenger <strong>${cand2.Name}</strong> represents <strong>TAILS</strong>.<br>
+                                <span style="font-weight: bold; color: var(--text);">Flip Outcome: ${flipOutcome}</span>.<br>
+                                <span style="color: var(--success); font-weight:bold;">${cand1.Name} is declared the winner by heads placement.</span>
+                            </div>`;
+
+                            // Embedded visual flip widget with user interaction control [2]
+                            presentationGraphics = `
+                            <div style="display: flex; gap: 40px; justify-content: center; align-items: center; margin: 30px 0; flex-wrap: wrap;">
+                                <div style="text-align: center; width: 220px;">
+                                    <div class="coin-container">
+                                        <div id="fsInteractiveCoin" class="coin">
+                                            <div class="coin-face coin-front">
+                                                <img src="${cand1.Photo}" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
+                                                <span class="coin-label">Heads</span>
+                                            </div>
+                                            <div class="coin-face coin-back">
+                                                <img src="${cand2.Photo}" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
+                                                <span class="coin-label">Tails</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #fff;">${cand1.Name}</h3>
+                                    <div style="color: #10b981; font-weight: bold;">Heads (Senior Admission)</div>
+                                </div>
+                                
+                                <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
+                                    <button id="fsTossStartBtn" onclick="runVirtualCoinToss(true)" style="background:#eab308; color:black; font-weight:bold; width:150px; border-radius:8px;">Start Coin Toss</button>
+                                    <div id="tossWinnerRevealText" class="hidden" style="font-size:24px; font-weight:900; color:#fbbf24; text-shadow:0 0 10px rgba(251,191,36,0.5);">Outcome: ${flipOutcome}!</div>
+                                </div>
+                                
+                                <div style="text-align: center; width: 220px; opacity: 0.85;">
+                                    <img src="${cand2.Photo}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #ca8a04; opacity: 0.8;">
+                                    <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #cbd5e1;">${cand2.Name}</h3>
+                                    <div style="color: #64748b; font-weight: bold;">Tails</div>
+                                </div>
+                            </div>`;
+                        } else {
+                            scenarioTitle = `Scenario B: Multi-Way Tie (${group.candidates.length} candidates) resolved by Draw of Lots`;
+                            
+                            let chitDrawsHtml = group.candidates.map((c, i) => {
+                                return `<li><strong>Lots Drawn #${i+1}:</strong> ${c.Name} (Chit seed: ${c.deterministicVal})</li>`;
+                            }).join("");
+
+                            auditExplanation = `
+                            <div style="font-size: 14px; margin-top: 8px; color: #b45309; line-height: 1.5;">
+                                Candidates are tied at <strong>${group.votes} votes</strong>. Verifiable lots (chits) were drawn sequentially:<br>
+                                <ul style="margin: 5px 0; padding-left: 20px;">${chitDrawsHtml}</ul>
+                                <span style="color: var(--success); font-weight:bold;">Ranks resolved dynamically in drawing order: ${cand1.Name} wins first placement.</span>
+                            </div>`;
+
+                            let presentationChitsHtml = group.candidates.map((c, i) => {
+                                return `
+                                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); width: 180px; text-align: center;">
+                                    <img src="${c.Photo}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid #ca8a04;">
+                                    <div style="font-weight: bold; color: #fff; font-size: 14px;">#${i+1} drawn lot</div>
+                                    <div style="font-size: 12px; color: #fbbf24;">${c.Name}</div>
+                                </div>`;
+                            }).join("");
+
+                            presentationGraphics = `
+                            <div style="display: flex; flex-direction: column; align-items: center; margin: 30px 0;">
+                                <div id="fsChitJar" class="chit-box">🗳️</div>
+                                <button id="fsShuffleStartBtn" onclick="runVirtualChitDraw()" style="background:#eab308; color:black; font-weight:bold; width:180px; border-radius:8px; margin-bottom:20px;">Draw Lots</button>
+                                <div id="fsChitsWrapper" class="chit-winner-reveal hidden" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+                                    ${presentationChitsHtml}
+                                </div>
+                            </div>`;
+                        }
+
+                        // Ready to View Embedded card [2] (Technical verification labels hidden as requested)
+                        embeddedSelectionList.innerHTML += `
+                        <div style="border-bottom: 1px dashed rgba(217, 119, 6, 0.3); padding-bottom: 15px; margin-bottom: 15px;">
+                            <h4 style="margin: 0; color: #b45309; font-size: 15px;">Tied at ${group.votes} votes (${group.candidates.length} candidates)</h4>
+                            <div style="font-weight: bold; margin-top: 5px; font-size: 13px; color:#1e2937;">Scenario: ${scenarioTitle}</div>
+                            ${auditExplanation}
+                        </div>`;
+
+                        // Full Screen Public presentation layout [2]
+                        fullScreenSelectionList.innerHTML += `
+                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box; text-align: center;">
+                            <h2 style="color: #fbbf24; margin-top: 0; font-size: 26px;">Tied Score: ${group.votes} Votes</h2>
+                            ${presentationGraphics}
+                            <div style="font-size: 18px; line-height: 1.6; color: #e2e8f0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-bottom: 10px;">
+                                <strong>Decision:</strong> ${auditExplanation.replace(/color: #b45309;/g, 'color: #fbbf24;')}
+                            </div>
+                        </div>`;
                     });
-                    setTimeout(animateFastNumbers, 600);
-                } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
-            } catch (error) { console.error(error); hideLoader(); await showModal("Render Error", "An error occurred while displaying results."); }
+                } else {
+                    tiePanel.classList.add('hidden');
+                }
+
+                let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
+                let arenaHTML = `<div class="results-arena"><div class="results-grid">`;
+                
+                rankedCandidates.forEach((c, index) => {
+                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let delay = index * 0.15; 
+                    let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
+                    let crown = c.rank === 1 ? `<div style="position:absolute; top:-50px; left:50%; transform:translateX(-50%); font-size:40px; filter: drop-shadow(0 0 10px gold); z-index:20;">👑</div>` : '';
+                    let rankText = getOrdinalSuffix(c.rank);
+                    
+                    let tieBadgeHtml = "";
+                    if (tiesMap[c.AdmNo]) {
+                        tieBadgeHtml = `<div class="tie-breaker-badge">Resolved: Simulated Toss</div>`;
+                    }
+                    
+                    arenaHTML += `
+                    <div class="results-card ${rankClass}" style="animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards; opacity: 0;">
+                        ${crown}
+                        <div class="rank-badge">${rankText}</div>
+                        <img src="${c.Photo}" class="card-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
+                        <div class="card-name">${c.Name}</div>
+                        <div class="card-meta">CLASS ${cls}-${div}</div>
+                        <div class="card-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div>
+                        <div class="card-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div>
+                        ${tieBadgeHtml}
+                    </div>`;
+                });
+                
+                arenaHTML += `</div></div>`; board.innerHTML = arenaHTML;
+
+                rankedCandidates.forEach((c) => {
+                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let rankText = getOrdinalSuffix(c.rank);
+                    let tieInfo = tiesMap[c.AdmNo] ? " (Simulated Tie-break)" : "";
+                    pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}${tieInfo}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
+                });
+                setTimeout(animateFastNumbers, 600);
+            } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
+        }
+
+        // Active animation handlers for virtual physical resolution [2]
+        function runVirtualCoinToss(winnerIsHeads) {
+            const coin = document.getElementById('fsInteractiveCoin');
+            if(!coin) return;
+            
+            coin.style.transition = 'none';
+            coin.style.transform = 'rotateY(0deg)';
+            coin.offsetHeight; // force paint reflow
+            
+            coin.style.transition = 'transform 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
+            // land on heads (1800deg) or tails (1980deg)
+            coin.style.transform = winnerIsHeads ? 'rotateY(1800deg)' : 'rotateY(1980deg)';
+
+            setTimeout(() => {
+                const text = document.getElementById('tossWinnerRevealText');
+                if (text) text.classList.remove('hidden');
+                fireConfetti();
+            }, 3500);
+        }
+
+        function runVirtualChitDraw() {
+            const jar = document.getElementById('fsChitJar');
+            if(!jar) return;
+
+            jar.classList.add('shaking');
+
+            setTimeout(() => {
+                jar.classList.remove('shaking');
+                const reveal = document.getElementById('fsChitsWrapper');
+                if (reveal) reveal.classList.remove('hidden');
+                fireConfetti();
+            }, 2500);
         }
 
         function animateFastNumbers() {
@@ -1113,6 +1713,12 @@
             const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection'; const printArea = document.getElementById(printId); const originalParent = printArea.parentNode; const originalNextSibling = printArea.nextSibling;
             document.body.appendChild(printArea); const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition'; document.body.classList.add(printClass);
             setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove(printClass); if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling); else originalParent.appendChild(printArea); }, 1000); }, 100);
+        }
+
+        async function markAttendanceInstantly(admNo, status, name, gender, cls, div) {
+            showLoader(); const res = await apiCall({ action: "markAttendance", AdmNo: admNo, Status: status, Name: name, Gender: gender, Class: cls, Div: div }); hideLoader();
+            if(res.success) { const idx = localVotersData.findIndex(v => v.AdmNo == admNo); if (idx > -1) localVotersData[idx].Status = status === "Present" ? "Voting..." : "Absent"; renderVotersTables(); } 
+            else await showModal("Action Blocked", res.message);
         }
     </script>
 </body>
