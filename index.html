@@ -1,3 +1,4 @@
+<html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,8 +30,8 @@
         .nav-btn { padding: 10px 15px; border: none; background: #e5e7eb; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; display: none; white-space: nowrap; }
         .nav-btn.active { background: var(--secondary); color: white; }
 
-        .tab-content { display: none; will-change: transform, opacity; }
-        .tab-content.active { display: block; animation: snapIn 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .tab-content.active { display: block; }
         input, select, button { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
         button { background: var(--secondary); color: white; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
         button:hover { filter: brightness(0.9); }
@@ -47,334 +48,25 @@
         .led.green { background: #005500; } .led.green.on { background: #00ff00; box-shadow: 0 0 20px #00ff00; }
         .big-btn { font-size: 20px; padding: 25px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); margin-top: 20px;}
         
-        /* Ballot List Responsive Grid */
-        .ballot-item {
-            display: grid;
-            grid-template-columns: 40px 60px 1fr 60px 100px;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            background: #f9fafb;
-        }
-        .ballot-sl {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            color: var(--primary);
-        }
-        .ballot-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid var(--primary);
-        }
-        .ballot-img.symbol {
-            border-radius: 0;
-            border: none;
-            object-fit: contain;
-        }
-        .ballot-name {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text);
-        }
-        .ballot-vote-container {
-            display: flex;
-            justify-content: center;
-        }
-        .vote-btn {
-            width: 100%;
-            height: 40px;
-            background: var(--primary);
-            border-radius: 20px;
-            margin: 0;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .ballot-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 2px solid #ddd; border-radius: 10px; margin-bottom: 10px; background: #f9fafb; }
+        .ballot-img { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid var(--primary); }
+        .vote-btn { width: 80px; height: 40px; background: var(--primary); border-radius: 20px; margin: 0; }
         
-        /* Mobile View Optimization for Ballot */
-        @media (max-width: 600px) {
-            .ballot-item {
-                grid-template-columns: 40px 50px 1fr 50px;
-                grid-template-rows: auto auto;
-                gap: 8px;
-                padding: 10px;
-            }
-            .ballot-sl {
-                grid-column: 1;
-                grid-row: 1 / span 2;
-                font-size: 20px;
-            }
-            .ballot-photo-container {
-                grid-column: 2;
-                grid-row: 1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .ballot-img {
-                width: 45px;
-                height: 45px;
-            }
-            .ballot-name {
-                grid-column: 3;
-                grid-row: 1;
-                font-size: 16px;
-                align-self: center;
-            }
-            .ballot-symbol-container {
-                grid-column: 4;
-                grid-row: 1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .ballot-vote-container {
-                grid-column: 2 / span 3;
-                grid-row: 2;
-                width: 100%;
-            }
-            .vote-btn {
-                height: 36px;
-                font-size: 14px;
-                border-radius: 8px;
-            }
-        }
+        /* Leaderboard Animations */
+        .leaderboard-container { display: flex; flex-direction: column; gap: 15px; margin-top: 30px; }
+        .candidate-card { display: flex; align-items: center; background: white; padding: 15px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,0.05); opacity: 0; animation: popIn 0.5s ease-out forwards; }
+        .candidate-card.rank-1 { border: 2px solid gold; background: #fffdf0; transform: scale(1.02); }
+        .candidate-card.rank-2 { border: 2px solid silver; background: #f8f9fa; }
+        .candidate-card.rank-3 { border: 2px solid #cd7f32; background: #fdfaf7; }
         
-        /* Responsive Grid Results Arena */
-        .results-arena {
-            background: linear-gradient(135deg, #0f172a, #1e1b4b);
-            border-radius: 24px;
-            padding: 40px 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            margin-top: 30px;
-        }
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 10px;
-        }
-
-        .results-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-radius: 24px;
-            text-align: center;
-            padding: 35px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .results-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
-        }
-
-        .results-card.rank-1 {
-            border: 3px solid #ffd700;
-            background: linear-gradient(180deg, rgba(255,215,0,0.12), rgba(0,0,0,0.5));
-            box-shadow: 0 10px 30px rgba(255,215,0,0.15);
-        }
-        .results-card.rank-2 {
-            border: 2px solid #c0c0c0;
-            background: linear-gradient(180deg, rgba(192,192,192,0.08), rgba(0,0,0,0.45));
-            box-shadow: 0 8px 25px rgba(192,192,192,0.1);
-        }
-        .results-card.rank-3 {
-            border: 2px solid #cd7f32;
-            background: linear-gradient(180deg, rgba(205,127,50,0.08), rgba(0,0,0,0.45));
-            box-shadow: 0 8px 20px rgba(205,127,50,0.08);
-        }
-
-        .rank-badge {
-            position: absolute;
-            top: -18px;
-            font-weight: 900;
-            background: #0f172a;
-            border-radius: 20px;
-            padding: 5px 20px;
-            border: 2px solid;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-            z-index: 10;
-            transform: rotate(-3deg);
-        }
-        .rank-1 .rank-badge { border-color: #ffd700; color: #ffd700; font-size: 18px; top: -22px; }
-        .rank-2 .rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 15px; }
-        .rank-3 .rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 14px; }
-        .rank-other .rank-badge { border-color: #fff; color: #fff; font-size: 12px; top: -12px; transform: rotate(0deg); }
-
-        .card-avatar {
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid rgba(255,255,255,0.2);
-            margin-bottom: 15px;
-            background: white;
-            z-index: 5;
-            width: 90px;
-            height: 90px;
-        }
-        .rank-1 .card-avatar { width: 140px; height: 140px; border: 5px solid #ffd700; box-shadow: 0 0 25px rgba(255,215,0,0.5); }
-        .rank-2 .card-avatar { width: 110px; height: 110px; border-color: #c0c0c0; }
-        .rank-3 .card-avatar { width: 100px; height: 100px; border-color: #cd7f32; }
-
-        .card-name { font-weight: 900; color: #fff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 5px; }
-        .rank-1 .card-name { font-size: 26px; color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
-        .rank-2 .card-name { font-size: 20px; color: #c0c0c0; }
-        .rank-3 .card-name { font-size: 18px; color: #cd7f32; }
-        .rank-other .card-name { font-size: 15px; color: #e2e8f0; }
-
-        .card-meta { font-weight: bold; color: #94a3b8; margin-bottom: 15px; font-size: 12px; }
-        .rank-1 .card-meta { font-size: 14px; }
-
-        .card-votes { font-weight: 900; line-height: 1; margin-bottom: 15px; }
-        .rank-1 .card-votes { font-size: 48px; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.4); }
-        .rank-2 .card-votes { font-size: 38px; color: #fff; }
-        .rank-3 .card-votes { font-size: 38px; color: #fff; }
-        .rank-other .card-votes { font-size: 24px; color: #fff; }
-
-        .card-pct { font-weight: 900; display: inline-block; border-radius: 30px; }
-        .rank-1 .card-pct { font-size: 18px; color: #000; background: #ffd700; padding: 5px 20px; box-shadow: 0 0 10px rgba(255,215,0,0.3); }
-        .rank-2 .card-pct { font-size: 15px; color: #0f172a; background: #c0c0c0; padding: 4px 15px; }
-        .rank-3 .card-pct { font-size: 13px; color: #fff; background: rgba(205,127,50,0.5); border: 1px solid #cd7f32; padding: 3px 12px; }
-        .rank-other .card-pct { font-size: 11px; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; padding: 3px 10px; }
-
-        /* Transparent automated dice tie indicator styling */
-        .tie-breaker-badge {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px dashed #f59e0b;
-            color: #fbbf24;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        /* Screen photo resizing so all candidates are visible together on small devices */
-        @media (max-width: 600px) {
-            .results-grid {
-                grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
-                gap: 8px !important;
-            }
-            .results-card {
-                padding: 10px 4px !important;
-                border-radius: 12px !important;
-            }
-            .card-avatar {
-                width: 38px !important;
-                height: 38px !important;
-            }
-            .rank-1 .card-avatar {
-                width: 48px !important;
-                height: 48px !important;
-            }
-            .card-name {
-                font-size: 9px !important;
-            }
-            .rank-1 .card-name {
-                font-size: 11px !important;
-            }
-        }
-
-        /* Interactive 3D Coin Flipping Engine Styles */
-        .coin-container {
-            perspective: 1000px;
-            width: 140px;
-            height: 140px;
-            margin: 20px auto;
-        }
-        .coin {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-        }
-        .coin-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 6px solid #d97706;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
-            background: #fef08a;
-            overflow: hidden;
-        }
-        .coin-front {
-            z-index: 2;
-            transform: rotateY(0deg);
-        }
-        .coin-back {
-            transform: rotateY(180deg);
-        }
-        .coin-avatar {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            opacity: 0.85;
-        }
-        .coin-label {
-            position: relative;
-            z-index: 2;
-            background: rgba(15, 23, 42, 0.9);
-            color: #fbbf24;
-            font-size: 11px;
-            font-weight: 900;
-            padding: 2px 8px;
-            border-radius: 10px;
-            border: 1px solid #fbbf24;
-            margin-top: auto;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-        
-        /* Shaking Lottery jar styles */
-        .chit-box {
-            font-size: 70px;
-            width: 120px;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            margin: 20px auto;
-            cursor: pointer;
-            user-select: none;
-        }
-        .chit-box.shaking {
-            animation: boxShake 0.4s ease-in-out infinite alternate;
-        }
-        @keyframes boxShake {
-            0% { transform: translateY(0) rotate(-4deg); }
-            100% { transform: translateY(-10px) rotate(4deg); }
-        }
+        .cand-rank { font-size: 24px; font-weight: bold; width: 40px; text-align: center; color: var(--primary); }
+        .rank-1 .cand-rank { color: gold; font-size: 28px; }
+        .cand-info { flex: 1; padding: 0 15px; }
+        .cand-info h3 { margin: 0 0 5px 0; }
+        .progress-track { width: 100%; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--secondary); transition: width 1.5s ease-out; width: 0%; }
+        .rank-1 .progress-fill { background: gold; }
+        .cand-stats { text-align: right; width: 100px; font-weight: bold; font-size: 18px; color: var(--text); }
 
         /* Full Screen Loader Spinner */
         .global-spinner-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; }
@@ -389,7 +81,6 @@
         .live-clock-panel { text-align: right; font-weight: bold; font-size: 16px; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;}
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes pulse { 0% { transform: scale(0.98); opacity: 0.8; } 50% { transform: scale(1.02); opacity: 1; } 100% { transform: scale(0.98); opacity: 0.8; } }
         @keyframes popIn { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
@@ -399,48 +90,72 @@
         @keyframes snapIn { from { opacity: 0; transform: scale(0.98) translateZ(0); } to { opacity: 1; transform: scale(1) translateZ(0); } }
         .global-spinner-overlay { backdrop-filter: blur(4px); transition: opacity 0.2s ease; }
         
-        @keyframes slideInRight { from { opacity: 0; transform: translateX(80px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        /* Horizontal Slidable Graphics Arena */
+        .results-arena { background: linear-gradient(145deg, #0f172a, #1e1b4b); border-radius: 24px; padding: 20px 0; box-shadow: 0 30px 60px rgba(0,0,0,0.4); position: relative; margin-top: 30px; }
+        .results-slider-wrapper { width: 100%; overflow: hidden; position: relative; }
+        .results-slider { display: flex; gap: 40px; overflow-x: auto; padding: 60px 40px; align-items: center; scroll-behavior: smooth; }
         
-        /* Coin Spin & Chit Shuffle animations */
-        .spinning-coin {
-            width: 120px;
-            height: 120px;
-            background: #eab308;
-            border-radius: 50%;
-            border: 5px solid #ca8a04;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 38px;
-            font-weight: 900;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            box-shadow: 0 0 25px rgba(234, 179, 8, 0.5);
-            animation: coinSpin 1.2s ease-in-out infinite alternate;
-        }
-        @keyframes coinSpin {
-            0% { transform: rotateY(0deg) scale(1); }
-            100% { transform: rotateY(720deg) scale(1.1); }
-        }
+        .results-slider::-webkit-scrollbar { height: 12px; }
+        .results-slider::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; margin: 0 20px; }
+        .results-slider::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.6); border-radius: 10px; }
 
-        .shaking-chit-box {
-            font-size: 80px;
-            animation: boxShake 0.5s ease-in-out infinite alternate;
-        }
-        @keyframes boxShake {
-            0% { transform: translateY(0) rotate(-4deg); }
-            100% { transform: translateY(-10px) rotate(4deg); }
-        }
+        .slide-card { position: relative; flex-shrink: 0; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 24px; text-align: center; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .slide-card:hover { transform: translateY(-10px); background: rgba(255, 255, 255, 0.08); }
 
+        /* Rank Scaling & Styling */
+        .slide-card.rank-1 { width: 340px; border: 4px solid #ffd700; background: linear-gradient(180deg, rgba(255,215,0,0.15), rgba(0,0,0,0.5)); z-index: 10; animation: glow1 2s infinite alternate; }
+        .slide-card.rank-2 { width: 280px; border: 3px solid #c0c0c0; background: linear-gradient(180deg, rgba(192,192,192,0.1), rgba(0,0,0,0.4)); box-shadow: 0 0 30px rgba(192,192,192,0.3); z-index: 9; }
+        .slide-card.rank-3 { width: 240px; border: 3px solid #cd7f32; background: linear-gradient(180deg, rgba(205,127,50,0.1), rgba(0,0,0,0.4)); box-shadow: 0 0 20px rgba(205,127,50,0.3); z-index: 8; }
+        .slide-card.rank-other { width: 180px; border: 2px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); z-index: 7; opacity: 0.85; }
+        .slide-card.rank-other:hover { opacity: 1; }
+
+        .slide-rank-badge { position: absolute; top: -20px; left: -20px; font-weight: 900; background: #0f172a; border-radius: 20px; padding: 5px 25px; border: 2px solid; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; transform: rotate(-5deg); }
+        .rank-1 .slide-rank-badge { border-color: #ffd700; color: #ffd700; font-size: 30px; top: -25px; left: -35px; box-shadow: 0 0 20px #ffd700; transform: rotate(-10deg); }
+        .rank-2 .slide-rank-badge { border-color: #c0c0c0; color: #c0c0c0; font-size: 24px; left: -25px; }
+        .rank-3 .slide-rank-badge { border-color: #cd7f32; color: #cd7f32; font-size: 20px; left: -20px; }
+        .rank-other .slide-rank-badge { border-color: #fff; color: #fff; font-size: 14px; top: -15px; left: -15px; padding: 3px 15px; transform: rotate(0deg); }
+        
+        .slide-avatar { border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,0.2); margin-bottom: 15px; background: white; z-index: 5; position: relative;}
+        .rank-1 .slide-avatar { width: 170px; height: 170px; border: 6px solid #ffd700; box-shadow: 0 0 40px rgba(255,215,0,0.6); }
+        .rank-2 .slide-avatar { width: 130px; height: 130px; border-color: #c0c0c0; }
+        .rank-3 .slide-avatar { width: 110px; height: 110px; border-color: #cd7f32; }
+        .rank-other .slide-avatar { width: 80px; height: 80px; border-width: 2px; }
+
+        .slide-name { font-weight: 900; color: #fff; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 5px; }
+        .rank-1 .slide-name { font-size: 32px; color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        .rank-2 .slide-name { font-size: 26px; color: #c0c0c0; }
+        .rank-3 .slide-name { font-size: 20px; color: #cd7f32; }
+        .rank-other .slide-name { font-size: 15px; color: #e2e8f0; }
+
+        .slide-meta { font-weight: bold; color: #94a3b8; margin-bottom: 15px; }
+        .rank-1 .slide-meta { font-size: 18px; }
+        .rank-2 .slide-meta { font-size: 15px; }
+        .rank-3 .slide-meta { font-size: 13px; }
+        .rank-other .slide-meta { font-size: 11px; margin-bottom: 10px; }
+
+        .slide-votes { font-weight: 900; line-height: 1; margin-bottom: 15px; }
+        .rank-1 .slide-votes { font-size: 60px; color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+        .rank-2 .slide-votes { font-size: 45px; color: #fff; }
+        .rank-3 .slide-votes { font-size: 35px; color: #fff; }
+        .rank-other .slide-votes { font-size: 24px; color: #fff; }
+
+        .slide-pct { font-weight: 900; display: inline-block; border-radius: 30px; }
+        .rank-1 .slide-pct { font-size: 22px; color: #000; background: #ffd700; padding: 6px 25px; box-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        .rank-2 .slide-pct { font-size: 18px; color: #0f172a; background: #c0c0c0; padding: 4px 18px; }
+        .rank-3 .slide-pct { font-size: 15px; color: #fff; background: rgba(205,127,50,0.5); border: 1px solid #cd7f32; padding: 4px 15px; }
+        .rank-other .slide-pct { font-size: 12px; color: #38bdf8; background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; padding: 3px 12px; }
+
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(80px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes glow1 { from { box-shadow: 0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1); } to { box-shadow: 0 0 60px rgba(255,215,0,0.8), inset 0 0 40px rgba(255,215,0,0.3); } }
+        
         /* --- NATIVE PRINT & PDF SAVING STYLES --- */
         @media print {
             body * { visibility: hidden; }
             body, html { background: white; margin: 0; padding: 0; width: 100%; height: 100%; }
             #globalLoader, #customModal, header, nav, #loginScreen, #mainApp { display: none !important; }
             
-            body.print-pdf #pdfReportData, body.print-pdf #pdfReportData * { visibility: visible; }
-            body.print-pdf #pdfReportData { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
-            body.print-pdf #exportContent { width: 100% !important; padding: 10px !important; margin: 0 !important; box-sizing: border-box !important; }
+            body.print-pdf #exportContent, body.print-pdf #exportContent * { visibility: visible; }
+            body.print-pdf #exportContent { display: block !important; position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; padding: 10px !important; margin: 0 !important; box-sizing: border-box !important; }
 
             @page { size: A4 portrait; margin: 0 !important; }
             
@@ -470,29 +185,6 @@
                 <button id="modalBtnCancel" style="background:#9ca3af; display:none; width:120px;">Cancel</button>
                 <button id="modalBtnOk" style="background:var(--primary); width:120px;">OK</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Before Result reveal Curtain Screen [2] -->
-    <div id="revealCurtain" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #1e3a8a, #0f172a); z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGka-p7C45PTqBMBKqSjulqicQlHmW_Ee1BCfUPpaW888vYnoPjElzW9DVm8az1kCOjdlabjA3qb_vS00GpCApyVWh2C0aIcOcvb-BWeeTI8AdLojSf25iCvNpMS6aENxrWO-SgM5xjqePEMsHfCLy4HinnGk2xAnDlKaapXYFY05jXQM/s56-c/Logo2.png" alt="School Logo" style="width: 100px; height: 100px; border-radius: 50%; background: white; padding: 5px; margin-bottom: 20px; box-shadow: 0 0 30px rgba(255,255,255,0.2);">
-        <h1 style="font-size: 42px; font-weight: 900; margin-bottom: 10px; color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);">TDTTI THURAVOOR</h1>
-        <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; color: #cbd5e1; letter-spacing: 2px;">ELECTION RESULTS COMPILED</h2>
-        <div style="font-size: 24px; padding: 15px 40px; border: 2px solid #fbbf24; border-radius: 30px; animation: pulse 1.5s infinite; color: #fbbf24; font-weight: bold; cursor: pointer;">
-            PRESS ANY KEY TO REVEAL VERDICT
-        </div>
-    </div>
-
-    <!-- Verifiable Physical Tie-Breaker Resolution Arena Overlay [2] -->
-    <div id="fullScreenTieModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 100001; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 40px; box-sizing: border-box; overflow-y: auto;">
-        <div style="max-width: 900px; width: 100%; text-align: center;">
-            <h1 style="color: #fbbf24; font-size: 40px; margin-bottom: 5px; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); text-transform: uppercase;">
-                🎲 Tie-Break Presentation Arena
-            </h1>
-            <p style="color: #94a3b8; font-size: 16px; margin-bottom: 40px;">
-                Verifiable Simulated Tie Resolution (Press any key to close and return)
-            </p>
-            <div id="fullScreenTieCandidatesList" style="display: flex; flex-direction: column; gap: 30px; width: 100%;"></div>
         </div>
     </div>
 
@@ -568,9 +260,12 @@
 
             <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
                 <h3 style="margin-top:0; color:var(--primary);">2. Search & Save Candidate</h3>
-                <div class="d-flex">
-                    <input type="text" id="adminSearch" placeholder="Search by Admission No or Name">
-                    <button onclick="adminFetchVoter()" style="width: 120px;">Fetch</button>
+                <div style="position: relative;">
+                    <div class="d-flex">
+                        <input type="text" id="adminSearch" placeholder="Search by Admission No or Name" oninput="handleAdminSearchInput()" autocomplete="off">
+                        <button onclick="adminFetchVoter()" style="width: 120px;">Fetch</button>
+                    </div>
+                    <div id="adminSearchDropdown" style="position: absolute; top: 100%; left: 0; width: calc(100% - 130px); background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; box-shadow: 0 8px 15px rgba(0,0,0,0.1);"></div>
                 </div>
                 <div id="adminForm" class="hidden" style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
                     <input type="text" id="candAdmNo" readonly>
@@ -606,6 +301,7 @@
             <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
                 <h2 style="margin: 0; color: var(--primary); text-transform: uppercase;">Control Unit</h2>
                 <div class="led-container" style="margin: 0;">
+                    <!-- Default state: OFF (no "on" class) -->
                     <div id="cuRed" class="led red"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
                     <div id="cuGreen" class="led green"></div> <span style="font-weight:900; font-size:18px; color:var(--success)">READY</span>
                 </div>
@@ -630,6 +326,7 @@
             <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 25px;">
                 <h2 style="margin: 0; color: var(--primary); text-transform: uppercase;">Ballot Unit</h2>
                 <div class="led-container" style="margin: 0;">
+                    <!-- Default state: OFF (no "on" class) -->
                     <div id="buRed" class="led red"></div> <span style="font-weight:900; font-size:18px; color:var(--danger)">BUSY</span>
                     <div id="buGreen" class="led green"></div> <span style="font-weight:900; font-size:18px; color:var(--success)">READY</span>
                 </div>
@@ -640,12 +337,14 @@
                 <h4 style="margin:10px 0 0; color:#475569; font-size: 18px; letter-spacing: 2px;">CLASS <span id="bgClass"></span> | DIVISION <span id="bgDiv"></span></h4>
             </div>
 
-            <div id="ballotList" class="hidden" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px;"></div>
+            <div id="ballotList" class="hidden" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: inset 0 0 10px #ccc;"></div>
             <div id="ballotWaiting" class="text-center" style="padding: 50px;"><h3>Waiting for Control Unit activation...</h3></div>
         </div>
 
         <div id="tab5" class="tab-content">
             <h2 id="vrTitle">Presiding Officer - Voting Records</h2>
+            
+            <!-- NEW GLOBAL START ELECTION BUTTON -->
             <button id="btnGlobalStart" onclick="startGlobalElection()" style="background:var(--success); font-size:20px; padding:15px; margin-bottom:15px; width:100%;">START ELECTION</button>
             
             <button onclick="fetchVotingStats()">Refresh Stats</button>
@@ -654,6 +353,7 @@
                 <div style="padding: 20px; background: #dbeafe; border-radius: 10px; text-align: center; width: 30%;"><h3>Male Votes</h3><h1 id="statMale">0</h1></div>
                 <div style="padding: 20px; background: #fce7f3; border-radius: 10px; text-align: center; width: 30%;"><h3>Female Votes</h3><h1 id="statFemale">0</h1></div>
             </div>
+            <!-- Disabled by default via HTML attribute -->
             <button id="btnGlobalEnd" onclick="endGlobalElection()" style="background: #9ca3af; font-size: 20px; padding: 15px;" disabled>END ALL POLLS GLOBALLY</button>
         </div>
 
@@ -676,20 +376,6 @@
                 <button onclick="fetchResults(event)" style="width:50%;">Publish Results</button>
                 <button id="btnExportPDF" class="hidden" onclick="generatePDF()" style="background:#dc2626; width:50%;">Save as PDF</button>
             </div>
-
-            <!-- Simulated Physical Tie-Breaker Embedded Audit Panel [2] -->
-            <div id="manualTieBreakerCard" class="hidden" style="background: rgba(245, 158, 11, 0.05); border: 2px dashed #f59e0b; border-radius: 16px; padding: 20px; margin: 25px auto; max-width: 600px; text-align: center; position: relative;">
-                <button onclick="document.getElementById('manualTieBreakerCard').classList.add('hidden')" style="position: absolute; top: 10px; right: 15px; width: auto; background: transparent; border: none; color: #d97706; font-size: 22px; font-weight: bold; cursor: pointer; margin: 0; padding: 0;">&times;</button>
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding-right: 25px;">
-                    <h3 style="margin: 0; color: #d97706; display: flex; align-items: center; gap: 8px;">
-                        🎲 Verifiable Tie-Break Resolution Log
-                    </h3>
-                    <button onclick="openFullScreenTieBreaker()" style="width: auto; padding: 8px 16px; background: #d97706; margin: 0; font-size: 14px; border-radius: 8px; color: white;">
-                        🖥️ Present Audit (Full Screen)
-                    </button>
-                </div>
-                <div id="tieCandidatesSelectionList" style="margin-top: 15px; text-align: left;"></div>
-            </div>
             
             <div id="resultData" class="hidden" style="margin-top: 30px;">
                 <div class="d-flex" style="justify-content: space-between; background:var(--primary); color:white; padding:15px; border-radius:8px;">
@@ -699,7 +385,7 @@
                     <div><b>Invalid:</b> <span id="resInvalid"></span></div>
                 </div>
 
-                <div id="animatedLeaderboard"></div>
+                <div id="animatedLeaderboard" class="leaderboard-container"></div>
             </div>
         </div>
         
@@ -751,7 +437,7 @@
                         <h2 style="color:var(--secondary); font-size:32px; margin:10px 0 0 0; letter-spacing: 2px;">SCHOOL PARLIAMENT ELECTION 2026</h2>
                     </div>
                     <div style="text-align:center;">
-                        <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); transform: scale(0.6); transform-origin: top center; margin-bottom: -450px;">
+                        <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.15);">
                         <h1 id="posterName" style="font-size: 65px; text-transform:uppercase; margin: 0 0 10px 0; font-weight:900; color: #111;">CANDIDATE NAME</h1>
                         <h2 style="font-size: 36px; color: #475569; margin: 0; font-weight:bold;">Constituency: Class <span id="posterClass" style="color:var(--danger)">X</span> - <span id="posterDiv" style="color:var(--danger)">Y</span></h2>
                     </div>
@@ -814,25 +500,53 @@
             <h3 style="font-size: 28px; color: #e2e8f0; margin-top: 20px; letter-spacing: 2px;">CLASS <span id="successClass" style="color: #38bdf8;"></span> <span style="color:#64748b;">|</span> DIV <span id="successDiv" style="color: #38bdf8;"></span></h3>
         </div>
     </div>
+    
+    
+    <!-- COIN TOSS MODAL -->
+    <div id="tossModal" class="modal-overlay hidden" style="z-index: 10001;">
+        <div class="modal-box" style="max-width: 600px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white;">
+            <h2 style="color: #ffd700; font-size: 32px; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">🎲 TIE BREAKER TOSS 🎲</h2>
+            <p style="font-size: 16px; color:#e0f2fe;">Randomly resolving tie between candidates with <b id="tossVoteCount" style="color:#ffd700; font-size:20px;"></b> votes. <span id="tossTimerContainer" style="color: #fca5a5; font-weight: bold; margin-left: 10px;">Time Left: <span id="tossTimerVal">15</span>s</span></p>
+            
+            <div id="tossCandidates" style="display:flex; justify-content:center; gap:20px; margin: 30px 0; flex-wrap:wrap;">
+                <!-- Candidates will be injected here -->
+            </div>
+            
+            <div id="tossWinnerAnnouncement" class="hidden" style="margin-top: 20px; animation: popIn 0.5s forwards;">
+                <h3 style="margin:0; color:#fff; font-size:18px;">WINNER BY TOSS:</h3>
+                <h1 id="tossWinnerName" style="color: #ffd700; font-size: 40px; margin:5px 0; text-shadow: 0 0 20px rgba(255,215,0,0.5);"></h1>
+            </div>
+            
+            <button id="btnStartToss" onclick="executeToss()" style="background: #ffd700; color: #000; font-size: 22px; padding: 15px; margin-top:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">FLIP COIN / SHUFFLE</button>
+            <button id="btnCloseToss" onclick="closeTossModal()" class="hidden" style="background: #ef4444; font-size: 18px; margin-top:10px;">Close & Refresh Results</button>
+        </div>
+    </div>
 
     </main>
 
-    <!-- Corrected & Restored PDF Report Layout container -->
     <div id="pdfReportData" style="display: none;">
         <div id="exportContent" style="padding: 40px; background: white; color: black; font-family: Arial, sans-serif; width: 794px; box-sizing: border-box; position: relative;">
-            <div style="text-align:center; border-bottom:3px solid #1e3a8a; padding-bottom:15px; margin-bottom:30px;">
-                <h1 style="margin:0; font-size:28px; color:#1e3a8a;">TDTTI THURAVOOR</h1>
-                <h2 style="margin:5px 0; font-size:18px; color:#333;">GENERAL SCHOOL ELECTION REPORT</h2>
-                <h3 style="margin:0; font-size:16px;">Class: <span id="pdfClass"></span> &nbsp;|&nbsp; Division: <span id="pdfDiv"></span></h3>
-                <h4 style="margin:5px 0; font-size:14px; font-weight:normal; color:#555;">Generated on: <span id="pdfDateTime"></span><br>Generated by: <span id="pdfGeneratedBy"></span></h4>
+            <div style="display: flex; align-items: center; justify-content: center; border-bottom:3px solid #1e3a8a; padding-bottom:15px; margin-bottom:30px; position: relative;">
+                <!-- School Logo -->
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGka-p7C45PTqBMBKqSjulqicQlHmW_Ee1BCfUPpaW888vYnoPjElzW9DVm8az1kCOjdlabjA3qb_vS00GpCApyVWh2C0aIcOcvb-BWeeTI8AdLojSf25iCvNpMS6aENxrWO-SgM5xjqePEMsHfCLy4HinnGk2xAnDlKaapXYFY05jXQM/s56-c/Logo2.png" style="position: absolute; left: 0; width: 85px; height: 85px; object-fit: contain;">
+                
+                <div style="text-align:center;">
+                    <h1 style="margin:0; font-size:28px; color:#1e3a8a;">TDTTI THURAVOOR</h1>
+                    <h2 style="margin:5px 0; font-size:18px; color:#333;">GENERAL SCHOOL ELECTION REPORT</h2>
+                    <h3 style="margin:0; font-size:16px;">Class: <span id="pdfClass"></span> &nbsp;|&nbsp; Division: <span id="pdfDiv"></span></h3>
+                    <h4 style="margin:5px 0; font-size:14px; font-weight:normal; color:#555;">Generated on: <span id="pdfDateTime"></span><br>Generated by: <span id="pdfGeneratedBy"></span></h4>
+                </div>
             </div>
             <table style="width:100%; margin-bottom:30px; font-size:16px; border:none;">
-                <tr><td style="padding:8px; width:40%;">1) No of Total Students in Class</td><td>: <strong id="pdfTotalStud"></strong></td></tr>
-                <tr><td style="padding:8px;">2) No of Voters Polled</td><td>: <strong id="pdfPolled"></strong></td></tr>
-                <tr><td style="padding:8px;">3) No of Absentees</td><td>: <strong id="pdfAbsent"></strong></td></tr>
-                <tr><td style="padding:8px;">4) No of Male Voters</td><td>: <strong id="pdfMale"></strong></td></tr>
-                <tr><td style="padding:8px;">5) No of Female Voters</td><td>: <strong id="pdfFemale"></strong></td></tr>
-                <tr><td style="padding:8px; color:#dc2626;">6) No of Invalid Votes</td><td>: <strong id="pdfInvalid" style="color:#dc2626;"></strong></td></tr>
+                <!-- Polling Times -->
+                <tr><td style="padding:8px; width:40%;"> Poll Started Time</td><td><strong id="pdfStartTime"></strong></td></tr>
+                <tr><td style="padding:8px;"> Poll End Time</td><td><strong id="pdfEndTime"></strong></td></tr>
+                <tr><td style="padding:8px; width:40%;"> No of Total Students in Class</td><td><strong id="pdfTotalStud"></strong></td></tr>
+                <tr><td style="padding:8px;"> No of Voters Polled</td><td><strong id="pdfPolled"></strong></td></tr>
+                <tr><td style="padding:8px;"> No of Absentees</td><td><strong id="pdfAbsent"></strong></td></tr>
+                <tr><td style="padding:8px;"> No of Male Voters</td><td><strong id="pdfMale"></strong></td></tr>
+                <tr><td style="padding:8px;"> No of Female Voters</td><td><strong id="pdfFemale"></strong></td></tr>
+                <tr><td style="padding:8px; color:#dc2626;"> No of Invalid Votes</td><td><strong id="pdfInvalid" style="color:#dc2626;"></strong></td></tr>
             </table>
             <h3 style="margin-bottom: 10px; color:#1e3a8a;">Winners Record (As per votes gained)</h3>
             <table style="width:100%; border-collapse: collapse; border: 1px solid #000; text-align:center;" border="1">
@@ -848,28 +562,13 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzvbLjEBAUQUMTO26FgW2lXpSXWv5kkykByAluE2Hnpzfypkhou3CR-tQMXxauaIhA89g/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbylsWPnixYGpNXxcnzvwE5iM9XOEUj7rFyllZSROq6do1SJFtmzBCaNVwYGqfA5ptMSTg/exec"; 
         const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
         
-        let sessionData = { username: "", loginTime: null, role: "", tabs: [], homeData: null };
+        let sessionData = { username: "", loginTime: null, role: "", homeData: null };
         let intervals =[], localVotersData =[], activeHomeVoterTimer;
-        let lastVotedAdmNo = ""; // Latency guard for client checks
 
-        // Global states for keyboard reveal flow [2]
-        let resultsRevealReady = false;
-        let resultsRevealed = false;
-        let pendingResultsData = null;
-
-        // Global state for heads/tails selection and toss resolution [2]
-        let tieBreakState = {
-            cand1: null,           // Candidate 1 (First in tied group)
-            cand2: null,           // Candidate 2
-            cand1Assignment: "",  // "HEADS" or "TAILS"
-            cand2Assignment: "",  // "HEADS" or "TAILS"
-            tossCompleted: false
-        };
-
-        // GLOBAL STATE TRACKERS FOR FRONTEND
+        // NEW GLOBAL STATE TRACKERS FOR FRONTEND
         let currentCuClass = "", currentCuDiv = "", currentCuState = "";
 
         function showLoader() { document.getElementById('globalLoader').classList.remove('hidden'); }
@@ -929,95 +628,79 @@
             }, 1000);
         }
 
-        window.onload = () => { 
-            startLiveClock(); 
-            const saved = localStorage.getItem("electionSession"); 
-            if(saved) { 
-                sessionData = JSON.parse(saved); 
-                initSession(); 
-            } 
-            
-            // Dynamic multi-stage keyboard controller [2]
-            window.addEventListener('keydown', function(event) {
-                if (resultsRevealReady) {
-                    // First stage: Reveal curtain is lifted
-                    resultsRevealReady = false;
-                    document.getElementById('revealCurtain').classList.add('hidden');
-                    renderRevealedResults(pendingResultsData);
-                    resultsRevealed = true;
-                } else if (resultsRevealed) {
-                    // Second stage: Dismiss public tie presentation modal and clear overlays
-                    closeFullScreenTieBreaker();
-                }
-            });
-        };
-
-        function openFullScreenTieBreaker() {
-            document.getElementById('fullScreenTieModal').classList.remove('hidden');
-        }
-        
-        function closeFullScreenTieBreaker() {
-            document.getElementById('fullScreenTieModal').classList.add('hidden');
-        }
+        window.onload = () => { startLiveClock(); const saved = localStorage.getItem("electionSession"); if(saved) { sessionData = JSON.parse(saved); initSession(); } };
 
         async function loginStaff() {
-            const user = document.getElementById('loginId').value.trim(); 
-            const pass = document.getElementById('loginPass').value.trim();
-            if(!user || !pass) { 
-                await showModal("Input Required", "Please enter both Username and Password."); 
-                return; 
-            }
-            showLoader();
-            const res = await apiCall({ action: "staffLogin", username: user, password: pass });
-            hideLoader();
-            if(res.success) {
-                sessionData = { 
-                    username: res.username, 
-                    loginTime: new Date().getTime(), 
-                    role: res.username, 
-                    tabs: res.tabs 
-                };
-                if(document.getElementById('keepLoggedIn').checked) {
-                    localStorage.setItem("electionSession", JSON.stringify(sessionData));
-                }
-                apiCall({ action: "logLogin", username: sessionData.username, loginTime: formatDateTime(new Date(sessionData.loginTime)) });
-                initSession();
-            } else { 
-                await showModal("Access Denied", res.message || "Invalid staff credentials."); 
-            }
+    const user = document.getElementById('loginId').value.trim(); 
+    const pass = document.getElementById('loginPass').value.trim();
+    if (!user || !pass) {
+        await showModal("Input Required", "Please enter both username and password.");
+        return;
+    }
+    showLoader();
+    const res = await apiCall({ action: "staffLogin", username: user, password: pass });
+    hideLoader();
+    
+    if (res.success) {
+        sessionData = { 
+            username: user, 
+            loginTime: new Date().getTime(), 
+            role: res.role, 
+            tabs: res.tabs 
+        };
+        if (document.getElementById('keepLoggedIn').checked) {
+            localStorage.setItem("electionSession", JSON.stringify(sessionData));
         }
+        apiCall({ 
+            action: "logLogin", 
+            username: sessionData.username, 
+            loginTime: formatDateTime(new Date(sessionData.loginTime)) 
+        });
+        initSession();
+    } else { 
+        await showModal("Access Denied", res.message || "Invalid staff credentials."); 
+    }
+}
 
         async function loginHomeVoter() {
             const phone = document.getElementById('homePhone').value.trim();
             if(!phone) { await showModal("Error", "Please enter phone number."); return; }
             showLoader(); const res = await apiCall({ action: "homeVoterLogin", Phone: phone }); hideLoader();
             if(res.success) {
-                sessionData = { username: "HomeVoter_" + phone, loginTime: new Date().getTime(), role: "Home", tabs: ["tab6"], homeData: res.data };
+                sessionData = { username: "HomeVoter_" + phone, loginTime: new Date().getTime(), role: "Home", homeData: res.data };
                 apiCall({ action: "logLogin", username: sessionData.username, loginTime: formatDateTime(new Date(sessionData.loginTime)) });
                 initSession();
             } else { await showModal("Login Failed", res.message); }
         }
 
         function initSession() {
-            document.getElementById('loginScreen').classList.add('hidden'); 
-            document.getElementById('mainHeader').classList.remove('hidden'); 
-            document.getElementById('mainApp').classList.remove('hidden');
-            
-            document.getElementById('userInfoText').innerHTML = `<b>${sessionData.username}</b><br>Logged in: ${formatDateTime(new Date(sessionData.loginTime))}`;
-            
-            const logoutBtn = document.getElementById('btnLogout');
-            if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'none'; }
+    document.getElementById('loginScreen').classList.add('hidden'); 
+    document.getElementById('mainHeader').classList.remove('hidden'); 
+    document.getElementById('mainApp').classList.remove('hidden');
+    
+    document.getElementById('userInfoText').innerHTML = `<b>${sessionData.username}</b><br>Logged in: ${formatDateTime(new Date(sessionData.loginTime))}`;
+    
+    const logoutBtn = document.getElementById('btnLogout');
+    if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'none'; }
 
-            const navMenu = document.getElementById('mainNav');
-            if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
+    const navMenu = document.getElementById('mainNav');
+    if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
 
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
-            const allowedTabs = sessionData.role === "Home" ? ["tab6"] : (sessionData.tabs || []);
-            
-            allowedTabs.forEach(tab => { const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); if(btn) btn.style.display = 'block'; });
-            switchTab(allowedTabs[0]);
-            if(sessionData.role === "Home") document.getElementById('hvName').innerText = sessionData.homeData.Name;
-        }
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
+    
+    // Dynamically query tabs retrieved from backend session data
+    const allowedTabs = sessionData.role === "Home" ? ["tab6"] : (sessionData.tabs || []);
+    
+    allowedTabs.forEach(tab => { 
+        const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); 
+        if(btn) btn.style.display = 'block'; 
+    });
+    
+    if (allowedTabs.length > 0) {
+        switchTab(allowedTabs[0]);
+    }
+    if(sessionData.role === "Home") document.getElementById('hvName').innerText = sessionData.homeData.Name;
+}
 
         async function logout() {
             if(sessionData.role !== "Home") {
@@ -1037,10 +720,11 @@
             if(btn) btn.classList.add('active');
 
             requestAnimationFrame(() => {
-                if(tabId === "tab1") fetchMediaLib();
-                if(tabId === "tab2") { 
+                if(tabId === "tab1") { fetchMediaLib(); fetchAllVotersForAdmin(); }
+                if(tabId === "tab2") {
                     document.querySelector("#votersTablePending tbody").innerHTML = ""; 
                     document.querySelector("#votersTableProcessed tbody").innerHTML = ""; 
+                    // Add an interval to dynamically listen to CU changes while on this tab
                     intervals.push(setInterval(async () => {
                         const res = await apiCall({ action: "checkControlStatus" });
                         if(res.success) {
@@ -1056,7 +740,78 @@
                 if(tabId === "tab11") fetchParliament(); 
             });
         }
+        
+        let globalAllVotersForSearch = [];
 
+        // Fetches all voters silently in the background so search is instant
+        async function fetchAllVotersForAdmin() {
+            if (globalAllVotersForSearch.length > 0) return; // Only fetch once
+            const res = await apiCall({ action: "getVoters" });
+            if (res.success) { globalAllVotersForSearch = res.data; }
+        }
+
+        // Handles the live typing
+        function handleAdminSearchInput() {
+            const term = document.getElementById('adminSearch').value.toLowerCase().trim();
+            const dropdown = document.getElementById('adminSearchDropdown');
+            dropdown.innerHTML = '';
+            
+            if (term.length === 0) { dropdown.style.display = 'none'; return; }
+            if (globalAllVotersForSearch.length === 0) {
+                dropdown.innerHTML = '<div style="padding: 10px; color: #94a3b8; font-style:italic;">Loading database...</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            // Find matches in AdmNo or Name
+            const matches = globalAllVotersForSearch.filter(v => 
+                (v.Name && v.Name.toLowerCase().includes(term)) || 
+                (v.AdmNo && v.AdmNo.toString().includes(term))
+            ).slice(0, 15); // Show max 15 results to keep it clean
+
+            // Sort so names that *start* with the typed letter appear at the top
+            matches.sort((a, b) => {
+                let aStarts = (a.Name && a.Name.toLowerCase().startsWith(term)) ? -1 : 1;
+                let bStarts = (b.Name && b.Name.toLowerCase().startsWith(term)) ? -1 : 1;
+                return aStarts - bStarts;
+            });
+
+            if (matches.length > 0) {
+                matches.forEach(m => {
+                    const div = document.createElement('div');
+                    div.style.padding = '10px 15px';
+                    div.style.borderBottom = '1px solid #f1f5f9';
+                    div.style.cursor = 'pointer';
+                    div.style.fontSize = '14px';
+                    div.innerHTML = `<strong style="color:var(--primary);">${m.Name}</strong> <span style="color:#64748b; font-size:12px;">(Adm: ${m.AdmNo}) - Class ${m.Class}${m.Div}</span>`;
+                    
+                    // Hover effects
+                    div.onmouseover = () => div.style.backgroundColor = '#f8fafc';
+                    div.onmouseout = () => div.style.backgroundColor = 'white';
+                    
+                    // On click, fill the input and automatically fetch the candidate
+                    div.onclick = () => {
+                        document.getElementById('adminSearch').value = m.AdmNo;
+                        dropdown.style.display = 'none';
+                        adminFetchVoter(); 
+                    };
+                    dropdown.appendChild(div);
+                });
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.innerHTML = '<div style="padding: 10px 15px; color: #ef4444; font-size:14px;">No matches found</div>';
+                dropdown.style.display = 'block';
+            }
+        }
+
+        // Hide dropdown if admin clicks anywhere else on the page
+        document.addEventListener('click', (e) => {
+            if (e.target.id !== 'adminSearch') {
+                const dd = document.getElementById('adminSearchDropdown');
+                if (dd) dd.style.display = 'none';
+            }
+        });
+        
         async function adminFetchVoter() {
             const term = document.getElementById('adminSearch').value.trim();
             if(!term) { await showModal("Input Required", "Please enter Admission No or Name to fetch."); return; }
@@ -1071,7 +826,7 @@
             const photoUrl = document.getElementById('candPhotoSelect').value; const symbolUrl = document.getElementById('candSymbolSelect').value;
             if(!photoUrl || !symbolUrl) { await showModal("Error", "Please select a Photo and a Symbol from the library dropdowns."); return; }
             showLoader();
-            const payload = { action: "saveCandidate", AdmNo: document.getElementById('candAdmNo').value, Name: document.getElementById('candName').value, Gender: document.getElementById('candGender').value, Class: document.getElementById('candDiv').value, Photo: photoUrl, Symbol: symbolUrl };
+            const payload = { action: "saveCandidate", AdmNo: document.getElementById('candAdmNo').value, Name: document.getElementById('candName').value, Gender: document.getElementById('candGender').value, Class: document.getElementById('candClass').value, Div: document.getElementById('candDiv').value, Photo: photoUrl, Symbol: symbolUrl };
             const res = await apiCall(payload); hideLoader();
             if(res.success) { await showModal("Success", "Candidate Saved Perfectly"); document.getElementById('adminForm').classList.add('hidden'); document.getElementById('adminSearch').value = ""; document.getElementById('candPhotoSelect').value = ""; document.getElementById('candSymbolSelect').value = ""; } else await showModal("Error", res.message);
         }
@@ -1080,6 +835,7 @@
             showLoader(); const res = await apiCall({ action: "getVoters" }); hideLoader(); 
             if(res.success) { 
                 localVotersData = res.data; 
+                // Capture state from backend
                 currentCuClass = res.cuClass; currentCuDiv = res.cuDiv; currentCuState = res.cuState;
                 renderVotersTables(); 
             } else await showModal("Error", "Failed to fetch voters."); 
@@ -1104,6 +860,7 @@
                 if (!v.Status || v.Status === "") { 
                     const safeName = (v.Name || "").replace(/'/g, "\\'"), safeGender = (v.Gender || "").replace(/'/g, "\\'");
                     
+                    // Conditionally show buttons or hide them if CU is not active for this class
                     let isActionAllowed = (v.Class == currentCuClass && v.Div == currentCuDiv && currentCuState && currentCuState !== "Stopped");
                     let actionHtml = isActionAllowed ? 
                         `<button onclick="markAttendanceInstantly('${v.AdmNo}', 'Present', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--success); width:auto; padding:5px 10px;">Present</button> 
@@ -1120,14 +877,24 @@
             if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='7' class='text-center'>No processed voters yet.</td></tr>";
         }
 
+        async function markAttendanceInstantly(admNo, status, name, gender, cls, div) {
+            showLoader(); const res = await apiCall({ action: "markAttendance", AdmNo: admNo, Status: status, Name: name, Gender: gender, Class: cls, Div: div }); hideLoader();
+            if(res.success) { const idx = localVotersData.findIndex(v => v.AdmNo == admNo); if (idx > -1) localVotersData[idx].Status = status === "Present" ? "Voting..." : "Absent"; renderVotersTables(); } 
+            else await showModal("Action Blocked", res.message);
+        }
+
+        // ==========================================
+        // DYNAMIC LED FUNCTION (Handles True/False/Null)
+        // ==========================================
         function setLEDs(unit, isReady) { 
             const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); 
             red.classList.remove('on'); green.classList.remove('on');
             if(isReady === true) { green.classList.add('on'); } 
             else if (isReady === false) { red.classList.add('on'); } 
+            // If isReady is null, both stay off.
         }
 
-        let cuCurrentClass = "", cuCurrentDiv = ""
+        let cuCurrentClass = "", cuCurrentDiv = "";
         async function startControlUnitSession() {
             const cls = document.getElementById('cuClass').value, div = document.getElementById('cuDiv').value;
             showLoader(); const res = await apiCall({ action: "startClassVoting", Class: cls, Div: div }); hideLoader();
@@ -1144,14 +911,17 @@
                 const res = await apiCall({ action: "checkControlStatus" });
                 if(res.success) {
                     if (res.globalStatus !== "Started") {
+                        // Global Election Not Started -> Hide everything, LEDs OFF
                         document.getElementById('cuSetupArea').classList.add('hidden'); 
                         document.getElementById('cuActiveArea').classList.add('hidden'); 
                         setLEDs("cu", null); 
                     } else if(res.state === "Stopped" || res.state === "" || res.state == null) { 
+                        // Global Started, but no specific class session running
                         document.getElementById('cuSetupArea').classList.remove('hidden'); 
                         document.getElementById('cuActiveArea').classList.add('hidden'); 
                         setLEDs("cu", null); 
                     } else {
+                        // Active session
                         document.getElementById('cuSetupArea').classList.add('hidden'); 
                         document.getElementById('cuActiveArea').classList.remove('hidden'); 
                         document.getElementById('lblCuClass').innerText = res.cuClass; document.getElementById('lblCuDiv').innerText = res.cuDiv;
@@ -1173,29 +943,35 @@
         }
 
         let currentBallotReady = false;
+        
         function startBallotUnitPolling() {
             intervals.push(setInterval(async () => {
+                // Stop new requests if a vote is currently being processed
+                if (window.isVoteSubmitting) return; 
+
                 const res = await apiCall({ action: "checkBallotStatus" });
+                
+                // CRITICAL: Check AGAIN! If the user clicked the button while we were waiting for this response, ignore the response!
+                if (window.isVoteSubmitting) return; 
+
                 if(res.success) {
                     if (res.globalStatus !== "Started" || res.cuState === "Stopped" || !res.cuState) {
                         setLEDs("bu", null);
                         currentBallotReady = false; 
                         document.getElementById('ballotGreeting').classList.add('hidden'); 
                         document.getElementById('ballotList').classList.add('hidden'); 
-                        document.getElementById('ballotList').innerHTML = ""; 
                         document.getElementById('ballotWaiting').classList.remove('hidden'); 
                         document.getElementById('ballotWaiting').innerHTML = "<h3>Waiting for Control Unit activation...</h3>";
-                    } else if(res.ready && res.admNo !== lastVotedAdmNo && !currentBallotReady) { 
+                    } else if(res.ready && !currentBallotReady) { 
                         setLEDs("bu", true);
                         currentBallotReady = true; 
                         let currentVoterName = res.voterName || "STUDENT";
                         renderBallot(res.candidates, "Standard", res.class, res.div, res.gender, res.admNo, currentVoterName); 
-                    } else if((!res.ready || res.admNo === lastVotedAdmNo) && currentBallotReady) { 
+                    } else if(!res.ready && currentBallotReady) { 
                         setLEDs("bu", false);
                         currentBallotReady = false; 
                         document.getElementById('ballotGreeting').classList.add('hidden'); 
                         document.getElementById('ballotList').classList.add('hidden'); 
-                        document.getElementById('ballotList').innerHTML = ""; 
                         document.getElementById('ballotWaiting').classList.remove('hidden'); 
                     } else if(!res.ready) {
                         setLEDs("bu", false); 
@@ -1217,68 +993,80 @@
             bList.classList.remove('hidden'); bList.innerHTML = "";
             
             candidates.forEach((c, i) => { 
-                bList.innerHTML += `
-                <div class="ballot-item">
-                    <div class="ballot-sl">${i+1}</div>
-                    <div class="ballot-photo-container">
-                        <img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'">
-                    </div>
-                    <div class="ballot-name">${c.Name}</div>
-                    <div class="ballot-symbol-container">
-                        <img src="${c.Symbol}" class="ballot-img symbol" onerror="this.src='https://via.placeholder.com/60'">
-                    </div>
-                    <div class="ballot-vote-container">
-                        <button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
-                    </div>
-                </div>`; 
+                bList.innerHTML += `<div class="ballot-item"><div style="font-size:24px; font-weight:bold;">${i+1}</div><div><img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'"></div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold;">${c.Name}</div><div><img src="${c.Symbol}" class="ballot-img" style="border-radius:0; border:none;" onerror="this.src='https://via.placeholder.com/60'"></div><button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`; 
             });
-            bList.innerHTML += `
-            <div class="ballot-item" style="background:#fee2e2;">
-                <div class="ballot-sl">${candidates.length+1}</div>
-                <div class="ballot-photo-container"></div>
-                <div class="ballot-name" style="text-align:center; font-weight:900;">N O T A</div>
-                <div class="ballot-symbol-container"></div>
-                <div class="ballot-vote-container">
-                    <button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
-                </div>
-            </div>`;
+            bList.innerHTML += `<div class="ballot-item" style="background:#fee2e2;"><div style="font-size:24px; font-weight:bold;">${candidates.length+1}</div><div style="flex:1; margin-left:15px; font-size:20px; font-weight:bold; text-align:center;">N O T A</div><button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button></div>`;
         }
 
         async function castVote(candId, candName, candSymbol, candPhoto, voteType, cls, div, gender, voterAdmNo) {
-            playBeep(); 
-            document.getElementById('successCandName').innerText = candName; document.getElementById('successClass').innerText = cls; document.getElementById('successDiv').innerText = div;
-            const symImg = document.getElementById('successCandSymbol'); const photoImg = document.getElementById('successCandPhoto');
-            
-            if (candId === "NOTA" || !candSymbol) { symImg.style.display = 'none'; photoImg.style.display = 'none'; } 
-            else { symImg.style.display = 'block'; symImg.src = candSymbol; photoImg.style.display = 'block'; photoImg.src = candPhoto; }
-            
-            document.getElementById('voteSuccessMsg').classList.remove('hidden');
-            
+            // Prevent double-clicking
+            if (window.isVoteSubmitting) return; 
+            window.isVoteSubmitting = true; // Lock the entire UI globally
+
+            // === 1. INSTANTLY CLEAR AND HIDE THE BALLOT ===
             if(voteType === "Standard") { 
-                lastVotedAdmNo = voterAdmNo; 
-                currentBallotReady = false;
                 document.getElementById('ballotGreeting').classList.add('hidden'); 
-                document.getElementById('ballotList').classList.add('hidden'); 
-                document.getElementById('ballotList').innerHTML = ""; 
+                
+                const bList = document.getElementById('ballotList');
+                bList.classList.add('hidden');
+                bList.innerHTML = ""; // Physically deletes candidates from the HTML
+                
+                document.getElementById('ballotWaiting').classList.add('hidden'); 
                 setLEDs("bu", false); 
+                currentBallotReady = false; 
             } else { 
-                clearInterval(activeHomeVoterTimer); 
-                document.getElementById('homeBallotArea').classList.add('hidden'); 
-                document.getElementById('homeBallotArea').innerHTML = "";
+                if (typeof activeHomeVoterTimer !== 'undefined') clearInterval(activeHomeVoterTimer); 
+                const hList = document.getElementById('homeBallotArea');
+                hList.classList.add('hidden'); 
+                hList.innerHTML = ""; 
             }
 
-            apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
-            
+            // === 2. YIELD TO BROWSER TO FORCE INSTANT REPAINT ===
+            // We wait 50 milliseconds. This gives the device graphics card enough time to visually clear the screen BEFORE the heavy audio and network tasks begin.
             setTimeout(() => {
-                document.getElementById('voteSuccessMsg').classList.add('hidden');
-                if(voteType === "Standard") { 
-                    document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                
+                // === 3. NOW PLAY BEEP ===
+                playBeep(); 
+                
+                // === 4. SETUP AND SHOW SUCCESS MESSAGE ===
+                document.getElementById('successCandName').innerText = candName; 
+                document.getElementById('successClass').innerText = cls; 
+                document.getElementById('successDiv').innerText = div;
+                const symImg = document.getElementById('successCandSymbol'); 
+                const photoImg = document.getElementById('successCandPhoto');
+                
+                if (candId === "NOTA" || !candSymbol) { 
+                    symImg.style.display = 'none'; photoImg.style.display = 'none'; 
                 } else { 
-                    showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => { logout(); }); 
+                    symImg.style.display = 'block'; symImg.src = candSymbol; 
+                    photoImg.style.display = 'block'; photoImg.src = candPhoto; 
                 }
-            }, 5000);
+                
+                document.getElementById('voteSuccessMsg').classList.remove('hidden');
+
+                // === 5. SEND VOTE TO GOOGLE SHEETS IN BACKGROUND ===
+                apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
+                
+                // === 6. WAIT 5 SECONDS, THEN RESET UI ===
+                setTimeout(() => {
+                    document.getElementById('voteSuccessMsg').classList.add('hidden');
+                    
+                    if(voteType === "Standard") { 
+                        document.getElementById('ballotWaiting').classList.remove('hidden'); 
+                    } else { 
+                        showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => { logout(); }); 
+                    }
+                    
+                    // Unlock the UI so the next voter can start polling
+                    window.isVoteSubmitting = false; 
+                }, 5000);
+
+            }, 50); // End of the 50ms repaint delay
         }
 
+        // ==========================================
+        // TAB 5: VOTING RECORDS & ELECTION CONTROLS
+        // ==========================================
         async function fetchVotingStats() {
             showLoader(); const res = await apiCall({ action: "getStats" }); hideLoader();
             if(res.success) { 
@@ -1337,654 +1125,214 @@
 
         function getOrdinalSuffix(i) { var j = i % 10, k = i % 100; if (j == 1 && k != 11) return i + "st"; if (j == 2 && k != 12) return i + "nd"; if (j == 3 && k != 13) return i + "rd"; return i + "th"; }
 
-        // Fetch results with pre-result reveal screen integration [2]
         async function fetchResults(event) {
             if(event) event.preventDefault(); showLoader();
             try {
                 const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
                 const res = await apiCall({ action: "getResults", Class: cls, Div: div });
+                if(!res.success) { hideLoader(); await showModal("Not Ready", res.message); return; }
+
+                let totalValid = res.stats.totalPolled - res.stats.invalid;
+                await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
                 hideLoader();
                 
-                if(!res.success) { await showModal("Not Ready", res.message); return; }
-
-                // Save data to global pending payload & configure pre-result reveal curtain
-                pendingResultsData = res;
-                resultsRevealReady = true;
+                document.getElementById('resultData').classList.remove('hidden'); document.getElementById('btnExportPDF').classList.remove('hidden');
+                document.getElementById('resStud').innerText = res.stats.totalStudents || 0; document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; document.getElementById('resAbsent').innerText = res.stats.absentees || 0; document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
                 
-                document.getElementById('revealCurtain').classList.remove('hidden');
-            } catch (error) { console.error(error); hideLoader(); await showModal("Render Error", "An error occurred while compiling results."); }
-        }
-
-        // Render result lists after curtain transition keypress is caught [2]
-        async function renderRevealedResults(res) {
-            const cls = document.getElementById('resClass').value; const div = document.getElementById('resDiv').value;
-            let totalValid = res.stats.totalPolled - res.stats.invalid;
-            
-            showLoader();
-            await apiCall({ action: "saveResults", Class: cls, Div: div, leaderboard: res.leaderboard, totalValid: totalValid });
-            hideLoader();
-
-            document.getElementById('resultData').classList.remove('hidden'); document.getElementById('btnExportPDF').classList.remove('hidden');
-            document.getElementById('resStud').innerText = res.stats.totalStudents || 0; document.getElementById('resPolled').innerText = res.stats.totalPolled || 0; document.getElementById('resAbsent').innerText = res.stats.absentees || 0; document.getElementById('resInvalid').innerText = res.stats.invalid || 0;
-            
-            const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-            document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
-
-            const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
-            board.innerHTML = ""; pdfBody.innerHTML = "";
-            
-            if(res.leaderboard && res.leaderboard.length > 0) {
-                const candidatesOnly = res.leaderboard.filter(c => c.AdmNo !== "NOTA");
+                const now = new Date(); document.getElementById('pdfDateTime').innerText = `${now.getDate().toString().padStart(2, '0')}:${(now.getMonth() + 1).toString().padStart(2, '0')}:${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                document.getElementById('pdfGeneratedBy').innerText = sessionData.username; document.getElementById('pdfClass').innerText = cls; document.getElementById('pdfDiv').innerText = div; document.getElementById('pdfTotalStud').innerText = res.stats.totalStudents || 0; document.getElementById('pdfPolled').innerText = res.stats.totalPolled || 0; document.getElementById('pdfAbsent').innerText = res.stats.absentees || 0; document.getElementById('pdfMale').innerText = res.stats.maleVoters || 0; document.getElementById('pdfFemale').innerText = res.stats.femaleVoters || 0; document.getElementById('pdfInvalid').innerText = res.stats.invalid || 0;
                 
-                // Identify ties to configure automated physical simulations [2]
-                let tiesMap = {};
-                let tieGroups = [];
-                let votesGroup = {};
-                
-                candidatesOnly.forEach(c1 => {
-                    let count = candidatesOnly.filter(c2 => c2.Votes === c1.Votes && c1.Votes > 0).length;
-                    if (count > 1) {
-                        tiesMap[c1.AdmNo] = true;
-                        if(!votesGroup[c1.Votes]) votesGroup[c1.Votes] = [];
-                        if(!votesGroup[c1.Votes].some(c => c.AdmNo === c1.AdmNo)) {
-                            votesGroup[c1.Votes].push(c1);
-                        }
-                    }
-                });
+                const formatPollTime = (dateString) => {
+                    if (!dateString) return "N/A";
+                    const d = new Date(dateString);
+                    if (isNaN(d.getTime())) return "N/A";
+                    return `${d.getDate().toString().padStart(2, '0')}:${(d.getMonth() + 1).toString().padStart(2, '0')}:${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+                };
 
-                for (let votesVal in votesGroup) {
-                    if (votesGroup[votesVal].length > 1) {
-                        tieGroups.push({
-                            votes: votesVal,
-                            candidates: votesGroup[votesVal]
+                document.getElementById('pdfStartTime').innerText = formatPollTime(res.stats.pollStart);
+                document.getElementById('pdfEndTime').innerText = formatPollTime(res.stats.pollEnd);
+                const board = document.getElementById('animatedLeaderboard'); const pdfBody = document.getElementById('pdfTableBody');
+                board.innerHTML = ""; pdfBody.innerHTML = "";
+                
+                if(res.leaderboard && res.leaderboard.length > 0) {
+                    fireConfetti(); 
+                    
+                    let rankedCandidates = res.leaderboard;
+                    window.lastRankedCandidates = rankedCandidates;
+
+                    // Detect actual raw ties
+                    let voteCounts = rankedCandidates.filter(c => c.Votes > 0).map(c => c.Votes);
+                    let tieScores = [...new Set(voteCounts.filter((item, index) => voteCounts.indexOf(item) !== index))];
+                    
+                    // Lockout: If a toss winner is already declared among any candidate, don't show the Banner
+                    let isTieResolved = rankedCandidates.some(c => c.electedByToss);
+                    
+                    let tieHtml = "";
+                    if (tieScores.length > 0 && !isTieResolved) {
+                        tieHtml = `<div style="background: #fef08a; border: 2px solid #eab308; padding: 20px; border-radius: 12px; margin-bottom: 30px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); animation: popIn 0.5s;">
+                            <h3 style="margin: 0 0 10px 0; color: #854d0e; font-size:22px;">⚠️ Tie Detected!</h3>
+                            <p style="margin:0 0 15px 0; color:#a16207;">Multiple candidates received the same number of votes.</p>`;
+                        tieScores.forEach(score => {
+                            tieHtml += `<button onclick="openTossModal(${score})" style="background: #eab308; color: #000; width: auto; margin: 5px; font-size:16px;">🎲 TOSS COIN (For ${score} Votes)</button>`;
                         });
+                        tieHtml += `</div>`;
                     }
-                }
 
-                let hasUnresolvedTies = tieGroups.some(group => {
-                    return group.candidates.every(c => c.tossWinOrder === 999);
-                });
-
-                const tiePanel = document.getElementById('manualTieBreakerCard');
-                const embeddedSelectionList = document.getElementById('tieCandidatesSelectionList');
-                const fullScreenSelectionList = document.getElementById('fullScreenTieCandidatesList');
-
-                if (hasUnresolvedTies) {
-                    // Lock results view visually until the coin toss is successfully completed [2]
-                    document.getElementById('resultData').style.filter = "blur(10px)";
-                    document.getElementById('resultData').style.pointerEvents = "none";
-
-                    tiePanel.classList.remove('hidden');
-                    embeddedSelectionList.innerHTML = "";
-                    fullScreenSelectionList.innerHTML = "";
+                    let arenaHTML = `${tieHtml}<div class="results-arena"><div class="results-slider-wrapper"><div class="results-slider">`;
                     
-                    tieGroups.forEach(group => {
-                        let scenarioTitle = "";
-                        let cand1 = group.candidates[0]; // Retain identity markers
-                        let cand2 = group.candidates[1];
-
-                        // Set global tracking states for coin flipper [2]
-                        tieBreakState.cand1 = cand1;
-                        tieBreakState.cand2 = cand2;
-                        tieBreakState.cand1Assignment = "";
-                        tieBreakState.cand2Assignment = "";
-                        tieBreakState.tossCompleted = false;
-
-                        if (group.candidates.length === 2) {
-                            scenarioTitle = "Two-Way Tie resolved by Verifiable Coin Toss";
-                            
-                            // Interactive Selection Panel layout (Embedded) [2]
-                            let tossEmbeddedGraphics = `
-                            <div style="text-align: center; margin-top: 15px;">
-                                <div style="display:flex; justify-content:center; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:20px;">
-                                    <div style="text-align:center; width:150px;">
-                                        <img src="${cand1.Photo}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);" onerror="this.src='https://via.placeholder.com/70'">
-                                        <div style="font-weight:bold; margin-top:5px; font-size:13px; color:var(--text);">${cand1.Name}</div>
-                                        <div style="margin-top:8px; display:flex; gap:5px; justify-content:center;">
-                                            <button id="btn_heads_1" onclick="selectCoinAssignment(1, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
-                                            <button id="btn_tails_1" onclick="selectCoinAssignment(1, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div style="font-size:20px; font-weight:bold; color:#ca8a04;">VS</div>
-                                    
-                                    <div style="text-align:center; width:150px;">
-                                        <img src="${cand2.Photo}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);" onerror="this.src='https://via.placeholder.com/70'">
-                                        <div style="font-weight:bold; margin-top:5px; font-size:13px; color:var(--text);">${cand2.Name}</div>
-                                        <div style="margin-top:8px; display:flex; gap:5px; justify-content:center;">
-                                            <button id="btn_heads_2" onclick="selectCoinAssignment(2, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
-                                            <button id="btn_tails_2" onclick="selectCoinAssignment(2, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="coin-container">
-                                    <div id="interactiveCoin" class="coin">
-                                        <div class="coin-face coin-front">
-                                            <img src="" id="coinFrontAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
-                                            <span class="coin-label">Heads</span>
-                                        </div>
-                                        <div class="coin-face coin-back">
-                                            <img src="" id="coinBackAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
-                                            <span class="coin-label">Tails</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button id="tossActionBtn" onclick="runCoinTossAnimation('${cls}', '${div}', ${group.votes})" disabled style="background:#ca8a04; color:white; font-weight:bold; width:200px; border-radius:8px; margin-top:15px; font-size:16px;">Flip Coin</button>
-                                <div id="tossWinnerRevealText" class="hidden" style="font-size:20px; font-weight:900; color:#d97706; margin-top:15px;"></div>
-                            </div>`;
-
-                            // Full Screen Presentation UI layout [2]
-                            let tossFullScreenGraphics = `
-                            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box; text-align: center;">
-                                <h2 style="color: #fbbf24; margin-top: 0; font-size: 26px;">Tied Score: ${group.votes} Votes</h2>
-                                
-                                <div style="display: flex; gap: 40px; justify-content: center; align-items: center; margin: 30px 0; flex-wrap: wrap;">
-                                    <div style="text-align: center; width: 220px;">
-                                        <img src="${cand1.Photo}" style="width: 115px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #1e3a8a;">
-                                        <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #fff;">${cand1.Name}</h3>
-                                        <div style="display:flex; gap:5px; justify-content:center; margin-top:10px;">
-                                            <button id="fs_btn_heads_1" onclick="selectCoinAssignment(1, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
-                                            <button id="fs_btn_tails_1" onclick="selectCoinAssignment(1, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
-                                        <div class="coin-container" style="width:160px; height:160px;">
-                                            <div id="fsInteractiveCoin" class="coin">
-                                                <div class="coin-face coin-front" style="border-width:8px;">
-                                                    <img src="" id="fsCoinFrontAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
-                                                    <span class="coin-label">Heads</span>
-                                                </div>
-                                                <div class="coin-face coin-back" style="border-width:8px;">
-                                                    <img src="" id="fsCoinBackAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
-                                                    <span class="coin-label">Tails</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button id="fsTossStartBtn" onclick="runCoinTossAnimation('${cls}', '${div}', ${group.votes})" disabled style="background:#fbbf24; color:black; font-weight:bold; width:180px; border-radius:8px; font-size:16px;">Flip Coin</button>
-                                        <div id="fsTossWinnerRevealText" class="hidden" style="font-size:24px; font-weight:900; color:#fbbf24; text-shadow:0 0 10px rgba(251,191,36,0.5); margin-top:10px;"></div>
-                                    </div>
-                                    
-                                    <div style="text-align: center; width: 220px;">
-                                        <img src="${cand2.Photo}" style="width: 115px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #1e3a8a;">
-                                        <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #cbd5e1;">${cand2.Name}</h3>
-                                        <div style="display:flex; gap:5px; justify-content:center; margin-top:10px;">
-                                            <button id="fs_btn_heads_2" onclick="selectCoinAssignment(2, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
-                                            <button id="fs_btn_tails_2" onclick="selectCoinAssignment(2, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
-
-                            embeddedSelectionList.innerHTML += tossEmbeddedGraphics;
-                            fullScreenSelectionList.innerHTML += tossFullScreenGraphics;
-                        } else {
-                            // Multi-way ties remain Lot-drawing structured
-                            scenarioTitle = `Scenario B: Multi-Way Tie (${group.candidates.length} candidates) resolved by Draw of Lots`;
-                            
-                            let chitDrawsHtml = group.candidates.map((c, i) => {
-                                return `<li><strong>Lots Drawn #${i+1}:</strong> ${c.Name} (Chit seed: ${c.deterministicVal})</li>`;
-                            }).join("");
-
-                            let lotPresentationHtml = `
-                            <div style="display: flex; flex-direction: column; align-items: center; margin: 30px 0;">
-                                <div id="fsChitJar" class="chit-box">🗳️</div>
-                                <button id="fsShuffleStartBtn" onclick="runVirtualChitDraw('${cls}', '${div}', ${group.votes}, [${group.candidates.map(c => `'${c.AdmNo}'`).join(',')}])" style="background:#fbbf24; color:black; font-weight:bold; width:180px; border-radius:8px; margin-bottom:20px;">Draw Lots</button>
-                                <div id="fsChitsWrapper" class="chit-winner-reveal hidden" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
-                                    ${presentationChitsHtml}
-                                </div>
-                            </div>`;
-
-                            embeddedSelectionList.innerHTML += `
-                            <div style="border-bottom: 1px dashed rgba(217, 119, 6, 0.3); padding-bottom: 15px; margin-bottom: 15px;">
-                                <h4 style="margin: 0; color: #b45309; font-size: 15px;">Tied at ${group.votes} votes (${group.candidates.length} candidates)</h4>
-                                <div style="font-weight: bold; margin-top: 5px; font-size: 13px; color:#1e2937;">Scenario: ${scenarioTitle}</div>
-                                <div style="font-size: 14px; margin-top: 8px; color: #b45309; line-height: 1.5;">
-                                    Ranks will be resolved automatically once lots are drawn.
-                                </div>
-                            </div>`;
-
-                            fullScreenSelectionList.innerHTML += `
-                            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box; text-align: center;">
-                                <h2 style="color: #fbbf24; margin-top: 0; font-size: 26px;">Tied Score: ${group.votes} Votes</h2>
-                                ${lotPresentationHtml}
-                            </div>`;
-                        }
+                    rankedCandidates.forEach((c, index) => {
+                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let delay = index * 0.15; 
+                        let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
+                        let crown = c.rank === 1 ? `<div style="position:absolute; top:-70px; left:50%; transform:translateX(-50%); font-size:55px; animation: popCrown 1s forwards; filter: drop-shadow(0 0 15px gold); z-index:20;">👑</div>` : '';
+                        let rankText = getOrdinalSuffix(c.rank);
+                        
+                        // Toss indicator label on card
+                        let tossBadge = c.electedByToss ? `<div style="color:#ef4444; font-weight:900; font-size:12px; margin-top:5px; text-transform:uppercase; letter-spacing:1px;">Elected by Toss</div>` : '';
+                        
+                        arenaHTML += `<div class="slide-card ${rankClass}" style="animation: slideInRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) ${delay}s forwards; opacity: 0;">${crown}<div class="slide-rank-badge">${rankText}</div><img src="${c.Photo}" class="slide-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'"><div class="slide-name">${c.Name}</div>${tossBadge}<div class="slide-meta">CLASS ${cls}-${div}</div><div class="slide-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div><div class="slide-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div></div>`;
                     });
+                    
+                    arenaHTML += `</div></div></div>`; board.innerHTML = arenaHTML;
+
+                    rankedCandidates.forEach((c) => {
+                        let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let rankText = getOrdinalSuffix(c.rank);
+                        let tossLabel = c.electedByToss ? " <strong style='color:#dc2626; font-size:12px;'>[Elected by Toss]</strong>" : "";
+                        pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}${tossLabel}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
+                    });
+                    setTimeout(animateFastNumbers, 600);
+                } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
+            } catch (error) { console.error(error); hideLoader(); await showModal("Render Error", "An error occurred while displaying results."); }
+        }
+        
+        let tossCountdownInterval;
+        let currentTossCandidates = [];
+
+        function openTossModal(score) {
+            currentTossCandidates = window.lastRankedCandidates.filter(c => c.Votes === score);
+            document.getElementById('tossVoteCount').innerText = score;
+            const container = document.getElementById('tossCandidates');
+            container.innerHTML = "";
+            
+            currentTossCandidates.forEach((c, idx) => {
+                container.innerHTML += `<div id="tossCand_${idx}" style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; border: 4px solid transparent; transition: 0.1s; text-align:center;">
+                    <img src="${c.Photo}" crossorigin="anonymous" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom:10px; background:white;">
+                    <div style="font-weight:bold; font-size:16px;">${c.Name}</div>
+                </div>`;
+            });
+            
+            document.getElementById('tossWinnerAnnouncement').classList.add('hidden');
+            document.getElementById('btnStartToss').classList.remove('hidden');
+            document.getElementById('btnCloseToss').classList.add('hidden');
+            document.getElementById('tossTimerContainer').style.display = "inline";
+            document.getElementById('tossTimerVal').innerText = "15";
+            document.getElementById('tossModal').classList.remove('hidden');
+
+            // Set countdown time limit (15 seconds)
+            if (tossCountdownInterval) clearInterval(tossCountdownInterval);
+            let timeLeft = 15;
+            tossCountdownInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('tossTimerVal').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(tossCountdownInterval);
+                    executeToss(); // Auto-resolve if timer expires
+                }
+            }, 1000);
+        }
+
+        async function executeToss() {
+            if (tossCountdownInterval) clearInterval(tossCountdownInterval);
+            document.getElementById('tossTimerContainer').style.display = "none";
+            document.getElementById('btnStartToss').classList.add('hidden');
+            const cands = currentTossCandidates;
+            
+            // Shuffling Animation
+            let cycles = 0, speed = 50, lastIdx = 0;
+            const spin = () => {
+                document.getElementById(`tossCand_${lastIdx}`).style.borderColor = "transparent";
+                lastIdx = Math.floor(Math.random() * cands.length);
+                document.getElementById(`tossCand_${lastIdx}`).style.borderColor = "#ffd700";
+                
+                cycles++;
+                if (cycles < 30) {
+                    setTimeout(spin, speed);
+                    speed += 10; 
                 } else {
-                    tiePanel.classList.add('hidden');
-                    document.getElementById('resultData').style.filter = "none";
-                    document.getElementById('resultData').style.pointerEvents = "auto";
-                    fireConfetti(); // Celebrate ONLY after results are displayed completely without ties [2]
+                    const winner = cands[lastIdx];
+                    document.getElementById(`tossCand_${lastIdx}`).style.backgroundColor = "rgba(255,215,0,0.3)";
+                    document.getElementById('tossWinnerName').innerText = winner.Name;
+                    document.getElementById('tossWinnerAnnouncement').classList.remove('hidden');
+                    document.getElementById('btnCloseToss').classList.remove('hidden');
+                    fireConfetti();
+                    
+                    const cls = document.getElementById('resClass').value, div = document.getElementById('resDiv').value;
+                    apiCall({ action: "tossWinner", Class: cls, Div: div, CandidateAdmNo: winner.AdmNo, CandidateName: winner.Name });
                 }
-
-                let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
-                let arenaHTML = `<div class="results-arena"><div class="results-grid">`;
-                
-                rankedCandidates.forEach((c, index) => {
-                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let delay = index * 0.15; 
-                    let rankClass = c.rank === 1 ? 'rank-1' : (c.rank === 2 ? 'rank-2' : (c.rank === 3 ? 'rank-3' : 'rank-other'));
-                    let crown = c.rank === 1 ? `<div style="position:absolute; top:-50px; left:50%; transform:translateX(-50%); font-size:40px; filter: drop-shadow(0 0 10px gold); z-index:20;">👑</div>` : '';
-                    let rankText = getOrdinalSuffix(c.rank);
-                    
-                    let tieBadgeHtml = "";
-                    if (tiesMap[c.AdmNo] && c.tossWinOrder !== 999) {
-                        tieBadgeHtml = `<div class="tie-breaker-badge">Resolved: Coin Toss</div>`;
-                    } else if (tiesMap[c.AdmNo]) {
-                        tieBadgeHtml = `<div class="tie-breaker-badge" style="background:rgba(239, 68, 68, 0.15); border-color:#ef4444; color:#f87171;">Tied (Resolution Pending)</div>`;
-                    }
-                    
-                    arenaHTML += `
-                    <div class="results-card ${rankClass}" style="animation: slideInRight 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${delay}s forwards; opacity: 0;">
-                        ${crown}
-                        <div class="rank-badge">${rankText}</div>
-                        <img src="${c.Photo}" class="card-avatar" crossorigin="anonymous" onerror="this.src='https://via.placeholder.com/170'">
-                        <div class="card-name">${c.Name}</div>
-                        <div class="card-meta">CLASS ${cls}-${div}</div>
-                        <div class="card-votes"><span class="fast-counter" data-target="${c.Votes}">0</span></div>
-                        <div class="card-pct"><span class="fast-counter-float" data-target="${pct}">0</span>%</div>
-                        ${tieBadgeHtml}
-                    </div>`;
-                });
-                
-                arenaHTML += `</div></div>`; board.innerHTML = arenaHTML;
-
-                rankedCandidates.forEach((c) => {
-                    let pct = totalValid > 0 ? ((c.Votes / totalValid)*100).toFixed(1) : 0; let rankText = getOrdinalSuffix(c.rank);
-                    let tieInfo = tiesMap[c.AdmNo] ? (c.tossWinOrder !== 999 ? " (Resolved)" : " (Tied)") : "";
-                    pdfBody.innerHTML += `<tr><td style="padding:10px;"><b>${rankText}</b></td><td><img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" crossorigin="anonymous"></td><td style="font-weight:bold;">${c.Name}${tieInfo}</td><td><img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;" crossorigin="anonymous"></td><td style="font-size:18px; font-weight:bold;">${c.Votes}</td><td>${pct}%</td></tr>`;
-                });
-                setTimeout(animateFastNumbers, 600);
-            } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
+            };
+            spin();
         }
 
-        // Live heads/tails assignment handler [2]
-        function selectCoinAssignment(candNo, choice) {
-            if (candNo === 1) {
-                tieBreakState.cand1Assignment = choice;
-                tieBreakState.cand2Assignment = (choice === 'HEADS') ? 'TAILS' : 'HEADS';
-            } else {
-                tieBreakState.cand2Assignment = choice;
-                tieBreakState.cand1Assignment = (choice === 'HEADS') ? 'TAILS' : 'HEADS';
+        function closeTossModal() {
+            if (tossCountdownInterval) clearInterval(tossCountdownInterval);
+            document.getElementById('tossModal').classList.add('hidden');
+            fetchResults(); // Reload results to apply the broken tie
+        }
+        
+        function animateFastNumbers() {
+            document.querySelectorAll('.fast-counter, .fast-counter-float').forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target')) || 0; const isFloat = counter.classList.contains('fast-counter-float');
+                if (target === 0) { counter.innerText = isFloat ? "0.0" : "0"; return; }
+                const duration = 2000, start = performance.now();
+                function update(currentTime) {
+                    const progress = Math.min((currentTime - start) / duration, 1);
+                    const current = (1 - Math.pow(1 - progress, 3)) * target;
+                    counter.innerText = isFloat ? current.toFixed(1) : Math.floor(current);
+                    if (progress < 1) { requestAnimationFrame(update); } else { counter.innerText = isFloat ? target.toFixed(1) : Math.floor(target); }
+                } requestAnimationFrame(update);
+            });
+        }
+
+        async function generatePDF() {
+            const isConfirmed = await showModal("Save as PDF", "Click OK to open the Print/Save dialog. \n\nTip: In the dialog, set the 'Destination' to 'Save as PDF' to save it to your device.", true, "Open Print / Save");
+            if (!isConfirmed) return;
+            const printArea = document.getElementById('exportContent'); const originalParent = printArea.parentNode;
+            document.body.appendChild(printArea); document.body.classList.add('print-pdf'); 
+            setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('print-pdf'); originalParent.appendChild(printArea); }, 1000); }, 100);
+        }
+
+        function fireConfetti() {
+            if (typeof confetti === 'undefined') { const script = document.createElement('script'); script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"; script.onload = launchParticles; document.head.appendChild(script); } else { launchParticles(); }
+            function launchParticles() {
+                var duration = 4000; var end = Date.now() + duration;
+                (function frame() { confetti({ particleCount: 7, angle: 60, spread: 65, origin: { x: 0 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] }); confetti({ particleCount: 7, angle: 120, spread: 65, origin: { x: 1 }, zIndex: 99999, colors:['#ffd700', '#38bdf8', '#ffffff'] }); if (Date.now() < end) requestAnimationFrame(frame); }());
             }
-            updateCoinSelectionButtonUI();
         }
 
-        function updateCoinSelectionButtonUI() {
-            const btnHeads1 = document.querySelectorAll('#btn_heads_1, #fs_btn_heads_1');
-            const btnTails1 = document.querySelectorAll('#btn_tails_1, #fs_btn_tails_1');
-            const btnHeads2 = document.querySelectorAll('#btn_heads_2, #fs_btn_heads_2');
-            const btnTails2 = document.querySelectorAll('#btn_tails_2, #fs_btn_tails_2');
-
-            // Reset all styles dynamically
-            [btnHeads1, btnTails1, btnHeads2, btnTails2].forEach(nodes => {
-                nodes.forEach(n => { if (n) { n.style.background = '#e5e7eb'; n.style.color = 'black'; } });
-            });
-
-            // Set active styles depending on choice
-            if (tieBreakState.cand1Assignment === 'HEADS') {
-                btnHeads1.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
-                btnTails2.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
-                
-                document.querySelectorAll('#coinFrontAvatar, #fsCoinFrontAvatar').forEach(img => { if(img) img.src = tieBreakState.cand1.Photo; });
-                document.querySelectorAll('#coinBackAvatar, #fsCoinBackAvatar').forEach(img => { if(img) img.src = tieBreakState.cand2.Photo; });
-            } else if (tieBreakState.cand1Assignment === 'TAILS') {
-                btnTails1.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
-                btnHeads2.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
-                
-                document.querySelectorAll('#coinFrontAvatar, #fsCoinFrontAvatar').forEach(img => { if(img) img.src = tieBreakState.cand2.Photo; });
-                document.querySelectorAll('#coinBackAvatar, #fsCoinBackAvatar').forEach(img => { if(img) img.src = tieBreakState.cand1.Photo; });
-            }
-
-            // Enable Flip Action Button
-            document.querySelectorAll('#tossActionBtn, #fsTossStartBtn').forEach(b => { if(b) b.disabled = false; });
-        }
-
-        // Genuinely fair live random toss execution [2]
-        async function runCoinTossAnimation(cls, div, score) {
-            // Genuinely randomized 50/50 live result [2]
-            const winnerIsHeads = Math.random() < 0.5;
-            const outcome = winnerIsHeads ? 'HEADS' : 'TAILS';
-            
-            // Map the outcome directly to whichever candidate was assigned HEADS or TAILS
-            const finalWinner = (tieBreakState.cand1Assignment === outcome) ? tieBreakState.cand1 : tieBreakState.cand2;
-            const finalRunnerUp = (finalWinner.AdmNo === tieBreakState.cand1.AdmNo) ? tieBreakState.cand2 : tieBreakState.cand1;
-
-            const coin = document.getElementById('interactiveCoin');
-            const fsCoin = document.getElementById('fsInteractiveCoin');
-            
-            [coin, fsCoin].forEach(c => {
-                if(!c) return;
-                c.style.transition = 'none';
-                c.style.transform = 'rotateY(0deg)';
-                c.offsetHeight; // force paint reflow
-                c.style.transition = 'transform 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
-                c.style.transform = winnerIsHeads ? 'rotateY(1800deg)' : 'rotateY(1980deg)';
-            });
-
-            // Lock controls immediately
-            document.querySelectorAll('#tossActionBtn, #fsTossStartBtn').forEach(b => { if(b) b.disabled = true; });
-
-            // Post manual resolution order to Google Sheet backend dynamically [2]
-            const savePromise = apiCall({
-                action: "saveTossWinner",
-                Class: cls,
-                Div: div,
-                Score: score,
-                OrderedAdmNos: [finalWinner.AdmNo, finalRunnerUp.AdmNo]
-            });
-
-            setTimeout(async () => {
-                const revealText = `Outcome: ${outcome}! Winner: ${finalWinner.Name}`;
-                
-                document.querySelectorAll('#tossWinnerRevealText, #fsTossWinnerRevealText').forEach(el => {
-                    if (el) {
-                        el.innerText = revealText;
-                        el.classList.remove('hidden');
-                    }
-                });
-
-                await savePromise; // wait until save action is persistent
-
-                // Automatically fetch and redraw fully resolved leaderboard [2]
-                const updatedResults = await apiCall({ action: "getResults", Class: cls, Div: div });
-                if(updatedResults.success) {
-                    // Hide the unresolved tie breaks panel
-                    document.getElementById('manualTieBreakerCard').classList.add('hidden');
-                    closeFullScreenTieBreaker();
-                    
-                    // Render official resolved results and celebrate
-                    renderRevealedResults(updatedResults);
-                }
-            }, 3500);
-        }
-
-        async function runVirtualChitDraw(cls, div, score, candidateIdArray) {
-            const jar = document.getElementById('fsChitJar');
-            if(!jar) return;
-
-            jar.classList.add('shaking');
-
-            // Truly randomized shuffle draw [2]
-            const shuffled = [...candidateIdArray].sort(() => Math.random() - 0.5);
-
-            // Post resolved draw order to backend permanently
-            const savePromise = apiCall({
-                action: "saveTossWinner",
-                Class: cls,
-                Div: div,
-                Score: score,
-                OrderedAdmNos: shuffled
-            });
-
-            setTimeout(async () => {
-                jar.classList.remove('shaking');
-                const reveal = document.getElementById('fsChitsWrapper');
-                if (reveal) reveal.classList.remove('hidden');
-                
-                await savePromise;
-
-                const updatedResults = await apiCall({ action: "getResults", Class: cls, Div: div });
-                if(updatedResults.success) {
-                    document.getElementById('manualTieBreakerCard').classList.add('hidden');
-                    closeFullScreenTieBreaker();
-                    renderRevealedResults(updatedResults);
-                }
-            }, 2500);
+        async function uploadMedia() {
+            const type = document.getElementById('mediaType').value; const label = document.getElementById('mediaLabel').value.trim();
+            if(!label) { await showModal("Missing Input", "Please enter a label for this media."); return; }
+            showLoader(); const url = await uploadImage('mediaFile'); if(!url) { hideLoader(); return; } 
+            const res = await apiCall({ action: "saveMedia", Type: type, Label: label, URL: url }); hideLoader(); 
+            if(res.success) { await showModal("Success", `${type} uploaded to Media Library successfully.`); document.getElementById('mediaLabel').value = ""; document.getElementById('mediaFile').value = ""; const fileNameDisplay = document.getElementById('uploadFileName'); if (fileNameDisplay) fileNameDisplay.innerText = ""; fetchMediaLib(); } else { await showModal("Error", res.message); }
         }
 
         async function fetchMediaLib() {
             const[mediaRes, candRes] = await Promise.all([apiCall({ action: "getMedia" }), apiCall({ action: "getAllCandidates" })]);
             if(mediaRes.success && candRes.success) {
-                // Exact whitespace trimming to filter only unused media assets [2]
-                const usedPhotos = candRes.data.map(c => (c.Photo || "").toString().trim()); 
-                const usedSymbols = candRes.data.map(c => (c.Symbol || "").toString().trim());
-                
-                const pSel = document.getElementById('candPhotoSelect'); 
-                const sSel = document.getElementById('candSymbolSelect');
-                pSel.innerHTML = '<option value="">-- Select Photo --</option>'; 
-                sSel.innerHTML = '<option value="">-- Select Symbol --</option>';
-                
+                const usedPhotos = candRes.data.map(c => c.Photo); const usedSymbols = candRes.data.map(c => c.Symbol);
+                const pSel = document.getElementById('candPhotoSelect'); const sSel = document.getElementById('candSymbolSelect');
+                pSel.innerHTML = '<option value="">-- Select Photo --</option>'; sSel.innerHTML = '<option value="">-- Select Symbol --</option>';
                 let availablePhotos = 0, availableSymbols = 0;
                 mediaRes.data.forEach(m => {
-                    const url = (m.URL || "").toString().trim();
-                    if(m.Type === "Photo" && !usedPhotos.includes(url)) { 
-                        pSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`; 
-                        availablePhotos++; 
-                    }
-                    if(m.Type === "Symbol" && !usedSymbols.includes(url)) { 
-                        sSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`; 
-                        availableSymbols++; 
-                    }
+                    if(m.Type === "Photo" && !usedPhotos.includes(m.URL)) { pSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`; availablePhotos++; }
+                    if(m.Type === "Symbol" && !usedSymbols.includes(m.URL)) { sSel.innerHTML += `<option value="${m.URL}">${m.Label}</option>`; availableSymbols++; }
                 });
                 if(availablePhotos === 0) pSel.innerHTML = '<option value="">-- All uploaded photos are in use --</option>';
                 if(availableSymbols === 0) sSel.innerHTML = '<option value="">-- All uploaded symbols are in use --</option>';
             }
         }
 
-        async function fetchVotersList() { 
-            showLoader(); const res = await apiCall({ action: "getVoters" }); hideLoader(); 
-            if(res.success) { 
-                localVotersData = res.data; 
-                currentCuClass = res.cuClass; currentCuDiv = res.cuDiv; currentCuState = res.cuState;
-                renderVotersTables(); 
-            } else await showModal("Error", "Failed to fetch voters."); 
-        }
-
-        function formatDateCustom(dateStr) {
-            if(!dateStr) return "-"; const d = new Date(dateStr); if(isNaN(d.getTime())) return "-";
-            return `${d.getDate().toString().padStart(2, '0')}:${(d.getMonth()+1).toString().padStart(2, '0')}:${d.getFullYear().toString().substring(2)} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
-        }
-
-        function renderVotersTables() {
-            const selClass = document.getElementById('vlClass').value, selDiv = document.getElementById('vlDiv').value;
-            const searchVal = document.getElementById('vlSearch') ? document.getElementById('vlSearch').value.toLowerCase().trim() : "";
-            const pendingTbody = document.querySelector("#votersTablePending tbody"), processedTbody = document.querySelector("#votersTableProcessed tbody");
-            pendingTbody.innerHTML = ""; processedTbody.innerHTML = ""; let pendingCount = 1, processedCount = 1;
-
-            let filtered = localVotersData.filter(v => v.Class == selClass && v.Div == selDiv);
-            if (searchVal) filtered = filtered.filter(v => v.AdmNo.toString().toLowerCase().includes(searchVal) || (v.Name || "").toLowerCase().includes(searchVal));
-            filtered.sort((a,b) => (a.Name||"").localeCompare(b.Name||""));
-
-            filtered.forEach(v => {
-                if (!v.Status || v.Status === "") { 
-                    const safeName = (v.Name || "").replace(/'/g, "\\'"), safeGender = (v.Gender || "").replace(/'/g, "\\'");
-                    
-                    let isActionAllowed = (v.Class == currentCuClass && v.Div == currentCuDiv && currentCuState && currentCuState !== "Stopped");
-                    let actionHtml = isActionAllowed ? 
-                        `<button onclick="markAttendanceInstantly('${v.AdmNo}', 'Present', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--success); width:auto; padding:5px 10px;">Present</button> 
-                         <button onclick="markAttendanceInstantly('${v.AdmNo}', 'Absent', '${safeName}', '${safeGender}', '${v.Class}', '${v.Div}')" style="background:var(--danger); width:auto; padding:5px 10px;">Absent</button>` 
-                        : `<span style="color:#94a3b8; font-size:12px; font-weight:bold;">Waiting for CU...</span>`;
-
-                    pendingTbody.innerHTML += `<tr><td>${pendingCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Class}</td><td>${v.Div}</td><td>${v.Phone}</td><td><span style="color:var(--warning); font-weight:bold;">Pending</span></td><td>${actionHtml}</td></tr>`;
-                } else {
-                    let col = v.Status === 'Voted' ? 'var(--primary)' : (v.Status === 'Voting...' ? 'var(--warning)' : (v.Status === 'Absent' ? 'var(--danger)' : 'var(--success)'));
-                    processedTbody.innerHTML += `<tr><td>${processedCount++}</td><td>${v.AdmNo}</td><td>${v.Name}</td><td>${v.Gender}</td><td>${v.Phone}</td><td><b style="color:${col}">${v.Status}</b></td><td><b style="color:#475569; font-size:13px;">${formatDateCustom(v.Time)}</b></td></tr>`;
-                }
-            });
-            if(pendingCount === 1) pendingTbody.innerHTML = "<tr><td colspan='9' class='text-center'>No pending voters found.</td></tr>";
-            if(processedCount === 1) processedTbody.innerHTML = "<tr><td colspan='7' class='text-center'>No processed voters yet.</td></tr>";
-        }
-
-        function setLEDs(unit, isReady) { 
-            const red = document.getElementById(unit+'Red'), green = document.getElementById(unit+'Green'); 
-            red.classList.remove('on'); green.classList.remove('on');
-            if(isReady === true) { green.classList.add('on'); } 
-            else if (isReady === false) { red.classList.add('on'); } 
-        }
-
-        
-        
-        function startControlUnitPolling() {
-            intervals.push(setInterval(async () => {
-                const res = await apiCall({ action: "checkControlStatus" });
-                if(res.success) {
-                    if (res.globalStatus !== "Started") {
-                        document.getElementById('cuSetupArea').classList.add('hidden'); 
-                        document.getElementById('cuActiveArea').classList.add('hidden'); 
-                        setLEDs("cu", null); 
-                    } else if(res.state === "Stopped" || res.state === "" || res.state == null) { 
-                        document.getElementById('cuSetupArea').classList.remove('hidden'); 
-                        document.getElementById('cuActiveArea').classList.add('hidden'); 
-                        setLEDs("cu", null); 
-                    } else {
-                        document.getElementById('cuSetupArea').classList.add('hidden'); 
-                        document.getElementById('cuActiveArea').classList.remove('hidden'); 
-                        document.getElementById('lblCuClass').innerText = res.cuClass; document.getElementById('lblCuDiv').innerText = res.cuDiv;
-                        
-                        const vDiv = document.getElementById('cuVoterDetails'), btn = document.getElementById('cuBtn');
-                        if(res.state === "Waiting") { vDiv.innerHTML = `<p style="color:var(--warning); font-weight:bold;">Waiting for Polling Officer to mark a voter as 'Present'...</p>`; btn.disabled = true; setLEDs("cu", false); } 
-                        else if(res.state === "VoterReady") { vDiv.innerHTML = `<h3 style="margin:0; color:var(--primary);">Active Voter Loaded:</h3><p style="font-size:22px; font-weight:bold; margin:5px 0;">${res.voter.Name} (${res.voter.Gender})</p><p style="margin:0;">Adm No: ${res.voter.AdmNo}</p>`; btn.disabled = false; setLEDs("cu", true); } 
-                        else if(res.state === "Voting") { vDiv.innerHTML = `<h3 style="margin:0; color:var(--danger);">Voting in Progress...</h3><p style="font-size:22px; font-weight:bold; margin:5px 0;">${res.voter.Name}</p><p style="margin:0;">Waiting for voter to complete ballot operation.</p>`; btn.disabled = true; setLEDs("cu", false); }
-                    }
-                }
-            }, 2500));
-        }
-
-        async function allowVote() { showLoader(); await apiCall({ action: "enableBallot" }); hideLoader(); }
-        async function endPollClass() {
-            if(await showModal("Confirm End Poll", `Are you sure you want to end polling for Class ${cuCurrentClass} Div ${cuCurrentDiv}? Results will be finalized for this class.`, true)) {
-                showLoader(); await apiCall({ action: "endPoll", Class: cuCurrentClass, Div: cuCurrentDiv }); hideLoader(); await showModal("Poll Ended", `Voting closed for Class ${cuCurrentClass} ${cuCurrentDiv}`);
-            }
-        }
-
-        
-        
-        function renderBallot(candidates, voteType, cls, div, gender, admNo = null, voterName = "STUDENT") {
-            document.getElementById(voteType === "Standard" ? 'ballotWaiting' : 'homeVoterLoginArea').classList.add('hidden'); 
-            
-            if(voteType === "Standard") {
-                let displayName = (voterName && voterName.trim() !== "") ? voterName : "STUDENT";
-                document.getElementById('bgName').innerText = displayName; document.getElementById('bgClass').innerText = cls; document.getElementById('bgDiv').innerText = div;
-                document.getElementById('ballotGreeting').classList.remove('hidden');
-            }
-
-            const bList = document.getElementById(voteType === "Standard" ? 'ballotList' : 'homeBallotArea'); 
-            bList.classList.remove('hidden'); bList.innerHTML = "";
-            
-            candidates.forEach((c, i) => { 
-                bList.innerHTML += `
-                <div class="ballot-item">
-                    <div class="ballot-sl">${i+1}</div>
-                    <div class="ballot-photo-container">
-                        <img src="${c.Photo}" class="ballot-img" onerror="this.src='https://via.placeholder.com/60'">
-                    </div>
-                    <div class="ballot-name">${c.Name}</div>
-                    <div class="ballot-symbol-container">
-                        <img src="${c.Symbol}" class="ballot-img symbol" onerror="this.src='https://via.placeholder.com/60'">
-                    </div>
-                    <div class="ballot-vote-container">
-                        <button class="vote-btn" onclick="castVote('${c.AdmNo}', '${c.Name.replace(/'/g,"\\'")}', '${c.Symbol}', '${c.Photo}', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
-                    </div>
-                </div>`; 
-            });
-            bList.innerHTML += `
-            <div class="ballot-item" style="background:#fee2e2;">
-                <div class="ballot-sl">${candidates.length+1}</div>
-                <div class="ballot-photo-container"></div>
-                <div class="ballot-name" style="text-align:center; font-weight:900;">N O T A</div>
-                <div class="ballot-symbol-container"></div>
-                <div class="ballot-vote-container">
-                    <button class="vote-btn" style="background:var(--danger)" onclick="castVote('NOTA', 'NOTA', '', '', '${voteType}', '${cls}', '${div}', '${gender}', '${admNo}')">VOTE</button>
-                </div>
-            </div>`;
-        }
-
-        async function castVote(candId, candName, candSymbol, candPhoto, voteType, cls, div, gender, voterAdmNo) {
-            playBeep(); 
-            document.getElementById('successCandName').innerText = candName; document.getElementById('successClass').innerText = cls; document.getElementById('successDiv').innerText = div;
-            const symImg = document.getElementById('successCandSymbol'); const photoImg = document.getElementById('successCandPhoto');
-            
-            if (candId === "NOTA" || !candSymbol) { symImg.style.display = 'none'; photoImg.style.display = 'none'; } 
-            else { symImg.style.display = 'block'; symImg.src = candSymbol; photoImg.style.display = 'block'; photoImg.src = candPhoto; }
-            
-            document.getElementById('voteSuccessMsg').classList.remove('hidden');
-            
-            if(voteType === "Standard") { 
-                lastVotedAdmNo = voterAdmNo; 
-                currentBallotReady = false;
-                document.getElementById('ballotGreeting').classList.add('hidden'); 
-                document.getElementById('ballotList').classList.add('hidden'); 
-                document.getElementById('ballotList').innerHTML = ""; 
-                setLEDs("bu", false); 
-            } else { 
-                clearInterval(activeHomeVoterTimer); 
-                document.getElementById('homeBallotArea').classList.add('hidden'); 
-                document.getElementById('homeBallotArea').innerHTML = "";
-            }
-
-            apiCall({ action: "castVote", Class: cls, Div: div, CandidateAdmNo: candId, CandidateName: candName, Gender: gender, IsInvalid: false, VoteType: voteType, AdmNo: voterAdmNo }); 
-            
-            setTimeout(() => {
-                document.getElementById('voteSuccessMsg').classList.add('hidden');
-                if(voteType === "Standard") { 
-                    document.getElementById('ballotWaiting').classList.remove('hidden'); 
-                } else { 
-                    showModal("Vote Cast", "Your vote has been recorded securely. Logging out.").then(() => { logout(); }); 
-                }
-            }, 5000);
-        }
-
-        async function fetchVotingStats() {
-            showLoader(); const res = await apiCall({ action: "getStats" }); hideLoader();
-            if(res.success) { 
-                document.getElementById('vrTitle').innerText = `Presiding Officer - Voting Records (Class ${res.data.cuClass || "None"} - ${res.data.cuDiv || "None"})`;
-                document.getElementById('statTotal').innerText = res.data.total; 
-                document.getElementById('statMale').innerText = res.data.male; 
-                document.getElementById('statFemale').innerText = res.data.female; 
-                
-                let startBtn = document.getElementById("btnGlobalStart");
-                let endBtn = document.getElementById("btnGlobalEnd");
-                
-                if(res.data.globalStatus === "Started") {
-                    startBtn.innerText = "ELECTION IN PROGRESS";
-                    startBtn.disabled = true;
-                    startBtn.style.background = "#9ca3af";
-                    
-                    endBtn.innerText = "END ALL POLLS GLOBALLY";
-                    endBtn.disabled = false;
-                    endBtn.style.background = "var(--danger)";
-                } else {
-                    startBtn.innerText = "START ELECTION";
-                    startBtn.disabled = false;
-                    startBtn.style.background = "var(--success)";
-                    
-                    endBtn.innerText = "POLL ENDED / INACTIVE";
-                    endBtn.disabled = true;
-                    endBtn.style.background = "#9ca3af";
-                }
-            }
-        }
-        
-        async function startGlobalElection() {
-            if(await showModal("Start Election", "Are you sure you want to open the polls and start the global election?", true, "YES, START ELECTION")) {
-                showLoader(); 
-                await apiCall({ action: "startGlobalElection" }); 
-                hideLoader(); 
-                fetchVotingStats(); 
-                await showModal("Election Started", "The election is now live. Control Unit can now start sessions.");
-            }
-        }
-        
-        async function endGlobalElection() {
-            if(await showModal("CRITICAL WARNING", "Are you sure you want to end the ENTIRE school election? This stops all active voting globally.", true, "END ELECTION")) {
-                showLoader(); await apiCall({ action: "endPoll" }); hideLoader(); fetchVotingStats(); await showModal("System Halted", "All voting operations have been securely ended.");
-            }
-        }
-
-        function startHomeVoting() {
-            const data = sessionData.homeData; document.getElementById('homeVoterLoginArea').style.display = 'none'; renderBallot(data.candidates, "Home", data.Class, data.Div, data.Gender, data.AdmNo);
-            let time = 300; const display = document.getElementById('hvTimer'); document.getElementById('homeBallotArea').insertBefore(display, document.getElementById('homeBallotArea').firstChild);
-            activeHomeVoterTimer = setInterval(async () => {
-                time--; let m = Math.floor(time / 60).toString().padStart(2, '0'), s = (time % 60).toString().padStart(2, '0'); display.innerText = `${m}:${s}`;
-                if(time <= 0) { clearInterval(activeHomeVoterTimer); showLoader(); await apiCall({ action: "castVote", Class: data.Class, Div: data.Div, CandidateAdmNo: "INVALID", CandidateName: "TIMEOUT", Gender: data.Gender, IsInvalid: true, VoteType: "Home", AdmNo: data.AdmNo }); hideLoader(); await showModal("Time Expired", "Ballot timeout. An invalid vote was recorded securely."); logout(); }
-            }, 1000);
-        }
-
-        function getOrdinalSuffix(i) { var j = i % 10, k = i % 100; if (j == 1 && k != 11) return i + "st"; if (j == 2 && k != 12) return i + "nd"; if (j == 3 && k != 13) return i + "rd"; return i + "th"; }
-
+        let allCandidates =[];
         async function fetchCandidatesForPoster() {
             const[candRes, mediaRes] = await Promise.all([ apiCall({ action: "getAllCandidates" }), apiCall({ action: "getMedia" }) ]);
             if(candRes.success) {
@@ -2034,12 +1382,6 @@
             const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection'; const printArea = document.getElementById(printId); const originalParent = printArea.parentNode; const originalNextSibling = printArea.nextSibling;
             document.body.appendChild(printArea); const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition'; document.body.classList.add(printClass);
             setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove(printClass); if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling); else originalParent.appendChild(printArea); }, 1000); }, 100);
-        }
-
-        async function markAttendanceInstantly(admNo, status, name, gender, cls, div) {
-            showLoader(); const res = await apiCall({ action: "markAttendance", AdmNo: admNo, Status: status, Name: name, Gender: gender, Class: cls, Div: div }); hideLoader();
-            if(res.success) { const idx = localVotersData.findIndex(v => v.AdmNo == admNo); if (idx > -1) localVotersData[idx].Status = status === "Present" ? "Voting..." : "Absent"; renderVotersTables(); } 
-            else await showModal("Action Blocked", res.message);
         }
     </script>
 </body>
