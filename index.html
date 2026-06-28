@@ -266,7 +266,7 @@
             white-space: nowrap;
         }
 
-        /* Screen photo resizing so all candidates are visible together on small devices */
+        /* Responsive photo resizing rules */
         @media (max-width: 600px) {
             .results-grid {
                 grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
@@ -314,7 +314,7 @@
             }
         }
 
-        /* Interactive 3D Coin Flipping Engine Styles */
+        /* Interactive 3D Coin Flipping Engine Styles [2] */
         .coin-container {
             perspective: 1000px;
             width: 140px;
@@ -658,7 +658,7 @@
             </div>
             
             <div id="ballotGreeting" class="hidden" style="text-align:center; margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 15px; border: 2px solid #7dd3fc; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
-                <h2 style="color: var(--primary); margin:0; font-size: 32px;">Hello <span id="bgName" style="color:#0284c7; font-weight: 900; text-transform: uppercase;"></span></h2>
+                <h2 style="color:var(--primary); margin:0; font-size: 32px;">Hello <span id="bgName" style="color:#0284c7; font-weight: 900; text-transform: uppercase;"></span></h2>
                 <h4 style="margin:10px 0 0; color:#475569; font-size: 18px; letter-spacing: 2px;">CLASS <span id="bgClass"></span> | DIVISION <span id="bgDiv"></span></h4>
             </div>
 
@@ -707,7 +707,7 @@
                         🎲 Verifiable Tie-Break Resolution Log
                     </h3>
                     <button onclick="openFullScreenTieBreaker()" style="width: auto; padding: 8px 16px; background: #d97706; margin: 0; font-size: 14px; border-radius: 8px; color: white;">
-                        🖥 nighttime present Audit
+                        🖥️ Present Audit (Full Screen)
                     </button>
                 </div>
                 <div id="tieCandidatesSelectionList" style="margin-top: 15px; text-align: left;"></div>
@@ -773,7 +773,7 @@
                         <h2 style="color:var(--secondary); font-size:32px; margin:10px 0 0 0; letter-spacing: 2px;">SCHOOL PARLIAMENT ELECTION 2026</h2>
                     </div>
                     <div style="text-align:center;">
-                        <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); transform: scale(0.6); transform-origin: top center; margin-bottom: -450px;">
+                        <img id="posterPhoto" src="https://via.placeholder.com/350" style="width: 400px; height: 400px; object-fit:cover; border-radius: 50%; border: 12px solid var(--primary); margin-bottom: 30px; box-shadow: 0 15px 30px rgba(0,0,0,0.2);">
                         <h1 id="posterName" style="font-size: 65px; text-transform:uppercase; margin: 0 0 10px 0; font-weight:900; color: #111;">CANDIDATE NAME</h1>
                         <h2 style="font-size: 36px; color: #475569; margin: 0; font-weight:bold;">Constituency: Class <span id="posterClass" style="color:var(--danger)">X</span> - <span id="posterDiv" style="color:var(--danger)">Y</span></h2>
                     </div>
@@ -882,6 +882,15 @@
         let resultsRevealed = false;
         let pendingResultsData = null;
 
+        // Global state for heads/tails selection and toss resolution [2]
+        let tieBreakState = {
+            cand1: null,           // Candidate 1 (First in tied group)
+            cand2: null,           // Candidate 2
+            cand1Assignment: "",  // "HEADS" or "TAILS"
+            cand2Assignment: "",  // "HEADS" or "TAILS"
+            tossCompleted: false
+        };
+
         // GLOBAL STATE TRACKERS FOR FRONTEND
         let currentCuClass = "", currentCuDiv = "", currentCuState = "";
 
@@ -967,7 +976,7 @@
 
         function openFullScreenTieBreaker() {
             document.getElementById('fullScreenTieModal').classList.remove('hidden');
-            // Auto-trigger timeouts removed. Operator controls launch sequences manually [2].
+            // Manual coin toss requires manual trigger. Auto timers removed. [2]
         }
         
         function closeFullScreenTieBreaker() {
@@ -1392,7 +1401,7 @@
                 
                 const candidatesOnly = res.leaderboard.filter(c => c.AdmNo !== "NOTA");
                 
-                // Identify ties to build dynamic audit scenarios [2]
+                // Identify ties to configure automated physical simulations [2]
                 let tiesMap = {};
                 let tieGroups = [];
                 let votesGroup = {};
@@ -1402,7 +1411,6 @@
                     if (count > 1) {
                         tiesMap[c1.AdmNo] = true;
                         if(!votesGroup[c1.Votes]) votesGroup[c1.Votes] = [];
-                        // Avoid double adding
                         if(!votesGroup[c1.Votes].some(c => c.AdmNo === c1.AdmNo)) {
                             votesGroup[c1.Votes].push(c1);
                         }
@@ -1413,7 +1421,7 @@
                     if (votesGroup[votesVal].length > 1) {
                         tieGroups.push({
                             votes: votesVal,
-                            candidates: votesGroup[votesVal] // Sorted already by backend LCG roll values
+                            candidates: votesGroup[votesVal]
                         });
                     }
                 }
@@ -1424,65 +1432,118 @@
                 const fullScreenSelectionList = document.getElementById('fullScreenTieCandidatesList');
 
                 if (tieGroups.length > 0) {
+                    // Lock results view visually until the coin toss is successfully completed
+                    document.getElementById('resultData').style.filter = "blur(10px)";
+                    document.getElementById('resultData').style.pointerEvents = "none";
+
                     tiePanel.classList.remove('hidden');
                     embeddedSelectionList.innerHTML = "";
                     fullScreenSelectionList.innerHTML = "";
                     
                     tieGroups.forEach(group => {
                         let scenarioTitle = "";
-                        let auditExplanation = "";
-                        let presentationGraphics = "";
-                        
-                        let cand1 = group.candidates[0];
+                        let cand1 = group.candidates[0]; // Pre-calculated sorted winner in backend
                         let cand2 = group.candidates[1];
 
-                        if (group.candidates.length === 2) {
-                            scenarioTitle = "Scenario A: Two-Way Tie resolved by Verifiable Coin Toss";
-                            
-                            // Define visual coin flip: Since cand1 is HEADS and is the winner, it lands on HEADS [2]
-                            let flipOutcome = "HEADS";
-                            
-                            auditExplanation = `
-                            <div style="font-size: 14px; margin-top: 8px; color: #b45309; line-height: 1.5;">
-                                Candidates are tied at <strong>${group.votes} votes</strong>. A virtual Coin Toss was executed. 
-                                Senior candidate <strong>${cand1.Name}</strong> represents <strong>HEADS</strong>. 
-                                Challenger <strong>${cand2.Name}</strong> represents <strong>TAILS</strong>.<br>
-                                <span style="font-weight: bold; color: var(--text);">Flip Outcome: ${flipOutcome}</span>.<br>
-                                <span style="color: var(--success); font-weight:bold;">${cand1.Name} is declared the winner by heads placement.</span>
-                            </div>`;
+                        // Set global tracking states for coin flipper [2]
+                        tieBreakState.cand1 = cand1;
+                        tieBreakState.cand2 = cand2;
+                        tieBreakState.cand1Assignment = "";
+                        tieBreakState.cand2Assignment = "";
+                        tieBreakState.tossCompleted = false;
 
-                            // Embedded visual flip widget with user interaction control [2]
-                            presentationGraphics = `
-                            <div style="display: flex; gap: 40px; justify-content: center; align-items: center; margin: 30px 0; flex-wrap: wrap;">
-                                <div style="text-align: center; width: 220px;">
-                                    <div class="coin-container">
-                                        <div id="fsInteractiveCoin" class="coin">
-                                            <div class="coin-face coin-front">
-                                                <img src="${cand1.Photo}" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
-                                                <span class="coin-label">Heads</span>
-                                            </div>
-                                            <div class="coin-face coin-back">
-                                                <img src="${cand2.Photo}" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
-                                                <span class="coin-label">Tails</span>
-                                            </div>
+                        if (group.candidates.length === 2) {
+                            scenarioTitle = "Two-Way Tie resolved by Verifiable Coin Toss";
+                            
+                            // Interactive Selection Panel layout (Embedded) [2]
+                            let tossEmbeddedGraphics = `
+                            <div style="text-align: center; margin-top: 15px;">
+                                <div style="display:flex; justify-content:center; gap:20px; align-items:center; flex-wrap:wrap; margin-bottom:20px;">
+                                    <div style="text-align:center; width:150px;">
+                                        <img src="${cand1.Photo}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);" onerror="this.src='https://via.placeholder.com/70'">
+                                        <div style="font-weight:bold; margin-top:5px; font-size:13px; color:var(--text);">${cand1.Name}</div>
+                                        <div style="margin-top:8px; display:flex; gap:5px; justify-content:center;">
+                                            <button id="btn_heads_1" onclick="selectCoinAssignment(1, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
+                                            <button id="btn_tails_1" onclick="selectCoinAssignment(1, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
                                         </div>
                                     </div>
-                                    <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #fff;">${cand1.Name}</h3>
-                                    <div style="color: #10b981; font-weight: bold;">Heads (Senior Admission)</div>
+                                    
+                                    <div style="font-size:20px; font-weight:bold; color:#ca8a04;">VS</div>
+                                    
+                                    <div style="text-align:center; width:150px;">
+                                        <img src="${cand2.Photo}" style="width:70px; height:70px; border-radius:50%; object-fit:cover; border:3px solid var(--primary);" onerror="this.src='https://via.placeholder.com/70'">
+                                        <div style="font-weight:bold; margin-top:5px; font-size:13px; color:var(--text);">${cand2.Name}</div>
+                                        <div style="margin-top:8px; display:flex; gap:5px; justify-content:center;">
+                                            <button id="btn_heads_2" onclick="selectCoinAssignment(2, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
+                                            <button id="btn_tails_2" onclick="selectCoinAssignment(2, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
-                                    <button id="fsTossStartBtn" onclick="runVirtualCoinToss(true)" style="background:#eab308; color:black; font-weight:bold; width:150px; border-radius:8px;">Start Coin Toss</button>
-                                    <div id="tossWinnerRevealText" class="hidden" style="font-size:24px; font-weight:900; color:#fbbf24; text-shadow:0 0 10px rgba(251,191,36,0.5);">Outcome: ${flipOutcome}!</div>
+
+                                <div class="coin-container">
+                                    <div id="interactiveCoin" class="coin">
+                                        <div class="coin-face coin-front">
+                                            <img src="" id="coinFrontAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
+                                            <span class="coin-label">Heads</span>
+                                        </div>
+                                        <div class="coin-face coin-back">
+                                            <img src="" id="coinBackAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
+                                            <span class="coin-label">Tails</span>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <button id="tossActionBtn" onclick="runCoinTossAnimation()" disabled style="background:#ca8a04; color:white; font-weight:bold; width:200px; border-radius:8px; margin-top:15px; font-size:16px;">Flip Coin</button>
+                                <div id="tossWinnerRevealText" class="hidden" style="font-size:20px; font-weight:900; color:#d97706; margin-top:15px;"></div>
+                            </div>`;
+
+                            // Full Screen Presentation UI layout [2]
+                            let tossFullScreenGraphics = `
+                            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box; text-align: center;">
+                                <h2 style="color: #fbbf24; margin-top: 0; font-size: 26px;">Tied Score: ${group.votes} Votes</h2>
                                 
-                                <div style="text-align: center; width: 220px; opacity: 0.85;">
-                                    <img src="${cand2.Photo}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #ca8a04; opacity: 0.8;">
-                                    <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #cbd5e1;">${cand2.Name}</h3>
-                                    <div style="color: #64748b; font-weight: bold;">Tails</div>
+                                <div style="display: flex; gap: 40px; justify-content: center; align-items: center; margin: 30px 0; flex-wrap: wrap;">
+                                    <div style="text-align: center; width: 220px;">
+                                        <img src="${cand1.Photo}" style="width: 115px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #1e3a8a;">
+                                        <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #fff;">${cand1.Name}</h3>
+                                        <div style="display:flex; gap:5px; justify-content:center; margin-top:10px;">
+                                            <button id="fs_btn_heads_1" onclick="selectCoinAssignment(1, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
+                                            <button id="fs_btn_tails_1" onclick="selectCoinAssignment(1, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="display:flex; flex-direction:column; align-items:center; gap:15px;">
+                                        <div class="coin-container" style="width:160px; height:160px;">
+                                            <div id="fsInteractiveCoin" class="coin">
+                                                <div class="coin-face coin-front" style="border-width:8px;">
+                                                    <img src="" id="fsCoinFrontAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
+                                                    <span class="coin-label">Heads</span>
+                                                </div>
+                                                <div class="coin-face coin-back" style="border-width:8px;">
+                                                    <img src="" id="fsCoinBackAvatar" class="coin-avatar" onerror="this.src='https://via.placeholder.com/120'">
+                                                    <span class="coin-label">Tails</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="fsTossStartBtn" onclick="runCoinTossAnimation()" disabled style="background:#fbbf24; color:black; font-weight:bold; width:180px; border-radius:8px; font-size:16px;">Flip Coin</button>
+                                        <div id="fsTossWinnerRevealText" class="hidden" style="font-size:24px; font-weight:900; color:#fbbf24; text-shadow:0 0 10px rgba(251,191,36,0.5); margin-top:10px;"></div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; width: 220px;">
+                                        <img src="${cand2.Photo}" style="width: 115px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #1e3a8a;">
+                                        <h3 style="margin: 10px 0 5px 0; font-size: 18px; color: #cbd5e1;">${cand2.Name}</h3>
+                                        <div style="display:flex; gap:5px; justify-content:center; margin-top:10px;">
+                                            <button id="fs_btn_heads_2" onclick="selectCoinAssignment(2, 'HEADS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">HEADS</button>
+                                            <button id="fs_btn_tails_2" onclick="selectCoinAssignment(2, 'TAILS')" style="background:#e5e7eb; color:black; font-size:11px; padding:4px 8px; margin:0; border-radius:4px; font-weight:bold;">TAILS</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>`;
+
+                            embeddedSelectionList.innerHTML += tossEmbeddedGraphics;
+                            fullScreenSelectionList.innerHTML += tossFullScreenGraphics;
                         } else {
+                            // Multi-way ties remain Lot-drawing structured
                             scenarioTitle = `Scenario B: Multi-Way Tie (${group.candidates.length} candidates) resolved by Draw of Lots`;
                             
                             let chitDrawsHtml = group.candidates.map((c, i) => {
@@ -1505,36 +1566,36 @@
                                 </div>`;
                             }).join("");
 
-                            presentationGraphics = `
+                            let lotPresentationHtml = `
                             <div style="display: flex; flex-direction: column; align-items: center; margin: 30px 0;">
                                 <div id="fsChitJar" class="chit-box">🗳️</div>
-                                <button id="fsShuffleStartBtn" onclick="runVirtualChitDraw()" style="background:#eab308; color:black; font-weight:bold; width:180px; border-radius:8px; margin-bottom:20px;">Draw Lots</button>
+                                <button id="fsShuffleStartBtn" onclick="runVirtualChitDraw()" style="background:#fbbf24; color:black; font-weight:bold; width:180px; border-radius:8px; margin-bottom:20px;">Draw Lots</button>
                                 <div id="fsChitsWrapper" class="chit-winner-reveal hidden" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
                                     ${presentationChitsHtml}
                                 </div>
                             </div>`;
+
+                            embeddedSelectionList.innerHTML += `
+                            <div style="border-bottom: 1px dashed rgba(217, 119, 6, 0.3); padding-bottom: 15px; margin-bottom: 15px;">
+                                <h4 style="margin: 0; color: #b45309; font-size: 15px;">Tied at ${group.votes} votes (${group.candidates.length} candidates)</h4>
+                                <div style="font-weight: bold; margin-top: 5px; font-size: 13px; color:#1e2937;">Scenario: ${scenarioTitle}</div>
+                                ${auditExplanation}
+                            </div>`;
+
+                            fullScreenSelectionList.innerHTML += `
+                            <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box; text-align: center;">
+                                <h2 style="color: #fbbf24; margin-top: 0; font-size: 26px;">Tied Score: ${group.votes} Votes</h2>
+                                ${lotPresentationHtml}
+                                <div style="font-size: 18px; line-height: 1.6; color: #e2e8f0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-bottom: 10px;">
+                                    <strong>Decision:</strong> ${auditExplanation.replace(/color: #b45309;/g, 'color: #fbbf24;')}
+                                </div>
+                            </div>`;
                         }
-
-                        // Ready to View Embedded card [2] (Technical verification labels hidden as requested)
-                        embeddedSelectionList.innerHTML += `
-                        <div style="border-bottom: 1px dashed rgba(217, 119, 6, 0.3); padding-bottom: 15px; margin-bottom: 15px;">
-                            <h4 style="margin: 0; color: #b45309; font-size: 15px;">Tied at ${group.votes} votes (${group.candidates.length} candidates)</h4>
-                            <div style="font-weight: bold; margin-top: 5px; font-size: 13px; color:#1e2937;">Scenario: ${scenarioTitle}</div>
-                            ${auditExplanation}
-                        </div>`;
-
-                        // Full Screen Public presentation layout [2]
-                        fullScreenSelectionList.innerHTML += `
-                        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box; text-align: center;">
-                            <h2 style="color: #fbbf24; margin-top: 0; font-size: 26px;">Tied Score: ${group.votes} Votes</h2>
-                            ${presentationGraphics}
-                            <div style="font-size: 18px; line-height: 1.6; color: #e2e8f0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-bottom: 10px;">
-                                <strong>Decision:</strong> ${auditExplanation.replace(/color: #b45309;/g, 'color: #fbbf24;')}
-                            </div>
-                        </div>`;
                     });
                 } else {
                     tiePanel.classList.add('hidden');
+                    document.getElementById('resultData').style.filter = "none";
+                    document.getElementById('resultData').style.pointerEvents = "auto";
                 }
 
                 let rankedCandidates = res.leaderboard.map((c, i) => ({ ...c, rank: i + 1 }));
@@ -1575,23 +1636,92 @@
             } else { board.innerHTML = "<h3 class='text-center' style='margin-top:50px;'>No candidates found.</h3>"; }
         }
 
+        // Live heads/tails assignment handler [2]
+        function selectCoinAssignment(candNo, choice) {
+            if (candNo === 1) {
+                tieBreakState.cand1Assignment = choice;
+                tieBreakState.cand2Assignment = (choice === 'HEADS') ? 'TAILS' : 'HEADS';
+            } else {
+                tieBreakState.cand2Assignment = choice;
+                tieBreakState.cand1Assignment = (choice === 'HEADS') ? 'TAILS' : 'HEADS';
+            }
+            updateCoinSelectionButtonUI();
+        }
+
+        function updateCoinSelectionButtonUI() {
+            const btnHeads1 = document.querySelectorAll('#btn_heads_1, #fs_btn_heads_1');
+            const btnTails1 = document.querySelectorAll('#btn_tails_1, #fs_btn_tails_1');
+            const btnHeads2 = document.querySelectorAll('#btn_heads_2, #fs_btn_heads_2');
+            const btnTails2 = document.querySelectorAll('#btn_tails_2, #fs_btn_tails_2');
+
+            // Reset all styles dynamically
+            [btnHeads1, btnTails1, btnHeads2, btnTails2].forEach(nodes => {
+                nodes.forEach(n => { if (n) { n.style.background = '#e5e7eb'; n.style.color = 'black'; } });
+            });
+
+            // Set active states depending on choice
+            if (tieBreakState.cand1Assignment === 'HEADS') {
+                btnHeads1.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
+                btnTails2.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
+                
+                document.querySelectorAll('#coinFrontAvatar, #fsCoinFrontAvatar').forEach(img => { if(img) img.src = tieBreakState.cand1.Photo; });
+                document.querySelectorAll('#coinBackAvatar, #fsCoinBackAvatar').forEach(img => { if(img) img.src = tieBreakState.cand2.Photo; });
+            } else if (tieBreakState.cand1Assignment === 'TAILS') {
+                btnTails1.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
+                btnHeads2.forEach(n => { if(n) { n.style.background = 'var(--secondary)'; n.style.color = 'white'; } });
+                
+                document.querySelectorAll('#coinFrontAvatar, #fsCoinFrontAvatar').forEach(img => { if(img) img.src = tieBreakState.cand2.Photo; });
+                document.querySelectorAll('#coinBackAvatar, #fsCoinBackAvatar').forEach(img => { if(img) img.src = tieBreakState.cand1.Photo; });
+            }
+
+            // Enable Flip Action Button
+            document.querySelectorAll('#tossActionBtn, #fsTossStartBtn').forEach(b => { if(b) b.disabled = false; });
+        }
+
         // Active animation handlers for virtual physical resolution [2]
-        function runVirtualCoinToss(winnerIsHeads) {
-            const coin = document.getElementById('fsInteractiveCoin');
-            if(!coin) return;
+        function runCoinTossAnimation() {
+            // Determine landing orientation: Since cand1 is the predetermined winner, it lands on Head/Tail choice assigned to cand1
+            let winnerIsHeads = (tieBreakState.cand1Assignment === 'HEADS');
             
-            coin.style.transition = 'none';
-            coin.style.transform = 'rotateY(0deg)';
-            coin.offsetHeight; // force paint reflow
+            const coin = document.getElementById('interactiveCoin');
+            const fsCoin = document.getElementById('fsInteractiveCoin');
             
-            coin.style.transition = 'transform 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
-            // land on heads (1800deg) or tails (1980deg)
-            coin.style.transform = winnerIsHeads ? 'rotateY(1800deg)' : 'rotateY(1980deg)';
+            [coin, fsCoin].forEach(c => {
+                if(!c) return;
+                c.style.transition = 'none';
+                c.style.transform = 'rotateY(0deg)';
+                c.offsetHeight; // force reflow
+                c.style.transition = 'transform 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.15)';
+                c.style.transform = winnerIsHeads ? 'rotateY(1800deg)' : 'rotateY(1980deg)';
+            });
+
+            // Disable toss buttons
+            document.querySelectorAll('#tossActionBtn, #fsTossStartBtn').forEach(b => { if(b) b.disabled = true; });
 
             setTimeout(() => {
-                const text = document.getElementById('tossWinnerRevealText');
-                if (text) text.classList.remove('hidden');
+                const outcome = winnerIsHeads ? 'HEADS' : 'TAILS';
+                const winnerObj = tieBreakState.cand1;
+
+                const revealText = `Outcome: ${outcome}! Winner: ${winnerObj.Name}`;
+                
+                document.querySelectorAll('#tossWinnerRevealText, #fsTossWinnerRevealText').forEach(el => {
+                    if (el) {
+                        el.innerText = revealText;
+                        el.classList.remove('hidden');
+                    }
+                });
+                
                 fireConfetti();
+                
+                // Lift results lock blur after presentation completes [2]
+                setTimeout(() => {
+                    const leaderboardEl = document.getElementById('resultData');
+                    if (leaderboardEl) {
+                        leaderboardEl.style.filter = "none";
+                        leaderboardEl.style.pointerEvents = "auto";
+                        leaderboardEl.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 1500);
             }, 3500);
         }
 
@@ -1605,7 +1735,18 @@
                 jar.classList.remove('shaking');
                 const reveal = document.getElementById('fsChitsWrapper');
                 if (reveal) reveal.classList.remove('hidden');
+                
                 fireConfetti();
+
+                // Lift results lock blur [2]
+                setTimeout(() => {
+                    const leaderboardEl = document.getElementById('resultData');
+                    if (leaderboardEl) {
+                        leaderboardEl.style.filter = "none";
+                        leaderboardEl.style.pointerEvents = "auto";
+                        leaderboardEl.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 1000);
             }, 2500);
         }
 
