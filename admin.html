@@ -96,27 +96,27 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .modal-box { background: white; padding: 30px; border-radius: 10px; text-align: center; max-width: 400px; width: 90%; animation: popIn 0.3s ease-out forwards;}
         
+        #printPosterContainer { display: none; }
+
         @keyframes snapIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
         @keyframes glow1 { from { box-shadow: 0 0 15px rgba(255,215,0,0.3); } to { box-shadow: 0 0 35px rgba(255,215,0,0.6); } }
         @keyframes fastSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Mobile evm layouts */
-        @media (max-width: 600px) {
-            .ballot-item { grid-template-columns: 25px 45px 1fr 45px 80px; gap: 8px; padding: 8px; }
-            .ballot-sl { font-size: 15px; }
-            .ballot-img { width: 40px; height: 40px; }
-            .ballot-name { font-size: 14px; }
-            .vote-btn { height: 35px; font-size: 13px; }
+        /* Mobile adjustment */
+        @media (max-width: 768px) {
+            .ballot-item { grid-template-columns: 30px 50px 1fr 50px 80px; gap: 10px; }
+            .ballot-img { width: 45px; height: 45px; }
+            .ballot-name { font-size: 15px; }
+            .vote-btn { width: 100%; height: 35px; font-size: 13px; }
         }
 
-        /* --- PRINT STYLES --- */
         /* --- NATIVE PRINT & PDF SAVING STYLES --- */
         @media print {
             body * { visibility: hidden; }
             body, html { background: white; margin: 0; padding: 0; }
             
             /* Hide non-printing interface blocks */
-            #globalLoader, #customModal, header, nav, #loginScreen, #mainApp, #pdfReportData { display: none !important; }
+            #globalLoader, #customModal, header, nav, #loginScreen, #mainApp, #pdfReportData, #publicNominationContainer { display: none !important; }
             
             /* A4 Portrait: Default PDF Report Printing */
             body.print-pdf #exportContent, body.print-pdf #exportContent * { visibility: visible; }
@@ -132,11 +132,8 @@
             }
 
             /* A4 Portrait: Candidate Poster Printing */
-            /* --- Clean Print Canvas for Poster Mode --- */
-            body.print-poster-mode #printPosterContainer, 
-            body.print-poster-mode #printPosterContainer * { 
-                visibility: visible !important; 
-            }
+            body.print-poster-mode { background: white; }
+            body.print-poster-mode #printPosterContainer, body.print-poster-mode #printPosterContainer * { visibility: visible !important; }
             body.print-poster-mode #printPosterContainer { 
                 display: block !important;
                 position: absolute !important; 
@@ -149,19 +146,17 @@
                 background: white !important; 
                 box-sizing: border-box !important; 
             }
-            
-            /* Fits the poster content exactly to the edges of the A4 sheet */
             body.print-poster-mode #printedPoster {
                 display: block !important;
                 position: relative !important;
                 width: 210mm !important;
                 height: 297mm !important;
                 margin: 0 !important;
-                padding: 60px !important; /* Matches preview padding */
+                padding: 60px !important; 
                 box-sizing: border-box !important;
                 border: none !important;
                 box-shadow: none !important;
-                transform: none !important; /* Removes the screen 0.6 scale */
+                transform: none !important; 
                 background: white !important;
             }
             
@@ -200,11 +195,49 @@
                 page-break-inside: avoid !important;
             }
             body.print-opposition select { appearance: none; -webkit-appearance: none; border: none; background: transparent; font-weight: bold; color: black; font-size: 16px; }
-        }
-        #printPosterContainer {
-            display: none;
-        }
 
+            /* A4 Landscape: Candidate Nomination List Printing */
+            body.print-nomination #printCandidateNominationSection,
+            body.print-nomination #printCandidateNominationSection * {
+                visibility: visible !important;
+            }
+            body.print-nomination #printCandidateNominationSection {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                padding: 30px !important;
+                box-sizing: border-box !important;
+                background: white !important;
+                page-break-inside: avoid !important;
+            }
+            body.print-nomination .print-header {
+                display: block !important;
+            }
+
+            /* Public Candidate Nomination Printing */
+            body.print-public-nomination #publicNominationPrintSection,
+            body.print-public-nomination #publicNominationPrintSection * {
+                visibility: visible !important;
+            }
+            body.print-public-nomination #publicNominationPrintSection {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 297mm !important;
+                height: 210mm !important;
+                padding: 30px !important;
+                box-sizing: border-box !important;
+                background: white !important;
+                page-break-inside: avoid !important;
+            }
+            body.print-public-nomination .print-header {
+                display: block !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -236,6 +269,7 @@
         </div>
     </header>
 
+    <!-- SINGLE TABBED LOGIN CONTAINER -->
     <div id="loginScreen" class="container" style="max-width: 500px; margin-top: 50px; border: 1px solid #e5e7eb; padding: 35px; border-radius: 16px; background: white; box-shadow: 0 15px 35px rgba(0,0,0,0.05);">
         <div style="text-align: center; margin-bottom: 25px;">
             <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjGka-p7C45PTqBMBKqSjulqicQlHmW_Ee1BCfUPpaW888vYnoPjElzW9DVm8az1kCOjdlabjA3qb_vS00GpCApyVWh2C0aIcOcvb-BWeeTI8AdLojSf25iCvNpMS6aENxrWO-SgM5xjqePEMsHfCLy4HinnGk2xAnDlKaapXYFY05jXQM/s56-c/Logo2.png" alt="School Logo" style="width: 90px; height: 90px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 3px solid white; margin-bottom: 10px; object-fit: contain; background: white; margin: 0 auto;">
@@ -268,8 +302,43 @@
         </div>
     </div>
 
+    <!-- PUBLIC CANDIDATE NOMINATION CONTAINER (Viewable without logging in) -->
+    <!-- PUBLIC CANDIDATE NOMINATION CONTAINER (Print Option Removed) -->
+    <div id="publicNominationContainer" class="container" style="max-width: 900px; margin-top: 30px; border: 1px solid #e5e7eb; padding: 30px; border-radius: 16px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
+        <div class="d-flex" style="justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+            <h3 style="margin: 0; color: var(--primary); font-weight: 800; font-size:18px;">Public Candidate Nomination List</h3>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <select id="publicClFilterClass" onchange="renderPublicCandidateList()" style="width:140px; margin:0; padding:5px 10px;"><option value="all">All Standards</option><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
+            </div>
+        </div>
+        <div id="publicNominationPrintSection" style="background: white;">
+            <div class="print-header hidden" style="text-align: center; margin-bottom: 20px;">
+                <h1 style="margin:0; color:#1e3a8a;">TDTTI THURAVOOR</h1>
+                <h2 style="margin:5px 0;">CANDIDATE NOMINATION LIST</h2>
+                <h3 id="publicPrintClassHeaderLabel" style="margin:0; font-weight:normal; color:#555;"></h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="publicNominationTable" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Class & Div</th>
+                            <th>Candidate Name</th>
+                            <th>Suggested By</th>
+                            <th>Supported By</th>
+                            <th>Symbol</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- BACKEND APPLICATION NAVIGATION -->
     <nav id="mainNav" class="hidden">
         <button class="nav-btn" data-target="tab1" onclick="switchTab('tab1')">Admin Panel</button>
+        <button class="nav-btn" data-target="tabCandidateList" onclick="switchTab('tabCandidateList')">Candidate List</button>
         <button class="nav-btn" data-target="tab2" onclick="switchTab('tab2')">Voters List</button>
         <button class="nav-btn" data-target="tab3" onclick="switchTab('tab3')">Control Unit</button>
         <button class="nav-btn" data-target="tab4" onclick="switchTab('tab4')">Ballot Unit</button>
@@ -317,11 +386,57 @@
                     <input type="text" id="candGender" readonly>
                     <input type="text" id="candClass" readonly>
                     <input type="text" id="candDiv" readonly>
+                    
                     <label style="font-weight:bold;">Select Candidate Photo:</label>
                     <div class="d-flex"><select id="candPhotoSelect"><option value="">-- Fetching Media Library --</option></select><button onclick="fetchMediaLib()" style="width:100px; background:#9ca3af;">Refresh</button></div>
+                    
                     <label style="font-weight:bold;">Select Candidate Symbol:</label>
                     <div class="d-flex"><select id="candSymbolSelect"><option value="">-- Fetching Media Library --</option></select><button onclick="fetchMediaLib()" style="width:100px; background:#9ca3af;">Refresh</button></div>
+                    
+                    <!-- New Fields -->
+                    <input type="text" id="candSuggestedBy" placeholder="Suggested By (Name)" style="border-radius: 8px; margin-top:10px;">
+                    <input type="text" id="candSupportedBy" placeholder="Supported By (Name)" style="border-radius: 8px;">
+                    <label style="font-weight:bold;">Nomination Application Status:</label>
+                    <select id="candNominationStatus" style="border-radius: 8px;">
+                        <option value="Pending">Pending</option>
+                        <option value="Accepted" selected>Accepted</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    
                     <button onclick="adminSaveCandidate()" style="margin-top:20px; padding:15px; font-size:18px;">Save Candidate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CANDIDATE LIST (STAFF/ADMIN BACKEND) -->
+        <div id="tabCandidateList" class="tab-content">
+            <h2>Finalised Candidate Nomination List</h2>
+            <div class="d-flex" style="background: #f3f4f6; padding: 15px; border-radius: 8px; flex-wrap:wrap; margin-bottom: 20px;">
+                <label style="font-weight: bold; white-space: nowrap;">Filter by Class:</label>
+                <select id="clFilterClass" onchange="renderNominationTable()" style="width:150px; margin-bottom:0;"><option value="all">All Standards</option><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
+                <button onclick="printCandidateNominationList()" style="width: auto; padding: 10px 20px; margin: 0; background: var(--success);">🖨️ Print Classwise List (Landscape)</button>
+            </div>
+            
+            <div id="printCandidateNominationSection" style="background: white; padding: 15px; border-radius: 8px;">
+                <div class="print-header hidden" style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="margin:0; color:#1e3a8a;">TDTTI THURAVOOR</h1>
+                    <h2 style="margin:5px 0;">FINALISED CANDIDATE NOMINATION LIST</h2>
+                    <h3 id="printClassHeaderLabel" style="margin:0; font-weight:normal; color:#555;"></h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="nominationCandidatesTable">
+                        <thead>
+                            <tr>
+                                <th>Class & Div</th>
+                                <th>Candidate Name</th>
+                                <th>Suggested By</th>
+                                <th>Supported By</th>
+                                <th>Symbol</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -361,7 +476,7 @@
             </div>
             <div id="cuActiveArea" class="hidden" style="max-width: 500px; margin: 20px auto; padding: 20px; background: #f0fdf4; border: 2px solid var(--success); border-radius: 10px;">
                 <h3 style="color:var(--success); margin-top:0;">Session Active: Class <span id="lblCuClass"></span> - <span id="lblCuDiv"></span></h3><hr>
-                <div id="cuVoterDetails" style="font-size: 18px; margin: 20px 0; min-height:80px;"><p style="color:var(--warning); font-weight:bold;">Waiting for Polling Officer...</p></div>
+                <div id="cuVoterDetails" style="font-size: 18px; margin: 20px 0; min-height:80px;"><p style="color:var(--warning); font-weight:bold;">Waiting for Polling Officer to mark a voter as 'Present'...</p></div>
                 <button id="cuBtn" class="big-btn" onclick="allowVote()" disabled style="width:100%;">ALLOW VOTER TO VOTE</button>
                 <button onclick="endPollClass()" style="background:var(--danger); margin-top:30px;">END POLL FOR THIS CLASS</button>
             </div>
@@ -377,13 +492,12 @@
                 </div>
             </div>
             
-            <div id="ballotGreeting" class="hidden" style="text-align:center; margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 15px; border: 2px solid #7dd3fc;">
+            <div id="ballotGreeting" class="hidden" style="text-align:center; margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-radius: 15px; border: 2px solid #7dd3fc; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
                 <h2 style="color: var(--primary); margin:0; font-size: 32px;">Hello <span id="bgName" style="color:#0284c7; font-weight: 900; text-transform: uppercase;"></span></h2>
                 <h4 style="margin:10px 0 0; color:#475569; font-size: 18px; letter-spacing: 2px;">CLASS <span id="bgClass"></span> | DIVISION <span id="bgDiv"></span></h4>
             </div>
 
-            <!-- EVM ballot box style container -->
-            <div id="ballotList" class="ballot-container hidden"></div>
+            <div id="ballotList" class="hidden" style="max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: inset 0 0 10px #ccc;"></div>
             <div id="ballotWaiting" class="text-center" style="padding: 50px;"><h3>Waiting for Control Unit activation...</h3></div>
         </div>
 
@@ -409,32 +523,31 @@
                 <h1 id="hvTimer" style="font-size:40px; color: var(--danger);">05:00</h1>
                 <button class="big-btn" onclick="startHomeVoting()" style="background:var(--warning);">ENTER BALLOT BOOTH</button>
             </div>
-            <div id="homeBallotArea" class="ballot-container hidden"></div>
+            <div id="homeBallotArea" class="hidden" style="max-width: 600px; margin: 20px auto; padding: 20px; background: white; border-radius: 10px; box-shadow: inset 0 0 10px #ccc;"></div>
         </div>
 
-        <!-- TAB 7: RESULTS SECTION -->
+        <!-- TAB 7: RESULTS -->
         <div id="tab7" class="tab-content">
-            <h2 class="text-center" style="color: var(--primary); font-weight: 900; font-size: 28px; margin-bottom: 25px;">ELECTION RESULTS PANEL</h2>
-            <div style="max-width: 600px; margin: 0 auto 30px;" class="d-flex">
-                <select id="resClass" style="margin-bottom:0;"><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
-                <select id="resDiv" style="margin-bottom:0;"><option value="A">Division A</option><option value="B">Division B</option><option value="C">Division C</option><option value="D">Division D</option><option value="E">Division E</option></select>
-                <button onclick="fetchResults(event)" style="background: var(--success); width:60%; font-size: 16px; margin-bottom:0;">Publish Results</button>
+            <h2 class="text-center">Election Results</h2>
+            <div style="max-width: 600px; margin: 0 auto;" class="d-flex">
+                <select id="resClass"><option value="5">Standard 5</option><option value="6">Standard 6</option><option value="7">Standard 7</option></select>
+                <select id="resDiv"><option value="A">Division A</option><option value="B">Division B</option><option value="C">Division C</option><option value="D">Division D</option><option value="E">Division E</option></select>
+                <button onclick="fetchResults(event)" style="width:50%;">Publish Results</button>
             </div>
-
-            <!-- TIE BREAKER CONTAINER -->
+            
+            <!-- Separated Tie-Breaker and Results Areas -->
             <div id="tieBreakerContainer" class="hidden" style="margin-bottom: 20px;"></div>
 
-            <!-- RESULTS SEPARATE CONTAINER WITH FULL SCREEN TRIGGER -->
             <div id="resultsDisplayContainer" class="hidden" style="border: 1px solid #e2e8f0; border-radius: 16px; padding: 25px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative;">
-                <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; flex-wrap: wrap;">
-                    <h3 style="margin:0; color:var(--primary); font-size:20px; font-weight: 800;">Class Results Data</h3>
-                    <div style="display:flex; gap:10px;">
-                        <button id="btnFullScreen" onclick="toggleFullScreen()" style="background: var(--primary); width:auto; margin:0; padding: 8px 16px; font-size: 14px;">🖥️ View Full Screen</button>
-                        <button id="btnExportPDF" onclick="generatePDF()" style="background: #dc2626; width:auto; margin:0; padding: 8px 16px; font-size: 14px;">Save as PDF</button>
+                <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap:wrap; gap: 10px;">
+                    <h3 style="margin: 0; color: var(--primary); font-weight: 800;">Declared Results Panel</h3>
+                    <div style="display:flex; gap: 10px;">
+                        <button id="btnFullScreen" onclick="toggleFullScreen()" style="background: var(--primary); width: auto; margin:0; padding: 8px 16px;">🖥️ Full Screen</button>
+                        <button id="btnExportPDF" onclick="generatePDF()" style="background:#dc2626; width:auto; margin:0; padding: 8px 16px;">Save as PDF</button>
                     </div>
                 </div>
 
-                <div id="resultStatsBar" class="d-flex" style="justify-content: space-between; background:var(--primary); color:white; padding:15px; border-radius:10px; margin-bottom: 25px;">
+                <div class="d-flex" style="justify-content: space-between; background:var(--primary); color:white; padding:15px; border-radius:8px; margin-bottom: 20px;">
                     <div><b>Total Students:</b> <span id="resStud"></span></div>
                     <div><b>Polled:</b> <span id="resPolled"></span></div>
                     <div><b>Absent:</b> <span id="resAbsent"></span></div>
@@ -448,7 +561,9 @@
         <!-- TAB 8: SYSTEM RESET -->
         <div id="tab8" class="tab-content text-center">
             <h2 style="color: var(--danger); font-size:32px;">⚠️ DANGER ZONE: FACTORY RESET ⚠️</h2>
-            <p style="font-size: 18px;">This action will permanently delete all data.</p>
+            <p style="font-size: 18px;">This action will permanently delete all Voters, Candidates, Votes, Logs, and Settings from the cloud database.</p>
+            <p style="font-size: 18px; font-weight:bold; color:var(--primary);">This cannot be undone. Use this only to prepare for a completely new election year.</p>
+            
             <div style="max-width: 500px; margin: 40px auto; text-align: left; background: #fee2e2; padding: 25px; border-radius: 10px; border: 3px solid #ef4444;">
                 <div class="d-flex" style="margin-bottom: 15px;">
                     <input type="checkbox" id="resetConfirm1" style="width:auto; transform:scale(1.5); margin:0 15px 0 5px; cursor:pointer;"> 
@@ -459,7 +574,8 @@
                     <label for="resetConfirm2" style="font-size:18px; cursor:pointer;">I am ready to start a completely new election.</label>
                 </div>
             </div>
-            <button onclick="executeFactoryReset()" style="background: var(--danger); font-size: 22px; padding: 20px; width: 500px; max-width: 100%; border-radius: 12px;">ERASE & RESET ELECTION SYSTEM</button>
+            
+            <button onclick="executeFactoryReset()" style="background: var(--danger); font-size: 22px; padding: 20px; width: 500px; max-width: 100%; border-radius: 12px; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);">ERASE & RESET ELECTION SYSTEM</button>
         </div>
 
         <!-- TAB 9: DOWNLOADS -->
@@ -503,7 +619,7 @@
                             <div id="posterLeaderName" style="color: #ffd700; font-size: 50px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 5px 15px rgba(0,0,0,0.3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding-top: 8px;">CANDIDATE NAME</div>
                         </div>
                         <div style="width: 125px; height: 100%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 10px solid var(--secondary); box-shadow: -10px 0 20px rgba(0,0,0,0.2); padding: 10px; box-sizing: border-box;">
-                            <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px;">
+                            <img id="posterSymbol" src="https://via.placeholder.com/200" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));">
                             <div id="posterSymbolLabel" style="font-size: 14px; font-weight: 900; color: var(--primary); text-transform: uppercase; background: #e0f2fe; padding: 4px 10px; border-radius: 8px; border: 2px dashed #7dd3fc; text-align: center; line-height: 1.0; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">VOTE FOR<br>SYMBOL</div>
                         </div>
                     </div>
@@ -548,7 +664,7 @@
         
     </main>
 
-    <!-- VOTE RECORDED SUCCESS FEEDBACK VIEW -->
+    <!-- SUCCESS MESSAGE VIEW -->
     <div id="voteSuccessMsg" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; backdrop-filter: blur(10px);">
         <h1 style="color: var(--success); font-size: 50px; margin-bottom: 20px; text-transform: uppercase;">Vote Recorded!</h1>
         <div style="background: rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.2);">
@@ -614,22 +730,37 @@
         </div>
     </div>
 
+    <!-- FULL INTEGRATED JAVASCRIPT -->
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyepvSDpclgnXyu7S2qPDW1SSCHj70T4MquFRY3VEQlDl3N4P1odzujPfAn5YSE4rGthw/exec"; 
-        const IMGBB_API_KEY = "16dfb69b779f21e90a89453050fb67f8"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAUzV9tFGn0zwZvugJaoJdTQLEp9G5_Ikn2ecN5YyMp9OLWVV5po5OeoyQ2EfmIzef/exec"; 
+        const IMGBB_API_KEY = "1032b8a5cf9568172cbc7caed6c58d69"; 
         
-        // Permanent Lightweight NOTA cross logo SVG
-        // Permanent lightweight SVGs for NOTA Presentation
         // Safe, percent-encoded SVGs to prevent quote collisions with src="..." and onclick="..."
         const NOTA_PHOTO_SVG = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23f1f5f9%22 rx=%2250%22/><text x=%2250%22 y=%2268%22 font-family=%22sans-serif%22 font-size=%2255%22 font-weight=%22900%22 fill=%22%231e3a8a%22 text-anchor=%22middle%22>N</text></svg>';
         const NOTA_SYMBOL_SVG = 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23fee2e2%22 rx=%2215%22/><line x1=%2225%22 y1=%2225%22 x2=%2275%22 y2=%2275%22 stroke=%22%23ef4444%22 stroke-width=%2210%22 stroke-linecap=%22round%22/><line x1=%2275%22 y1=%2225%22 x2=%2225%22 y2=%2275%22 stroke=%22%23ef4444%22 stroke-width=%2210%22 stroke-linecap=%22round%22/></svg>';
-        
-        let sessionData = { username: "", loginTime: null, role: "", homeData: null, tabs: [] };
-        let intervals =[], localVotersData =[], activeHomeVoterTimer;
 
-        // Caching references to avoid latency/feel lag-free on operations
+        const DEFAULT_ROLE_TABS = {
+            "admin": ["tab1", "tabCandidateList", "tab2", "tab3", "tab4", "tab5", "tab6", "tab7", "tab9", "tab10", "tab11", "tab8"],
+            "polling": ["tab2"],
+            "Control": ["tab3"],
+            "Balot": ["tab4"],
+            "presiding": ["tab5"],
+            "RESULT": ["tab7"]
+        };
+
+        let sessionData = { username: "", loginTime: null, role: "", homeData: null, tabs: [] };
+        let intervals = [], localVotersData = [], activeHomeVoterTimer;
+
+        // Caching variables to avoid latency
         let votersCache = null;
+        let nominationCache = [];
+        let globalAllVotersForSearch = [];
+        let allCandidates = [];
+        let currentTossCandidates = [];
+        let tossCountdownInterval;
+        
         let currentCuClass = "", currentCuDiv = "", currentCuState = "";
+        let currentBallotReady = false;
 
         function showLoader() { document.getElementById('globalLoader').classList.remove('hidden'); }
         function hideLoader() { document.getElementById('globalLoader').classList.add('hidden'); }
@@ -688,7 +819,38 @@
             }, 1000);
         }
 
-        window.onload = () => { startLiveClock(); const saved = localStorage.getItem("electionSession"); if(saved) { sessionData = JSON.parse(saved); initSession(); } };
+        window.onload = () => { 
+            startLiveClock(); 
+            fetchPublicNominationList(); // Silent background populate
+            const saved = localStorage.getItem("electionSession"); 
+            if(saved) { 
+                sessionData = JSON.parse(saved); 
+                initSession(); 
+            } 
+        };
+
+        function switchLoginType(type) {
+            const staffBtn = document.getElementById('tabStaffBtn');
+            const homeBtn = document.getElementById('tabHomeBtn');
+            const staffSec = document.getElementById('loginSectionStaff');
+            const homeSec = document.getElementById('loginSectionHome');
+            
+            if (type === 'staff') {
+                staffBtn.style.background = 'var(--secondary)';
+                staffBtn.style.color = 'white';
+                homeBtn.style.background = 'transparent';
+                homeBtn.style.color = '#475569';
+                staffSec.classList.remove('hidden');
+                homeSec.classList.add('hidden');
+            } else {
+                homeBtn.style.background = 'var(--warning)';
+                homeBtn.style.color = '#000';
+                staffBtn.style.background = 'transparent';
+                staffBtn.style.color = '#475569';
+                homeSec.classList.remove('hidden');
+                staffSec.classList.add('hidden');
+            }
+        }
 
         async function loginStaff() {
             const user = document.getElementById('loginId').value.trim(); 
@@ -735,8 +897,10 @@
 
         function initSession() {
             document.getElementById('loginScreen').classList.add('hidden'); 
-
-            // Hide the header and live clock only for Ballot logins (Staff Ballot or Home Voter)
+            
+            const pubContainer = document.getElementById('publicNominationContainer');
+            if (pubContainer) pubContainer.style.display = "none";
+            
             const isBallotLogin = (sessionData.role === "Balot" || sessionData.role === "Home");
             const mainHeader = document.getElementById('mainHeader');
             const liveClock = document.getElementById('liveClock');
@@ -748,21 +912,35 @@
                 if (mainHeader) mainHeader.classList.remove('hidden');
                 if (liveClock) liveClock.classList.remove('hidden');
             }
-
-            document.getElementById('mainHeader').classList.remove('hidden'); 
+            
             document.getElementById('mainApp').classList.remove('hidden');
             
             document.getElementById('userInfoText').innerHTML = `<b>${sessionData.username}</b><br>Logged in: ${formatDateTime(new Date(sessionData.loginTime))}`;
             
             const logoutBtn = document.getElementById('btnLogout');
-            if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'show'; }
+            if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'none'; }
 
+            // Clear the hidden class override first to show/hide the admin navigation bar cleanly
             const navMenu = document.getElementById('mainNav');
-            if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
+            if (navMenu) {
+                if (sessionData.role === "admin") {
+                    navMenu.classList.remove('hidden');
+                    navMenu.style.display = 'flex';
+                } else {
+                    navMenu.classList.add('hidden');
+                    navMenu.style.display = 'none';
+                }
+            }
 
             document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
             
-            const allowedTabs = sessionData.role === "Home" ? ["tab6"] : (sessionData.tabs || []);
+            // Check for dynamic tabs from spreadsheet, otherwise apply local fallback defaults
+            let allowedTabs = sessionData.tabs || [];
+            if (allowedTabs.length === 0 && DEFAULT_ROLE_TABS[sessionData.role]) {
+                allowedTabs = DEFAULT_ROLE_TABS[sessionData.role];
+            } else if (sessionData.role === "Home") {
+                allowedTabs = ["tab6"];
+            }
             
             allowedTabs.forEach(tab => { 
                 const btn = document.querySelector(`.nav-btn[data-target="${tab}"]`); 
@@ -794,12 +972,12 @@
 
             requestAnimationFrame(() => {
                 if(tabId === "tab1") { fetchMediaLib(); fetchAllVotersForAdmin(); }
+                if(tabId === "tabCandidateList") { fetchNominationList(); }
                 if(tabId === "tab2") {
-                    // Instantly render from cached voters first if available to prevent UX lag
                     if (votersCache) {
                         localVotersData = votersCache;
                         renderVotersTables();
-                        fetchVotersList(true); // Silent background refresh
+                        fetchVotersList(true); 
                     } else {
                         fetchVotersList();
                     }
@@ -818,8 +996,6 @@
                 if(tabId === "tab11") fetchParliament(); 
             });
         }
-        
-        let globalAllVotersForSearch = [];
 
         async function fetchAllVotersForAdmin() {
             if (globalAllVotersForSearch.length > 0) return; 
@@ -876,13 +1052,6 @@
             }
         }
 
-        document.addEventListener('click', (e) => {
-            if (e.target.id !== 'adminSearch') {
-                const dd = document.getElementById('adminSearchDropdown');
-                if (dd) dd.style.display = 'none';
-            }
-        });
-        
         async function adminFetchVoter() {
             const term = document.getElementById('adminSearch').value.trim();
             if(!term) { await showModal("Input Required", "Please enter Admission No or Name to fetch."); return; }
@@ -894,12 +1063,34 @@
         }
         
         async function adminSaveCandidate() {
-            const photoUrl = document.getElementById('candPhotoSelect').value; const symbolUrl = document.getElementById('candSymbolSelect').value;
+            const photoUrl = document.getElementById('candPhotoSelect').value; 
+            const symbolUrl = document.getElementById('candSymbolSelect').value;
             if(!photoUrl || !symbolUrl) { await showModal("Error", "Please select a Photo and a Symbol from the library dropdowns."); return; }
             showLoader();
-            const payload = { action: "saveCandidate", AdmNo: document.getElementById('candAdmNo').value, Name: document.getElementById('candName').value, Gender: document.getElementById('candGender').value, Class: document.getElementById('candClass').value, Div: document.getElementById('candDiv').value, Photo: photoUrl, Symbol: symbolUrl };
+            const payload = { 
+                action: "saveCandidate", 
+                AdmNo: document.getElementById('candAdmNo').value, 
+                Name: document.getElementById('candName').value, 
+                Gender: document.getElementById('candGender').value, 
+                Class: document.getElementById('candClass').value, 
+                Div: document.getElementById('candDiv').value, 
+                Photo: photoUrl, 
+                Symbol: symbolUrl,
+                SuggestedBy: document.getElementById('candSuggestedBy').value.trim(),
+                SupportedBy: document.getElementById('candSupportedBy').value.trim(),
+                Status: document.getElementById('candNominationStatus').value
+            };
             const res = await apiCall(payload); hideLoader();
-            if(res.success) { await showModal("Success", "Candidate Saved Successfully"); document.getElementById('adminForm').classList.add('hidden'); document.getElementById('adminSearch').value = ""; document.getElementById('candPhotoSelect').value = ""; document.getElementById('candSymbolSelect').value = ""; } else await showModal("Error", res.message);
+            if(res.success) { 
+                await showModal("Success", "Candidate Saved Successfully"); 
+                document.getElementById('adminForm').classList.add('hidden'); 
+                document.getElementById('adminSearch').value = ""; 
+                document.getElementById('candPhotoSelect').value = ""; 
+                document.getElementById('candSymbolSelect').value = ""; 
+                document.getElementById('candSuggestedBy').value = "";
+                document.getElementById('candSupportedBy').value = "";
+                fetchNominationList(); 
+            } else await showModal("Error", res.message);
         }
 
         async function fetchVotersList(silent = false) { 
@@ -1001,16 +1192,23 @@
                 }
             }, 2500));
         }
+        
+        async function allowVote() { 
+            showLoader(); 
+            const res = await apiCall({ action: "enableBallot" }); 
+            hideLoader(); 
+            if (!res.success) {
+                await showModal("Error", res.message || "Failed to enable Ballot Unit.");
+            }
+        }
 
-        async function allowVote() { showLoader(); await apiCall({ action: "enableBallot" }); hideLoader(); }
         async function endPollClass() {
             if(await showModal("Confirm End Poll", `Are you sure you want to end polling for Class ${cuCurrentClass} Div ${cuCurrentDiv}?`, true)) {
                 showLoader(); await apiCall({ action: "endPoll", Class: cuCurrentClass, Div: cuCurrentDiv }); hideLoader(); await showModal("Poll Ended", `Voting closed for Class ${cuCurrentClass} ${cuCurrentDiv}`);
             }
         }
 
-        let currentBallotReady = false;
-        
+
         function startBallotUnitPolling() {
             intervals.push(setInterval(async () => {
                 if (window.isVoteSubmitting) return; 
@@ -1056,7 +1254,6 @@
             const bList = document.getElementById(voteType === "Standard" ? 'ballotList' : 'homeBallotArea'); 
             bList.classList.remove('hidden'); bList.innerHTML = "";
             
-            // Sort standard candidates alphabetically by Name
             candidates.sort((a, b) => a.Name.localeCompare(b.Name));
 
             candidates.forEach((c, i) => { 
@@ -1070,7 +1267,6 @@
                 </div>`; 
             });
             
-            // Append NOTA last using different Photo and Symbol SVGs
             bList.innerHTML += `
             <div class="ballot-item" style="background:#fef2f2; border: 2px solid #fee2e2;">
                 <div class="ballot-sl">${candidates.length+1}</div>
@@ -1253,7 +1449,6 @@
                         let rankText = getOrdinalSuffix(c.rank);
                         let tossBadge = c.electedByToss ? `<div style="color:#ef4444; font-weight:900; font-size:12px; margin-top:5px; text-transform:uppercase;">Elected by Toss</div>` : '';
                         
-                        // Dynamically swap NOTA placeholders with crisp local SVGs
                         let photoUrl = c.Photo;
                         if (c.AdmNo === "NOTA") {
                             photoUrl = NOTA_PHOTO_SVG;
@@ -1299,7 +1494,6 @@
             } catch (error) { console.error(error); hideLoader(); await showModal("Render Error", "An error occurred."); }
         }
 
-        // Robust, foolproof CSS-based full screen toggle for GAS Webapp frames
         function toggleFullScreen() {
             const elem = document.getElementById('resultsDisplayContainer');
             const btn = document.getElementById('btnFullScreen');
@@ -1312,9 +1506,6 @@
             }
         }
         
-        let tossCountdownInterval;
-        let currentTossCandidates = [];
-
         function openTossModal(score) {
             currentTossCandidates = window.lastRankedCandidates.filter(c => c.Votes === score);
             document.getElementById('tossVoteCount').innerText = score;
@@ -1438,7 +1629,6 @@
             }
         }
 
-        let allCandidates =[];
         async function fetchCandidatesForPoster() {
             const[candRes, mediaRes] = await Promise.all([ apiCall({ action: "getAllCandidates" }), apiCall({ action: "getMedia" }) ]);
             if(candRes.success) {
@@ -1459,35 +1649,25 @@
                 showModal("Select Candidate", "Please select a candidate first."); 
                 return; 
             }
-            
-            // 1. Fetch the live preview container
             const printArea = document.getElementById('posterPrintArea'); 
-            
-            // 2. Clone the container so the screen display is completely untouched
             const clone = printArea.cloneNode(true);
-            clone.id = "printedPoster"; // Assign a unique ID for the printable copy
+            clone.id = "printedPoster"; 
             
-            // 3. Create a temporary background printer container
             const printContainer = document.createElement('div');
             printContainer.id = "printPosterContainer";
             printContainer.appendChild(clone);
             document.body.appendChild(printContainer);
             
-            // 4. Inject portrait page margins dynamically
             const style = document.createElement('style');
             style.id = "portraitPrintStyle";
             style.innerHTML = "@page { size: A4 portrait; margin: 0 !important; }";
             document.head.appendChild(style);
 
-            // 5. Activate print mode class on body
             document.body.classList.add('print-poster-mode');
             
             setTimeout(() => { 
-                // 6. Open system print / save dialog
                 window.print(); 
-                
                 setTimeout(() => { 
-                    // 7. Clean up the cloned nodes and styles immediately after printing
                     document.body.classList.remove('print-poster-mode');
                     const styleEl = document.getElementById("portraitPrintStyle");
                     if (styleEl) styleEl.remove();
@@ -1520,61 +1700,182 @@
         }
 
         async function printParliament(section) {
-            const isConfirmed = await showModal("Print / Save", `You are about to print or save the ${section} report.`, true, "Proceed"); 
-            if (!isConfirmed) return;
+            const isConfirmed = await showModal("Print / Save", `Confirm print of ${section} report.`, true, "Proceed"); if (!isConfirmed) return;
+            const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection'; const printArea = document.getElementById(printId); const originalParent = printArea.parentNode; const originalNextSibling = printArea.nextSibling;
             
-            const printId = section === 'ministry' ? 'printMinistrySection' : 'printOppositionSection'; 
-            const printArea = document.getElementById(printId); 
-            const originalParent = printArea.parentNode; 
-            const originalNextSibling = printArea.nextSibling;
-            
-            // Inject Landscape Page Style dynamically to force browser landscape mode on A4
             const style = document.createElement('style');
             style.id = "landscapePrintStyle";
             style.innerHTML = "@page { size: A4 landscape; margin: 0 !important; }";
             document.head.appendChild(style);
 
+            document.body.appendChild(printArea); const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition'; document.body.classList.add(printClass);
+            setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove(printClass); const styleEl = document.getElementById("landscapePrintStyle"); if (styleEl) styleEl.remove(); if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling); else originalParent.appendChild(printArea); }, 1000); }, 100);
+        }
+
+        async function fetchNominationList() {
+            showLoader();
+            const res = await apiCall({ action: "getAllCandidates" });
+            hideLoader();
+            if (res.success) {
+                nominationCache = res.data;
+                renderNominationTable();
+            }
+        }
+
+        function renderNominationTable() {
+            const tableBody = document.querySelector("#nominationCandidatesTable tbody");
+            tableBody.innerHTML = "";
+            const filter = document.getElementById("clFilterClass").value;
+            
+            let filtered = nominationCache;
+            if (filter !== "all") {
+                filtered = nominationCache.filter(c => c.Class.toString() === filter);
+            }
+            filtered.sort((a,b) => a.Name.localeCompare(b.Name));
+
+            filtered.forEach(c => {
+                let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:35px; height:35px; object-fit:contain;">` : "<span style='color:var(--danger); font-size:12px; font-weight:bold;'>Not Allotted</span>";
+                
+                let currentStatus = c.Status || "Pending";
+                if (currentStatus === "Accepted") currentStatus = "Approved"; // Standardize visual mapping
+
+                // Generate dynamic inline editing selector inside the row
+                let inlineSelectHtml = `
+                    <select onchange="updateNominationStatusInline('${c.AdmNo}', this.value)" style="margin:0; padding:6px; font-size:13px; font-weight:bold; border-radius:4px; border:1px solid #ccc; width:120px; outline:none; cursor:pointer;">
+                        <option value="Pending" ${currentStatus === "Pending" ? "selected" : ""}>Pending</option>
+                        <option value="Approved" ${currentStatus === "Approved" ? "selected" : ""}>Approved</option>
+                        <option value="Rejected" ${currentStatus === "Rejected" ? "selected" : ""}>Rejected</option>
+                    </select>
+                `;
+
+                tableBody.innerHTML += `<tr>
+                    <td><b>Class ${c.Class} - ${c.Div}</b></td>
+                    <td style="font-weight:bold;">${c.Name}</td>
+                    <td>${c.SuggestedBy || "-"}</td>
+                    <td>${c.SupportedBy || "-"}</td>
+                    <td>${symbolHtml}</td>
+                    <td>${inlineSelectHtml}</td>
+                </tr>`;
+            });
+            if (filtered.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No candidate nominations recorded.</td></tr>";
+            }
+        }
+
+        async function updateNominationStatusInline(admNo, newStatus) {
+            showLoader();
+            const res = await apiCall({ action: "updateCandidateStatus", AdmNo: admNo, Status: newStatus });
+            hideLoader();
+            
+            if (res.success) {
+                // Sync the local memory cache instantly
+                const idx = nominationCache.findIndex(c => c.AdmNo.toString() === admNo.toString());
+                if (idx > -1) {
+                    nominationCache[idx].Status = newStatus;
+                }
+                // Refresh both table displays smoothly
+                renderNominationTable();
+                renderPublicCandidateList();
+            } else {
+                await showModal("Action Failed", res.message || "Failed to update candidate status.");
+                renderNominationTable(); // Revert display to server state
+            }
+        }
+
+        async function fetchPublicNominationList() {
+            const res = await apiCall({ action: "getAllCandidates" });
+            if (res.success) {
+                nominationCache = res.data;
+                renderPublicCandidateList();
+            }
+        }
+
+        function renderPublicCandidateList() {
+            const tableBody = document.querySelector("#publicNominationTable tbody");
+            tableBody.innerHTML = "";
+            const filter = document.getElementById("publicClFilterClass").value;
+            
+            let filtered = nominationCache;
+            if (filter !== "all") {
+                filtered = nominationCache.filter(c => c.Class.toString() === filter);
+            }
+            filtered.sort((a,b) => a.Name.localeCompare(b.Name));
+
+            filtered.forEach(c => {
+                let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:35px; height:35px; object-fit:contain;">` : "<span style='color:var(--danger); font-size:12px; font-weight:bold;'>Not Allotted</span>";
+                
+                let displayStatus = c.Status || "Pending";
+                if (displayStatus === "Accepted") displayStatus = "Approved"; // Align string mapping
+                
+                let statusStyle = displayStatus === "Approved" ? "color:var(--success);" : (displayStatus === "Rejected" ? "color:var(--danger);" : "color:var(--warning);");
+                
+                tableBody.innerHTML += `<tr>
+                    <td><b>Class ${c.Class} - ${c.Div}</b></td>
+                    <td style="font-weight:bold;">${c.Name}</td>
+                    <td>${c.SuggestedBy || "-"}</td>
+                    <td>${c.SupportedBy || "-"}</td>
+                    <td>${symbolHtml}</td>
+                    <td><b style="${statusStyle}">${displayStatus}</b></td>
+                </tr>`;
+            });
+            if (filtered.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No candidate nominations recorded.</td></tr>";
+            }
+        }
+
+        function printCandidateNominationList() {
+            const filter = document.getElementById("clFilterClass").value;
+            const label = document.getElementById("printClassHeaderLabel");
+            label.innerText = filter === "all" ? "ALL STANDARDS NOMINATIONS" : `STANDARD ${filter} NOMINATIONS`;
+
+            const printArea = document.getElementById('printCandidateNominationSection'); 
+            const originalParent = printArea.parentNode; 
+            
+            const style = document.createElement('style');
+            style.id = "nominationPrintLandscapeStyle";
+            style.innerHTML = "@page { size: A4 landscape; margin: 0 !important; }";
+            document.head.appendChild(style);
+
             document.body.appendChild(printArea); 
-            const printClass = section === 'ministry' ? 'print-ministry' : 'print-opposition'; 
-            document.body.classList.add(printClass);
+            document.body.classList.add('print-nomination');
             
             setTimeout(() => { 
                 window.print(); 
                 setTimeout(() => { 
-                    document.body.classList.remove(printClass); 
-                    const styleEl = document.getElementById("landscapePrintStyle");
+                    document.body.classList.remove('print-nomination'); 
+                    const styleEl = document.getElementById("nominationPrintLandscapeStyle");
                     if (styleEl) styleEl.remove();
-
-                    if (originalNextSibling) originalParent.insertBefore(printArea, originalNextSibling); 
-                    else originalParent.appendChild(printArea); 
+                    originalParent.appendChild(printArea); 
                 }, 1000); 
             }, 100);
         }
 
-        function switchLoginType(type) {
-            const staffBtn = document.getElementById('tabStaffBtn');
-            const homeBtn = document.getElementById('tabHomeBtn');
-            const staffSec = document.getElementById('loginSectionStaff');
-            const homeSec = document.getElementById('loginSectionHome');
+        function printPublicCandidateList() {
+            const filter = document.getElementById("publicClFilterClass").value;
+            const label = document.getElementById("publicPrintClassHeaderLabel");
+            label.innerText = filter === "all" ? "ALL STANDARDS NOMINATIONS" : `STANDARD ${filter} NOMINATIONS`;
+
+            const printArea = document.getElementById('publicNominationPrintSection'); 
+            const originalParent = printArea.parentNode; 
             
-            if (type === 'staff') {
-                staffBtn.style.background = 'var(--secondary)';
-                staffBtn.style.color = 'white';
-                homeBtn.style.background = 'transparent';
-                homeBtn.style.color = '#475569';
-                staffSec.classList.remove('hidden');
-                homeSec.classList.add('hidden');
-            } else {
-                homeBtn.style.background = 'var(--warning)';
-                homeBtn.style.color = '#000';
-                staffBtn.style.background = 'transparent';
-                staffBtn.style.color = '#475569';
-                homeSec.classList.remove('hidden');
-                staffSec.classList.add('hidden');
-            }
+            const style = document.createElement('style');
+            style.id = "publicNominationPrintLandscapeStyle";
+            style.innerHTML = "@page { size: A4 landscape; margin: 0 !important; }";
+            document.head.appendChild(style);
+
+            document.body.appendChild(printArea); 
+            document.body.classList.add('print-public-nomination');
+            
+            setTimeout(() => { 
+                window.print(); 
+                setTimeout(() => { 
+                    document.body.classList.remove('print-public-nomination'); 
+                    const styleEl = document.getElementById("publicNominationPrintLandscapeStyle");
+                    if (styleEl) styleEl.remove();
+                    originalParent.appendChild(printArea); 
+                }, 1000); 
+            }, 100);
         }
-
-
     </script>
 </body>
 </html>
