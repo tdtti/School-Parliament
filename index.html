@@ -735,7 +735,7 @@
 
         function initSession() {
             document.getElementById('loginScreen').classList.add('hidden'); 
-            
+
             // Hide the header and live clock only for Ballot logins (Staff Ballot or Home Voter)
             const isBallotLogin = (sessionData.role === "Balot" || sessionData.role === "Home");
             const mainHeader = document.getElementById('mainHeader');
@@ -748,20 +748,20 @@
                 if (mainHeader) mainHeader.classList.remove('hidden');
                 if (liveClock) liveClock.classList.remove('hidden');
             }
-            
+
+            document.getElementById('mainHeader').classList.remove('hidden'); 
             document.getElementById('mainApp').classList.remove('hidden');
             
             document.getElementById('userInfoText').innerHTML = `<b>${sessionData.username}</b><br>Logged in: ${formatDateTime(new Date(sessionData.loginTime))}`;
             
             const logoutBtn = document.getElementById('btnLogout');
-            if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'none'; }
+            if(logoutBtn) { logoutBtn.style.display = sessionData.role === "admin" ? 'inline-block' : 'show'; }
 
             const navMenu = document.getElementById('mainNav');
-            if(navMenu) { navMenu.style.display = sessionData.role === "admin" ? 'flex' : 'none'; }
+            if(navMenu) { sessionData.role === "admin" ? navMenu.classList.remove('hidden') : navMenu.classList.add('hidden'); }
 
             document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
             
-            // Dynamically query tabs retrieved from backend session data
             const allowedTabs = sessionData.role === "Home" ? ["tab6"] : (sessionData.tabs || []);
             
             allowedTabs.forEach(tab => { 
