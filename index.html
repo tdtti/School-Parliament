@@ -322,6 +322,7 @@
                     <thead>
                         <tr>
                             <th>Class & Div</th>
+                            <th>Photo</th>
                             <th>Candidate Name</th>
                             <th>Suggested By</th>
                             <th>Supported By</th>
@@ -431,9 +432,12 @@
                 </div>
             </div>
 
-            <!-- SECTION 3: CANDIDATE LIST WITH ACTIONS -->
+            <!-- SECTION 3: CANDIDATE LIST WITH ACTIONS (Sync Button Added) -->
             <div style="background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
-                <h3 style="margin-top:0; color:var(--primary);">3. Registered Candidate List</h3>
+                <div class="d-flex" style="justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap:wrap; gap:10px;">
+                    <h3 style="margin:0; color:var(--primary);">3. Registered Candidate List</h3>
+                    <button onclick="forceSyncWithGoogleSheet()" style="background: var(--secondary); width: auto; margin:0; padding: 8px 16px; font-size: 13px;">🔄 Sync with Google Sheet</button>
+                </div>
                 <div style="overflow-x: auto;">
                     <table id="adminCandidatesTable">
                         <thead>
@@ -475,6 +479,7 @@
                         <thead>
                             <tr>
                                 <th>Class & Div</th>
+                                <th>Photo</th>
                                 <th>Candidate Name</th>
                                 <th>Suggested By</th>
                                 <th>Supported By</th>
@@ -1180,14 +1185,38 @@
             }
         }
         
-        async function adminFetchVoter() {
-            const term = document.getElementById('adminSearch').value.trim();
-            if(!term) { await showModal("Input Required", "Please enter Admission No or Name to fetch."); return; }
-            showLoader(); const res = await apiCall({ action: "fetchVoter", term: term }); hideLoader();
-            if(res.success) {
-                document.getElementById('adminForm').classList.remove('hidden');
-                document.getElementById('candAdmNo').value = res.data.AdmNo; document.getElementById('candName').value = res.data.Name; document.getElementById('candGender').value = res.data.Gender; document.getElementById('candClass').value = res.data.Class; document.getElementById('candDiv').value = res.data.Div;
-            } else { document.getElementById('adminForm').classList.add('hidden'); await showModal("Action Blocked", res.message); }
+        function adminFetchVoter() {
+            const term = document.getElementById('adminSearch').value.toLowerCase().trim();
+            if(!term) { 
+                showModal("Input Required", "Please enter Admission No or Name to fetch."); 
+                return; 
+            }
+            
+            // Query local cache instantly instead of sending laggy sheet request
+            const votersList = globalAllVotersForSearch.length > 0 ? globalAllVotersForSearch : (electionCache.voters || []);
+            let found = votersList.find(v => v.AdmNo.toString().toLowerCase() === term || v.Name.toLowerCase() === term);
+            
+            if (found) {
+                // Check if already registered as a candidate
+                let isAlreadyCandidate = nominationCache.some(c => c.AdmNo.toString() === found.AdmNo.toString());
+                if (isAlreadyCandidate && !isEditMode) {
+                    showModal("Action Blocked", `The voter ${found.Name} (Adm No: ${found.AdmNo}) is already registered.`);
+                } else {
+                    document.getElementById('adminForm').classList.remove('hidden');
+                    document.getElementById('candAdmNo').value = found.AdmNo; 
+                    document.getElementById('candName').value = found.Name; 
+                    document.getElementById('candGender').value = found.Gender; 
+                    document.getElementById('candClass').value = found.Class; 
+                    document.getElementById('candDiv').value = found.Div;
+                    
+                    if (!isEditMode) {
+                        document.getElementById('candSuggestedBy').value = "";
+                        document.getElementById('candSupportedBy').value = "";
+                    }
+                }
+            } else {
+                showModal("Voter Not Found", "No voter found in the preloaded database matching that term. Please try again.");
+            }
         }
         
         async function adminSaveCandidate() {
@@ -1203,53 +1232,56 @@
             const stat = document.getElementById('candNominationStatus').value;
 
             if (!name || !cls || !div) {
-                await showModal("Required Input", "Candidate Name, Class, and Division cannot be empty.");
+                showModal("Required Input", "Candidate Name, Class, and Division cannot be empty.");
                 return;
             }
 
-            showLoader();
-            const payload = { 
-                action: "saveCandidate",
-                AdmNo: adm, 
-                Name: name, 
-                Gender: gender, 
-                Class: cls, 
-                Div: div, 
-                Photo: photoUrl, 
-                Symbol: symbolUrl, 
-                SuggestedBy: sug, 
-                SupportedBy: sup, 
-                Status: stat
-            };
+            // 1. Save state backup in case of connection dropouts
+            const backupNominationCache = [...nominationCache]; 
+            const newCand = { AdmNo: adm, Name: name, Gender: gender, Class: cls, Div: div, Photo: photoUrl, Symbol: symbolUrl, SuggestedBy: sug, SupportedBy: sup, Status: stat };
             
-            // Check if updating in Edit Mode
+            // 2. Optimistically apply changes locally
             if (isEditMode) {
-                payload.action = "updateCandidate";
-                payload.AdmNo = editingCandidateAdmNo;
+                const idx = nominationCache.findIndex(c => c.AdmNo.toString() === editingCandidateAdmNo.toString());
+                if (idx > -1) nominationCache[idx] = newCand;
+            } else {
+                nominationCache.push(newCand);
             }
 
-            const res = await apiCall(payload); 
-            hideLoader();
+            // 3. Instantly refresh the UI tables so user feels 0ms latency
+            renderAdminCandidatesTable();
+            renderNominationTable();
+            renderPublicCandidateList();
+            
+            const wasEditing = isEditMode;
+            const targetEditAdm = editingCandidateAdmNo;
+            cancelCandidateEdit(); // Instantly close form and scroll
 
-            if(res.success) { 
-                await showModal("Success", isEditMode ? "Candidate record updated." : "Candidate Saved successfully."); 
-                
-                // Optimistic UI state sync
-                const newCand = { AdmNo: adm, Name: name, Gender: gender, Class: cls, Div: div, Photo: photoUrl, Symbol: symbolUrl, SuggestedBy: sug, SupportedBy: sup, Status: stat };
-                if (isEditMode) {
-                    const idx = nominationCache.findIndex(c => c.AdmNo.toString() === editingCandidateAdmNo.toString());
-                    if (idx > -1) nominationCache[idx] = newCand;
-                } else {
-                    nominationCache.push(newCand);
+            // 4. Send save package in the background silently
+            const payload = { 
+                action: wasEditing ? "updateCandidate" : "saveCandidate",
+                AdmNo: adm, Name: name, Gender: gender, Class: cls, Div: div, Photo: photoUrl, Symbol: symbolUrl, SuggestedBy: sug, SupportedBy: sup, Status: stat
+            };
+            if (wasEditing) payload.AdmNo = targetEditAdm;
+
+            // 5. Silent background sync with network failure catcher
+            apiCall(payload).then((res) => {
+                if (!res || !res.success) {
+                    // Sync failed, rollback UI to backup state
+                    nominationCache = backupNominationCache;
+                    renderAdminCandidatesTable();
+                    renderNominationTable();
+                    renderPublicCandidateList();
+                    showModal("Network Issue", "Failed to sync candidate to cloud database. Please check your connection and try again.");
                 }
-
-                cancelCandidateEdit();
+            }).catch(() => {
+                // Connection lost, rollback UI
+                nominationCache = backupNominationCache;
                 renderAdminCandidatesTable();
                 renderNominationTable();
                 renderPublicCandidateList();
-            } else {
-                await showModal("Error", res.message);
-            }
+                showModal("Network Issue", "Connection lost. Please check your network and try again.");
+            });
         }
 
         // Optimized Upload: Execute loading silently with inline text feedback to prevent layout blockage
@@ -1258,27 +1290,35 @@
             const label = document.getElementById('mediaLabel').value.trim();
             const uploadStatus = document.getElementById('uploadFileName');
             
-            if(!label) { await showModal("Missing Input", "Please enter a label first."); return; }
+            if(!label) { showModal("Missing Input", "Please enter a label."); return; }
             
-            if (uploadStatus) uploadStatus.innerHTML = "<span style='color:var(--secondary);'>Uploading asset ... Please wait</span>";
-            const url = await uploadImage('mediaFile'); 
-            if(!url) { 
-                if (uploadStatus) uploadStatus.innerHTML = "<span style='color:var(--danger);'>Upload failed.</span>";
-                return; 
-            } 
+            if (uploadStatus) uploadStatus.innerHTML = "<span style='color:var(--secondary); font-weight:bold;'>Uploading image silently... you can continue working.</span>";
             
-            const res = await apiCall({ action: "saveMedia", Type: type, Label: label, URL: url }); 
-            if(res.success) { 
-                if (uploadStatus) uploadStatus.innerHTML = `<span style='color:var(--success);'>${type} uploaded successfully.</span>`;
-                document.getElementById('mediaLabel').value = ""; 
-                document.getElementById('mediaFile').value = ""; 
+            // Decoupled from full-screen spinner to prevent interface blocks
+            uploadImage('mediaFile').then(async (url) => {
+                if(!url) {
+                    if (uploadStatus) uploadStatus.innerHTML = "<span style='color:var(--danger); font-weight:bold;'>Network Issue: Image upload failed.</span>";
+                    showModal("Network Issue", "Image upload failed. Please check your internet connection and try again.");
+                    return;
+                }
                 
-                // Silent cache sync
-                electionCache.media.push({ Type: type, Label: label, URL: url });
-                renderAdminMediaDropdowns();
-            } else { 
-                if (uploadStatus) uploadStatus.innerHTML = `<span style='color:var(--danger);'>${res.message}</span>`;
-            }
+                const res = await apiCall({ action: "saveMedia", Type: type, Label: label, URL: url });
+                if (res && res.success) {
+                    if (uploadStatus) uploadStatus.innerHTML = `<span style='color:var(--success); font-weight:bold;'>${type} uploaded successfully!</span>`;
+                    document.getElementById('mediaLabel').value = "";
+                    document.getElementById('mediaFile').value = "";
+                    
+                    // Silent local state cache refresh
+                    electionCache.media.push({ Type: type, Label: label, URL: url });
+                    renderAdminMediaDropdowns();
+                } else {
+                    if (uploadStatus) uploadStatus.innerHTML = "<span style='color:var(--danger); font-weight:bold;'>Cloud sync failed.</span>";
+                    showModal("Network Issue", "Media database save failed. Please check your connection and try again.");
+                }
+            }).catch(() => {
+                if (uploadStatus) uploadStatus.innerHTML = "<span style='color:var(--danger); font-weight:bold;'>Network connection lost.</span>";
+                showModal("Network Issue", "Network connection lost. Please try uploading again.");
+            });
         }
 
         async function fetchVotersList(silent = false) { 
@@ -2028,8 +2068,35 @@
             }
         }
 
+        async function forceSyncWithGoogleSheet() {
+            showLoader();
+            const res = await apiCall({ action: "getInitialData" });
+            hideLoader();
+            if (res.success) {
+                // Refresh local cache references instantly
+                electionCache = res;
+                localVotersData = res.voters;
+                votersCache = res.voters;
+                nominationCache = res.candidates;
+                allCandidates = res.candidates;
+                
+                // Dynamically re-render all active on-screen panels
+                renderAdminCandidatesTable();
+                renderNominationTable();
+                renderPublicCandidateList();
+                
+                await showModal("Sync Complete", "Cache successfully synchronized with Google Sheet.");
+            } else {
+                await showModal("Sync Failed", "Network issue: Failed to fetch fresh records. Please try again.");
+            }
+        }
+
+        // ===================================================
+        // NOMINATION TABLES: Renders Photos inside Tables
+        // ===================================================
         function renderNominationTable() {
             const tableBody = document.querySelector("#nominationCandidatesTable tbody");
+            if (!tableBody) return;
             tableBody.innerHTML = "";
             const filter = document.getElementById("clFilterClass").value;
             
@@ -2042,10 +2109,16 @@
             filtered.forEach(c => {
                 let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:35px; height:35px; object-fit:contain;">` : "<span style='color:var(--danger); font-size:12px; font-weight:bold;'>Not Allotted</span>";
                 
-                let currentStatus = c.Status || "Pending";
-                if (currentStatus === "Accepted") currentStatus = "Approved"; // Standardize visual mapping
+                // Match candidate photo with SVG if NOTA
+                let photoUrl = c.Photo;
+                if (c.AdmNo === "NOTA") {
+                    photoUrl = NOTA_PHOTO_SVG;
+                }
+                let photoHtml = photoUrl ? `<img src="${photoUrl}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;" crossorigin="anonymous">` : "<span>-</span>";
 
-                // Generate dynamic inline editing selector inside the row
+                let currentStatus = c.Status || "Pending";
+                if (currentStatus === "Accepted") currentStatus = "Approved";
+
                 let inlineSelectHtml = `
                     <select onchange="updateNominationStatusInline('${c.AdmNo}', this.value)" style="margin:0; padding:6px; font-size:13px; font-weight:bold; border-radius:4px; border:1px solid #ccc; width:120px; outline:none; cursor:pointer;">
                         <option value="Pending" ${currentStatus === "Pending" ? "selected" : ""}>Pending</option>
@@ -2056,6 +2129,7 @@
 
                 tableBody.innerHTML += `<tr>
                     <td><b>Class ${c.Class} - ${c.Div}</b></td>
+                    <td>${photoHtml}</td>
                     <td style="font-weight:bold;">${c.Name}</td>
                     <td>${c.SuggestedBy || "-"}</td>
                     <td>${c.SupportedBy || "-"}</td>
@@ -2064,7 +2138,7 @@
                 </tr>`;
             });
             if (filtered.length === 0) {
-                tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No candidate nominations recorded.</td></tr>";
+                tableBody.innerHTML = "<tr><td colspan='7' class='text-center'>No candidate nominations recorded.</td></tr>";
             }
         }
 
@@ -2098,6 +2172,7 @@
 
         function renderPublicCandidateList() {
             const tableBody = document.querySelector("#publicNominationTable tbody");
+            if (!tableBody) return;
             tableBody.innerHTML = "";
             const filter = document.getElementById("publicClFilterClass").value;
             
@@ -2110,13 +2185,21 @@
             filtered.forEach(c => {
                 let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:35px; height:35px; object-fit:contain;">` : "<span style='color:var(--danger); font-size:12px; font-weight:bold;'>Not Allotted</span>";
                 
+                // Match candidate photo with SVG if NOTA
+                let photoUrl = c.Photo;
+                if (c.AdmNo === "NOTA") {
+                    photoUrl = NOTA_PHOTO_SVG;
+                }
+                let photoHtml = photoUrl ? `<img src="${photoUrl}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;" crossorigin="anonymous">` : "<span>-</span>";
+
                 let displayStatus = c.Status || "Pending";
-                if (displayStatus === "Accepted") displayStatus = "Approved"; // Align string mapping
+                if (displayStatus === "Accepted") displayStatus = "Approved";
                 
                 let statusStyle = displayStatus === "Approved" ? "color:var(--success);" : (displayStatus === "Rejected" ? "color:var(--danger);" : "color:var(--warning);");
                 
                 tableBody.innerHTML += `<tr>
                     <td><b>Class ${c.Class} - ${c.Div}</b></td>
+                    <td>${photoHtml}</td>
                     <td style="font-weight:bold;">${c.Name}</td>
                     <td>${c.SuggestedBy || "-"}</td>
                     <td>${c.SupportedBy || "-"}</td>
@@ -2125,7 +2208,7 @@
                 </tr>`;
             });
             if (filtered.length === 0) {
-                tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No candidate nominations recorded.</td></tr>";
+                tableBody.innerHTML = "<tr><td colspan='7' class='text-center'>No candidate nominations recorded.</td></tr>";
             }
         }
 
