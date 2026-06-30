@@ -238,6 +238,18 @@
                 display: block !important;
             }
         }
+
+        /* Sortable table header styles */
+        th.sortable { 
+            cursor: pointer; 
+            user-select: none; 
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        th.sortable:hover { 
+            background-color: var(--secondary) !important; 
+            color: white !important; 
+        }
+
     </style>
 </head>
 <body>
@@ -321,13 +333,14 @@
                 <table id="publicNominationTable" style="width: 100%;">
                     <thead>
                         <tr>
-                            <th>Class & Div</th>
+                            <th class="sortable" onclick="handlePublicSort('class-div')">Sl No ↕</th>
+                            <th class="sortable" onclick="handlePublicSort('class-div')">Class & Div ↕</th>
                             <th>Photo</th>
-                            <th>Candidate Name</th>
-                            <th>Suggested By</th>
-                            <th>Supported By</th>
+                            <th class="sortable" onclick="handlePublicSort('name')">Candidate Name ↕</th>
+                            <th class="sortable" onclick="handlePublicSort('sug')">Suggested By ↕</th>
+                            <th class="sortable" onclick="handlePublicSort('sup')">Supported By ↕</th>
                             <th>Symbol</th>
-                            <th>Status</th>
+                            <th class="sortable" onclick="handlePublicSort('status')">Status ↕</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -442,12 +455,13 @@
                     <table id="adminCandidatesTable">
                         <thead>
                             <tr>
-                                <th>Adm No</th>
-                                <th>Name</th>
-                                <th>Class & Div</th>
+                                <th class="sortable" onclick="handleAdminSort('class-div')">Sl No ↕</th>
+                                <th class="sortable" onclick="handleAdminSort('adm')">Adm No ↕</th>
+                                <th class="sortable" onclick="handleAdminSort('name')">Name ↕</th>
+                                <th class="sortable" onclick="handleAdminSort('class-div')">Class & Div ↕</th>
                                 <th>Photo</th>
                                 <th>Symbol</th>
-                                <th>Suggested / Supported</th>
+                                <th class="sortable" onclick="handleAdminSort('sug')">Suggested / Supported ↕</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -478,13 +492,14 @@
                     <table id="nominationCandidatesTable">
                         <thead>
                             <tr>
-                                <th>Class & Div</th>
+                                <th class="sortable" onclick="handlePrivateSort('class-div')">Sl No ↕</th>
+                                <th class="sortable" onclick="handlePrivateSort('class-div')">Class & Div ↕</th>
                                 <th>Photo</th>
-                                <th>Candidate Name</th>
-                                <th>Suggested By</th>
-                                <th>Supported By</th>
+                                <th class="sortable" onclick="handlePrivateSort('name')">Candidate Name ↕</th>
+                                <th class="sortable" onclick="handlePrivateSort('sug')">Suggested By ↕</th>
+                                <th class="sortable" onclick="handlePrivateSort('sup')">Supported By ↕</th>
                                 <th>Symbol</th>
-                                <th>Status</th>
+                                <th class="sortable" onclick="handlePrivateSort('status')">Status ↕</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -828,6 +843,90 @@
         
         let currentCuClass = "", currentCuDiv = "", currentCuState = "";
         let currentBallotReady = false;
+
+        // Tracking sort configuration states
+        let adminSortState = { column: 'class-div', direction: 'asc' };
+        let privateSortState = { column: 'class-div', direction: 'asc' };
+        let publicSortState = { column: 'class-div', direction: 'asc' };
+
+        // ===================================================
+        // UNIVERSAL CANDIDATE SORTING ALGORITHM
+        // ===================================================
+        function sortCandidateArray(array, column, direction) {
+            const dir = direction === 'asc' ? 1 : -1;
+            
+            return array.sort((a, b) => {
+                if (column === 'class-div') {
+                    // 1. Sort by Class numerically
+                    const classA = parseInt(a.Class) || 0;
+                    const classB = parseInt(b.Class) || 0;
+                    if (classA !== classB) return (classA - classB) * dir;
+                    
+                    // 2. Sort by Division alphabetically
+                    const divA = (a.Div || "").toString();
+                    const divB = (b.Div || "").toString();
+                    if (divA !== divB) return divA.localeCompare(divB) * dir;
+                    
+                    // 3. Sort by Candidate Name alphabetically (Default layout)
+                    return a.Name.localeCompare(b.Name) * dir;
+                }
+                
+                if (column === 'adm') {
+                    const admA = parseInt(a.AdmNo) || 0;
+                    const admB = parseInt(b.AdmNo) || 0;
+                    return (admA - admB) * dir;
+                }
+                
+                if (column === 'name') {
+                    return (a.Name || "").localeCompare(b.Name || "") * dir;
+                }
+                
+                if (column === 'sug') {
+                    return (a.SuggestedBy || "").localeCompare(b.SuggestedBy || "") * dir;
+                }
+                
+                if (column === 'sup') {
+                    return (a.SupportedBy || "").localeCompare(b.SupportedBy || "") * dir;
+                }
+                
+                if (column === 'status') {
+                    return (a.Status || "").localeCompare(b.Status || "") * dir;
+                }
+                
+                return 0;
+            });
+        }
+
+        // Click controllers to toggle ascending/descending states
+        function handleAdminSort(column) {
+            if (adminSortState.column === column) {
+                adminSortState.direction = adminSortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                adminSortState.column = column;
+                adminSortState.direction = 'asc';
+            }
+            renderAdminCandidatesTable();
+        }
+
+        function handlePrivateSort(column) {
+            if (privateSortState.column === column) {
+                privateSortState.direction = privateSortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                privateSortState.column = column;
+                privateSortState.direction = 'asc';
+            }
+            renderNominationTable();
+        }
+
+        function handlePublicSort(column) {
+            if (publicSortState.column === column) {
+                publicSortState.direction = publicSortState.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                publicSortState.column = column;
+                publicSortState.direction = 'asc';
+            }
+            renderPublicCandidateList();
+        }
 
         function showLoader() { document.getElementById('globalLoader').classList.remove('hidden'); }
         function hideLoader() { document.getElementById('globalLoader').classList.add('hidden'); }
@@ -1870,11 +1969,16 @@
             if (!tbody) return;
             tbody.innerHTML = "";
 
-            nominationCache.forEach(c => {
+            // Clone and apply sorting
+            let list = [...nominationCache];
+            sortCandidateArray(list, adminSortState.column, adminSortState.direction);
+
+            list.forEach((c, idx) => {
                 let photoHtml = c.Photo ? `<img src="${c.Photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">` : "<span>-</span>";
                 let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:40px; height:40px; object-fit:contain;">` : "<span>-</span>";
                 
                 tbody.innerHTML += `<tr>
+                    <td>${idx + 1}</td>
                     <td><b>${c.AdmNo}</b></td>
                     <td><b>${c.Name}</b></td>
                     <td>Class ${c.Class} - ${c.Div}</td>
@@ -1889,8 +1993,8 @@
                 </tr>`;
             });
 
-            if (nominationCache.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='7' class='text-center'>No candidates registered yet.</td></tr>";
+            if (list.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='8' class='text-center'>No candidates registered yet.</td></tr>";
             }
         }
 
@@ -2100,16 +2204,17 @@
             tableBody.innerHTML = "";
             const filter = document.getElementById("clFilterClass").value;
             
-            let filtered = nominationCache;
+            let filtered = [...nominationCache];
             if (filter !== "all") {
                 filtered = nominationCache.filter(c => c.Class.toString() === filter);
             }
-            filtered.sort((a,b) => a.Name.localeCompare(b.Name));
+            
+            // Apply sorting
+            sortCandidateArray(filtered, privateSortState.column, privateSortState.direction);
 
-            filtered.forEach(c => {
+            filtered.forEach((c, idx) => {
                 let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:35px; height:35px; object-fit:contain;">` : "<span style='color:var(--danger); font-size:12px; font-weight:bold;'>Not Allotted</span>";
                 
-                // Match candidate photo with SVG if NOTA
                 let photoUrl = c.Photo;
                 if (c.AdmNo === "NOTA") {
                     photoUrl = NOTA_PHOTO_SVG;
@@ -2128,6 +2233,7 @@
                 `;
 
                 tableBody.innerHTML += `<tr>
+                    <td>${idx + 1}</td>
                     <td><b>Class ${c.Class} - ${c.Div}</b></td>
                     <td>${photoHtml}</td>
                     <td style="font-weight:bold;">${c.Name}</td>
@@ -2138,7 +2244,7 @@
                 </tr>`;
             });
             if (filtered.length === 0) {
-                tableBody.innerHTML = "<tr><td colspan='7' class='text-center'>No candidate nominations recorded.</td></tr>";
+                tableBody.innerHTML = "<tr><td colspan='8' class='text-center'>No candidate nominations recorded.</td></tr>";
             }
         }
 
@@ -2176,28 +2282,30 @@
             tableBody.innerHTML = "";
             const filter = document.getElementById("publicClFilterClass").value;
             
-            let filtered = nominationCache;
+            let filtered = [...nominationCache];
             if (filter !== "all") {
                 filtered = nominationCache.filter(c => c.Class.toString() === filter);
             }
-            filtered.sort((a,b) => a.Name.localeCompare(b.Name));
+            
+            // Apply sorting
+            sortCandidateArray(filtered, publicSortState.column, publicSortState.direction);
 
-            filtered.forEach(c => {
+            filtered.forEach((c, idx) => {
                 let symbolHtml = c.Symbol ? `<img src="${c.Symbol}" style="width:35px; height:35px; object-fit:contain;">` : "<span style='color:var(--danger); font-size:12px; font-weight:bold;'>Not Allotted</span>";
                 
-                // Match candidate photo with SVG if NOTA
+                let displayStatus = c.Status || "Pending";
+                if (displayStatus === "Accepted") displayStatus = "Approved"; 
+                
+                let statusStyle = displayStatus === "Approved" ? "color:var(--success);" : (displayStatus === "Rejected" ? "color:var(--danger);" : "color:var(--warning);");
+                
                 let photoUrl = c.Photo;
                 if (c.AdmNo === "NOTA") {
                     photoUrl = NOTA_PHOTO_SVG;
                 }
                 let photoHtml = photoUrl ? `<img src="${photoUrl}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;" crossorigin="anonymous">` : "<span>-</span>";
 
-                let displayStatus = c.Status || "Pending";
-                if (displayStatus === "Accepted") displayStatus = "Approved";
-                
-                let statusStyle = displayStatus === "Approved" ? "color:var(--success);" : (displayStatus === "Rejected" ? "color:var(--danger);" : "color:var(--warning);");
-                
                 tableBody.innerHTML += `<tr>
+                    <td>${idx + 1}</td>
                     <td><b>Class ${c.Class} - ${c.Div}</b></td>
                     <td>${photoHtml}</td>
                     <td style="font-weight:bold;">${c.Name}</td>
@@ -2208,7 +2316,7 @@
                 </tr>`;
             });
             if (filtered.length === 0) {
-                tableBody.innerHTML = "<tr><td colspan='7' class='text-center'>No candidate nominations recorded.</td></tr>";
+                tableBody.innerHTML = "<tr><td colspan='8' class='text-center'>No candidate nominations recorded.</td></tr>";
             }
         }
 
